@@ -1,0 +1,10 @@
+{
+  "brand": "Doma",
+  "tagline": "Wspólny plan rodziny",
+  "tabs": {
+    "today": "Dzisiaj",
+    "calendar": "Kalendarz",
+    "tasks": "Sprawy",
+    "shopping": "Zakupy"
+  }
+}
