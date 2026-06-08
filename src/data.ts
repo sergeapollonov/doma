@@ -1,4 +1,13 @@
-import type { EventItem, HouseholdTask, PersonId, ShoppingItem, TaskItem } from "./types";
+import type {
+  EventItem,
+  HouseholdTask,
+  PersonId,
+  ShoppingCategory,
+  ShoppingItem,
+  ShoppingListItem,
+  ShoppingListState,
+  TaskItem
+} from "./types";
 
 export const people: Record<PersonId, { name: string; initials: string; color: string }> = {
   alex: { name: "Алексей", initials: "С", color: "#163A5F" },
@@ -210,4 +219,190 @@ export const initialShopping: ShoppingItem[] = [
   { id: "shop-7", title: "Куриное филе", category: "Мясо и рыба", purchased: false }
 ];
 
+export const initialShoppingCategories = [
+  {
+    id: "cat-dairy",
+    familyId: null,
+    nameRu: "Молочное",
+    namePl: "Nabiał",
+    iconKey: "milk",
+    colorKey: "doma_blue",
+    sortOrder: 1,
+    isDefault: true,
+    createdAt: "2026-06-03T08:00:00+02:00"
+  },
+  {
+    id: "cat-fruit-veg",
+    familyId: null,
+    nameRu: "Овощи и фрукты",
+    namePl: "Warzywa i owoce",
+    iconKey: "leaf",
+    colorKey: "shopping_green",
+    sortOrder: 2,
+    isDefault: true,
+    createdAt: "2026-06-03T08:00:00+02:00"
+  },
+  {
+    id: "cat-home",
+    familyId: null,
+    nameRu: "Дом",
+    namePl: "Dom",
+    iconKey: "home",
+    colorKey: "doma_blue",
+    sortOrder: 3,
+    isDefault: true,
+    createdAt: "2026-06-03T08:00:00+02:00"
+  },
+  {
+    id: "cat-meat-fish",
+    familyId: null,
+    nameRu: "Мясо и рыба",
+    namePl: "Mięso i ryby",
+    iconKey: "meat",
+    colorKey: "danger_red",
+    sortOrder: 4,
+    isDefault: true,
+    createdAt: "2026-06-03T08:00:00+02:00"
+  },
+  {
+    id: "cat-other",
+    familyId: null,
+    nameRu: "Другое",
+    namePl: "Inne",
+    iconKey: "more",
+    colorKey: "family_sand",
+    sortOrder: 99,
+    isDefault: true,
+    createdAt: "2026-06-03T08:00:00+02:00"
+  }
+] satisfies ShoppingCategory[];
+
+export const initialShoppingListItems = [
+  {
+    id: "shop-1",
+    familyId: "family-1",
+    categoryId: "cat-dairy",
+    title: "Молоко",
+    quantity: "2 л",
+    note: null,
+    status: "active",
+    sortOrder: 1,
+    createdBy: "user-maya",
+    updatedBy: null,
+    purchasedBy: null,
+    purchasedAt: null,
+    createdAt: "2026-06-03T08:00:00+02:00",
+    updatedAt: "2026-06-03T08:00:00+02:00",
+    deletedAt: null
+  },
+  {
+    id: "shop-2",
+    familyId: "family-1",
+    categoryId: "cat-dairy",
+    title: "Сыр",
+    quantity: null,
+    note: null,
+    status: "active",
+    sortOrder: 2,
+    createdBy: "user-alex",
+    updatedBy: null,
+    purchasedBy: null,
+    purchasedAt: null,
+    createdAt: "2026-06-03T08:02:00+02:00",
+    updatedAt: "2026-06-03T08:02:00+02:00",
+    deletedAt: null
+  },
+  {
+    id: "shop-3",
+    familyId: "family-1",
+    categoryId: "cat-fruit-veg",
+    title: "Помидоры",
+    quantity: "500 г",
+    note: null,
+    status: "active",
+    sortOrder: 1,
+    createdBy: "user-maya",
+    updatedBy: null,
+    purchasedBy: null,
+    purchasedAt: null,
+    createdAt: "2026-06-03T08:04:00+02:00",
+    updatedAt: "2026-06-03T08:04:00+02:00",
+    deletedAt: null
+  },
+  {
+    id: "shop-4",
+    familyId: "family-1",
+    categoryId: "cat-fruit-veg",
+    title: "Огурцы",
+    quantity: null,
+    note: null,
+    status: "active",
+    sortOrder: 2,
+    createdBy: "user-alex",
+    updatedBy: null,
+    purchasedBy: null,
+    purchasedAt: null,
+    createdAt: "2026-06-03T08:06:00+02:00",
+    updatedAt: "2026-06-03T08:06:00+02:00",
+    deletedAt: null
+  },
+  {
+    id: "shop-5",
+    familyId: "family-1",
+    categoryId: "cat-home",
+    title: "Бумажные полотенца",
+    quantity: null,
+    note: null,
+    status: "active",
+    sortOrder: 1,
+    createdBy: "user-alex",
+    updatedBy: null,
+    purchasedBy: null,
+    purchasedAt: null,
+    createdAt: "2026-06-03T08:08:00+02:00",
+    updatedAt: "2026-06-03T08:08:00+02:00",
+    deletedAt: null
+  },
+  {
+    id: "shop-6",
+    familyId: "family-1",
+    categoryId: "cat-home",
+    title: "Средство для мытья посуды",
+    quantity: null,
+    note: null,
+    status: "active",
+    sortOrder: 2,
+    createdBy: "user-maya",
+    updatedBy: null,
+    purchasedBy: null,
+    purchasedAt: null,
+    createdAt: "2026-06-03T08:10:00+02:00",
+    updatedAt: "2026-06-03T08:10:00+02:00",
+    deletedAt: null
+  },
+  {
+    id: "shop-7",
+    familyId: "family-1",
+    categoryId: "cat-meat-fish",
+    title: "Куриное филе",
+    quantity: null,
+    note: null,
+    status: "active",
+    sortOrder: 1,
+    createdBy: "user-alex",
+    updatedBy: null,
+    purchasedBy: null,
+    purchasedAt: null,
+    createdAt: "2026-06-03T08:12:00+02:00",
+    updatedAt: "2026-06-03T08:12:00+02:00",
+    deletedAt: null
+  }
+] satisfies ShoppingListItem[];
+
 export const frequentShopping = ["Молоко", "Хлеб", "Яйца", "Бананы", "Кофе"];
+
+export const initialShoppingListState = {
+  categories: initialShoppingCategories,
+  items: initialShoppingListItems,
+  frequentItemTitles: frequentShopping
+} satisfies ShoppingListState;

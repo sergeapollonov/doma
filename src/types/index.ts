@@ -18,6 +18,12 @@ export type HouseholdTaskStatus = "active" | "completed" | "archived";
 
 export type HouseholdTaskPriority = "low" | "normal" | "high";
 
+export type ShoppingCategoryId = `cat-${string}`;
+
+export type ShoppingItemId = `shop-${string}`;
+
+export type ShoppingItemStatus = "active" | "purchased" | "archived";
+
 export type HouseholdTask = {
   id: HouseholdTaskId;
   familyId: FamilyId;
@@ -53,6 +59,58 @@ export type CompleteHouseholdTaskInput = {
   taskId: HouseholdTaskId;
   completedBy: UserId;
   completedAt: ISODateTimeString;
+};
+
+export type ShoppingCategory = {
+  id: ShoppingCategoryId;
+  familyId: FamilyId | null;
+  nameRu: string;
+  namePl: string;
+  iconKey: string;
+  colorKey: string;
+  sortOrder: number;
+  isDefault: boolean;
+  createdAt: ISODateTimeString;
+};
+
+export type ShoppingListItem = {
+  id: ShoppingItemId;
+  familyId: FamilyId;
+  categoryId: ShoppingCategoryId | null;
+  title: string;
+  quantity: string | null;
+  note: string | null;
+  status: ShoppingItemStatus;
+  sortOrder: number;
+  createdBy: UserId;
+  updatedBy: UserId | null;
+  purchasedBy: UserId | null;
+  purchasedAt: ISODateTimeString | null;
+  createdAt: ISODateTimeString;
+  updatedAt: ISODateTimeString;
+  deletedAt: ISODateTimeString | null;
+};
+
+export type ShoppingListState = {
+  categories: ShoppingCategory[];
+  items: ShoppingListItem[];
+  frequentItemTitles: string[];
+};
+
+export type NewShoppingListItemInput = {
+  familyId: FamilyId;
+  categoryId?: ShoppingCategoryId | null;
+  title: string;
+  quantity?: string | null;
+  note?: string | null;
+  sortOrder?: number;
+  createdBy: UserId;
+};
+
+export type PurchaseShoppingListItemInput = {
+  itemId: ShoppingItemId;
+  purchasedBy: UserId;
+  purchasedAt: ISODateTimeString;
 };
 
 export type EventItem = {
