@@ -1,4 +1,4 @@
-import { EventItem, PersonId, ShoppingItem, TaskItem } from "./types";
+import type { EventItem, HouseholdTask, PersonId, ShoppingItem, TaskItem } from "./types";
 
 export const people: Record<PersonId, { name: string; initials: string; color: string }> = {
   alex: { name: "Алексей", initials: "С", color: "#163A5F" },
@@ -31,6 +31,123 @@ export const initialEvents: EventItem[] = [
     reminder: "За 30 минут"
   }
 ];
+
+export const initialHouseholdTasks = [
+  {
+    id: "task-1",
+    familyId: "family-1",
+    title: "Позвонить мастеру",
+    description: null,
+    assigneeMemberId: "member-alex",
+    isShared: true,
+    dueAt: "2026-06-03T18:00:00+02:00",
+    reminderAt: null,
+    status: "active",
+    priority: "normal",
+    createdBy: "user-alex",
+    updatedBy: null,
+    completedBy: null,
+    completedAt: null,
+    createdAt: "2026-06-03T08:00:00+02:00",
+    updatedAt: "2026-06-03T08:00:00+02:00",
+    deletedAt: null
+  },
+  {
+    id: "task-2",
+    familyId: "family-1",
+    title: "Оплатить интернет",
+    description: null,
+    assigneeMemberId: "member-maya",
+    isShared: true,
+    dueAt: "2026-06-03T20:00:00+02:00",
+    reminderAt: "2026-06-03T19:00:00+02:00",
+    status: "active",
+    priority: "normal",
+    createdBy: "user-alex",
+    updatedBy: null,
+    completedBy: null,
+    completedAt: null,
+    createdAt: "2026-06-03T08:05:00+02:00",
+    updatedAt: "2026-06-03T08:05:00+02:00",
+    deletedAt: null
+  },
+  {
+    id: "task-3",
+    familyId: "family-1",
+    title: "Купить подарок",
+    description: null,
+    assigneeMemberId: "member-alex",
+    isShared: true,
+    dueAt: "2026-06-05T18:00:00+02:00",
+    reminderAt: null,
+    status: "active",
+    priority: "high",
+    createdBy: "user-alex",
+    updatedBy: null,
+    completedBy: null,
+    completedAt: null,
+    createdAt: "2026-06-03T08:10:00+02:00",
+    updatedAt: "2026-06-03T08:10:00+02:00",
+    deletedAt: null
+  },
+  {
+    id: "task-4",
+    familyId: "family-1",
+    title: "Записать машину на сервис",
+    description: null,
+    assigneeMemberId: "member-maya",
+    isShared: true,
+    dueAt: null,
+    reminderAt: null,
+    status: "active",
+    priority: "normal",
+    createdBy: "user-maya",
+    updatedBy: null,
+    completedBy: null,
+    completedAt: null,
+    createdAt: "2026-06-03T08:15:00+02:00",
+    updatedAt: "2026-06-03T08:15:00+02:00",
+    deletedAt: null
+  },
+  {
+    id: "task-5",
+    familyId: "family-1",
+    title: "Разобрать документы",
+    description: null,
+    assigneeMemberId: null,
+    isShared: true,
+    dueAt: null,
+    reminderAt: null,
+    status: "active",
+    priority: "low",
+    createdBy: "user-alex",
+    updatedBy: null,
+    completedBy: null,
+    completedAt: null,
+    createdAt: "2026-06-03T08:20:00+02:00",
+    updatedAt: "2026-06-03T08:20:00+02:00",
+    deletedAt: null
+  },
+  {
+    id: "task-6",
+    familyId: "family-1",
+    title: "Оплатить страховку",
+    description: null,
+    assigneeMemberId: "member-alex",
+    isShared: true,
+    dueAt: "2026-06-02T18:00:00+02:00",
+    reminderAt: null,
+    status: "completed",
+    priority: "normal",
+    createdBy: "user-alex",
+    updatedBy: "user-alex",
+    completedBy: "user-alex",
+    completedAt: "2026-06-03T08:30:00+02:00",
+    createdAt: "2026-06-02T09:00:00+02:00",
+    updatedAt: "2026-06-03T08:30:00+02:00",
+    deletedAt: null
+  }
+] satisfies HouseholdTask[];
 
 export const initialTasks: TaskItem[] = [
   {
