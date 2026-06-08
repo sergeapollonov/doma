@@ -108,6 +108,7 @@ Read these after the main source-of-truth docs:
 /docs/privacy-notes.md
 /docs/milestones.md
 /docs/definition-of-done.md
+/docs/adr/README.md
 ```
 
 ## 6. Visual references
