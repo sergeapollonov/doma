@@ -1,0 +1,68 @@
+import {
+  addHouseholdTask,
+  addShoppingItem,
+  completeTask,
+  createInitialLocalAppState,
+  purchaseShoppingItem,
+  selectDate,
+  setLanguage
+} from "./appState";
+import type {
+  AddHouseholdTaskActionInput,
+  AddShoppingListItemActionInput,
+  CompleteHouseholdTaskInput,
+  LocalAppState,
+  PurchaseShoppingListItemInput
+} from "../types";
+
+type Expect<T extends true> = T;
+type IsAssignable<Actual, Expected> = Actual extends Expected ? true : false;
+
+const initialState: LocalAppState = createInitialLocalAppState();
+
+type _InitialStateMatchesLocalAppState = Expect<IsAssignable<typeof initialState, LocalAppState>>;
+
+const languageState: LocalAppState = setLanguage(initialState, "pl");
+const selectedDateState: LocalAppState = selectDate(languageState, "2026-06-04");
+
+const addTaskInput: AddHouseholdTaskActionInput = {
+  id: "task-state-typecheck",
+  familyId: "family-1",
+  title: "Собрать документы",
+  assigneeMemberId: "member-alex",
+  dueAt: "2026-06-04T18:00:00+02:00",
+  createdBy: "user-alex",
+  createdAt: "2026-06-04T09:00:00+02:00"
+};
+
+const taskState: LocalAppState = addHouseholdTask(selectedDateState, addTaskInput);
+
+const completeTaskInput: CompleteHouseholdTaskInput = {
+  taskId: "task-state-typecheck",
+  completedBy: "user-alex",
+  completedAt: "2026-06-04T19:00:00+02:00"
+};
+
+const completedTaskState: LocalAppState = completeTask(taskState, completeTaskInput);
+
+const addShoppingInput: AddShoppingListItemActionInput = {
+  id: "shop-state-typecheck",
+  familyId: "family-1",
+  categoryId: "cat-home",
+  title: "Салфетки",
+  quantity: "1 уп",
+  createdBy: "user-maya",
+  createdAt: "2026-06-04T09:05:00+02:00"
+};
+
+const shoppingState: LocalAppState = addShoppingItem(completedTaskState, addShoppingInput);
+
+const purchaseShoppingInput: PurchaseShoppingListItemInput = {
+  itemId: "shop-state-typecheck",
+  purchasedBy: "user-maya",
+  purchasedAt: "2026-06-04T09:30:00+02:00"
+};
+
+const purchasedShoppingState: LocalAppState = purchaseShoppingItem(shoppingState, purchaseShoppingInput);
+
+void purchasedShoppingState;

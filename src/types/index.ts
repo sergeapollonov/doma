@@ -12,6 +12,8 @@ export type TabKey = "today" | "calendar" | "tasks" | "shopping";
 
 export type ISODateTimeString = `${number}-${number}-${number}T${string}`;
 
+export type ISODateString = `${number}-${number}-${number}`;
+
 export type HouseholdTaskId = `task-${string}`;
 
 export type HouseholdTaskStatus = "active" | "completed" | "archived";
@@ -23,6 +25,8 @@ export type ShoppingCategoryId = `cat-${string}`;
 export type ShoppingItemId = `shop-${string}`;
 
 export type ShoppingItemStatus = "active" | "purchased" | "archived";
+
+export type SelectedDateKey = ISODateString;
 
 export type HouseholdTask = {
   id: HouseholdTaskId;
@@ -111,6 +115,26 @@ export type PurchaseShoppingListItemInput = {
   itemId: ShoppingItemId;
   purchasedBy: UserId;
   purchasedAt: ISODateTimeString;
+};
+
+export type LocalAppState = {
+  language: Language;
+  familyId: FamilyId;
+  currentUserId: UserId;
+  selectedDate: SelectedDateKey;
+  events: EventItem[];
+  householdTasks: HouseholdTask[];
+  shoppingList: ShoppingListState;
+};
+
+export type AddHouseholdTaskActionInput = NewHouseholdTaskInput & {
+  id: HouseholdTaskId;
+  createdAt: ISODateTimeString;
+};
+
+export type AddShoppingListItemActionInput = NewShoppingListItemInput & {
+  id: ShoppingItemId;
+  createdAt: ISODateTimeString;
 };
 
 export type EventItem = {
