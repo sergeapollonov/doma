@@ -15,10 +15,32 @@ import {
   View
 } from "react-native";
 
-import { frequentShopping, initialEvents, initialShopping, initialTasks, people } from "./src/data";
+import { people } from "./src/data";
 import { copy } from "./src/i18n";
+import {
+  addHouseholdTask as addHouseholdTaskToState,
+  addShoppingItem as addShoppingItemToState,
+  completeTask as completeTaskInState,
+  createInitialLocalAppState,
+  purchaseShoppingItem as purchaseShoppingItemInState,
+  setLanguage as setAppLanguage
+} from "./src/state/appState";
 import { colors, radius, spacing } from "./src/theme";
-import { EventItem, Language, PersonId, ShoppingItem, TabKey, TaskItem } from "./src/types";
+import {
+  EventItem,
+  HouseholdTask,
+  HouseholdTaskId,
+  ISODateTimeString,
+  Language,
+  PersonId,
+  ShoppingCategory,
+  ShoppingCategoryId,
+  ShoppingItem,
+  ShoppingItemId,
+  ShoppingListItem,
+  TabKey,
+  TaskItem
+} from "./src/types";
 
 type Stage = "onboarding" | "login" | "family" | "invite" | "acceptInvite" | "app";
 type AuthIntent = "createFamily" | "acceptInvite";
@@ -61,6 +83,19 @@ const frequentVisuals: Record<string, { icon: IconName; tint: string }> = {
   Кофе: { icon: "cafe-outline", tint: "rgba(143,102,61,0.14)" }
 };
 
+const taskAssigneeToMemberId: Record<PersonId, HouseholdTask["assigneeMemberId"]> = {
+  alex: "member-alex",
+  maya: "member-maya"
+};
+
+const shoppingCategoryNameToId: Record<string, ShoppingCategoryId> = {
+  Молочное: "cat-dairy",
+  "Овощи и фрукты": "cat-fruit-veg",
+  Дом: "cat-home",
+  "Мясо и рыба": "cat-meat-fish",
+  Базовое: "cat-other"
+};
+
 const webShell =
   Platform.OS === "web"
     ? ({
@@ -76,7 +111,8 @@ const webShell =
     : null;
 
 export default function App() {
-  const [language, setLanguage] = useState<Language>("ru");
+  const [appState, setAppState] = useState(createInitialLocalAppState);
+  const language = appState.language;
   const text = copy[language] as typeof copy.ru;
   const [stage, setStage] = useState<Stage>("onboarding");
   const [authIntent, setAuthIntent] = useState<AuthIntent>("createFamily");
@@ -89,9 +125,6 @@ export default function App() {
   const [taskFilter, setTaskFilter] = useState<"all" | "mine" | "maya" | "shared" | "done">("all");
   const [familyName, setFamilyName] = useState("Семья Алексея");
   const [userName, setUserName] = useState("Алексей");
-  const [events, setEvents] = useState<EventItem[]>(initialEvents);
-  const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
-  const [shopping, setShopping] = useState<ShoppingItem[]>(initialShopping);
   const [eventDraft, setEventDraft] = useState({
     title: "",
     date: "3 июня",
@@ -109,6 +142,16 @@ export default function App() {
     category: "Базовое"
   });
 
+  const events = appState.events;
+  const tasks = useMemo(
+    () => appState.householdTasks.map((task) => toTaskItem(task, text, language)),
+    [appState.householdTasks, language, text]
+  );
+  const shopping = useMemo(
+    () => appState.shoppingList.items.map((item) => toShoppingItem(item, appState.shoppingList.categories)),
+    [appState.shoppingList.categories, appState.shoppingList.items]
+  );
+  const frequentShopping = appState.shoppingList.frequentItemTitles;
   const activeTasks = useMemo(() => tasks.filter((task) => !task.completed), [tasks]);
   const purchasedCount = shopping.filter((item) => item.purchased).length;
   const pendingShopping = shopping.filter((item) => !item.purchased);
@@ -142,17 +185,20 @@ export default function App() {
       return;
     }
     const participants: PersonId[] = eventDraft.participants === "alex" ? ["alex"] : ["alex", "maya"];
-    setEvents((items) => [
-      ...items,
-      {
-        id: `event-${Date.now()}`,
-        title: eventDraft.title.trim(),
-        date: eventDraft.date,
-        time: eventDraft.time,
-        participants,
-        reminder: text.thirtyMin
-      }
-    ]);
+    setAppState((state) => ({
+      ...state,
+      events: [
+        ...state.events,
+        {
+          id: `event-${Date.now()}`,
+          title: eventDraft.title.trim(),
+          date: eventDraft.date,
+          time: eventDraft.time,
+          participants,
+          reminder: text.thirtyMin
+        }
+      ]
+    }));
     setEventDraft({ title: "", date: "3 июня", time: "09:00", participants: "both" });
     setSheet(null);
     setActiveTab("today");
@@ -162,17 +208,18 @@ export default function App() {
     if (!taskDraft.title.trim()) {
       return;
     }
-    setTasks((items) => [
-      {
-        id: `task-${Date.now()}`,
+    setAppState((state) =>
+      addHouseholdTaskToState(state, {
+        id: createHouseholdTaskId(),
+        familyId: state.familyId,
         title: taskDraft.title.trim(),
-        assignee: taskDraft.assignee,
-        due: taskDraft.due,
-        reminder: text.noReminder,
-        completed: false
-      },
-      ...items
-    ]);
+        assigneeMemberId: taskDraft.assignee === "shared" ? null : taskAssigneeToMemberId[taskDraft.assignee],
+        dueAt: dueLabelToDateTime(taskDraft.due, text),
+        reminderAt: null,
+        createdBy: state.currentUserId,
+        createdAt: nowDateTime()
+      })
+    );
     setTaskDraft({ title: "", assignee: "alex", due: text.noDue });
     setSheet(null);
     setActiveTab("tasks");
@@ -183,16 +230,17 @@ export default function App() {
     if (!nextTitle) {
       return;
     }
-    setShopping((items) => [
-      {
-        id: `shop-${Date.now()}-${nextTitle}`,
+    setAppState((state) =>
+      addShoppingItemToState(state, {
+        id: createShoppingItemId(nextTitle),
+        familyId: state.familyId,
+        categoryId: shoppingCategoryNameToId[shoppingDraft.category] ?? "cat-other",
         title: nextTitle,
-        quantity: title ? undefined : shoppingDraft.quantity.trim() || undefined,
-        category: shoppingDraft.category,
-        purchased: false
-      },
-      ...items
-    ]);
+        quantity: title ? null : shoppingDraft.quantity.trim() || null,
+        createdBy: state.currentUserId,
+        createdAt: nowDateTime()
+      })
+    );
     setShoppingDraft({ title: "", quantity: "", category: "Базовое" });
     setSheet(null);
     setActiveTab("shopping");
@@ -599,8 +647,9 @@ export default function App() {
   }
 
   function renderTasks() {
-    const todayTasks = tasks.filter((task) => !task.completed && task.due === "Сегодня");
-    const weekTasks = tasks.filter((task) => !task.completed && task.due !== "Сегодня" && task.due !== text.noDue);
+    const todayLabel = language === "ru" ? "Сегодня" : "Dzisiaj";
+    const todayTasks = tasks.filter((task) => !task.completed && task.due === todayLabel);
+    const weekTasks = tasks.filter((task) => !task.completed && task.due !== todayLabel && task.due !== text.noDue);
     const noDueTasks = tasks.filter((task) => !task.completed && task.due === text.noDue);
     const doneTasks = tasks.filter((task) => task.completed);
     const groups = [
@@ -853,8 +902,8 @@ export default function App() {
         <SheetTitle title={text.settings} />
         <Text style={styles.fieldLabel}>{text.language}</Text>
         <View style={styles.segment}>
-          <Segment label="Русский" active={language === "ru"} onPress={() => setLanguage("ru")} />
-          <Segment label="Polski" active={language === "pl"} onPress={() => setLanguage("pl")} />
+          <Segment label="Русский" active={language === "ru"} onPress={() => setAppState((state) => setAppLanguage(state, "ru"))} />
+          <Segment label="Polski" active={language === "pl"} onPress={() => setAppState((state) => setAppLanguage(state, "pl"))} />
         </View>
         <Card style={styles.offlineCard}>
           <Ionicons name="cloud-offline-outline" size={22} color={colors.domaBlue} />
@@ -868,12 +917,104 @@ export default function App() {
   }
 
   function toggleTask(id: string) {
-    setTasks((items) => items.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task)));
+    setAppState((state) =>
+      completeTaskInState(state, {
+        taskId: id as HouseholdTaskId,
+        completedBy: state.currentUserId,
+        completedAt: nowDateTime()
+      })
+    );
   }
 
   function toggleShopping(id: string) {
-    setShopping((items) => items.map((item) => (item.id === id ? { ...item, purchased: !item.purchased } : item)));
+    setAppState((state) =>
+      purchaseShoppingItemInState(state, {
+        itemId: id as ShoppingItemId,
+        purchasedBy: state.currentUserId,
+        purchasedAt: nowDateTime()
+      })
+    );
   }
+}
+
+function nowDateTime(): ISODateTimeString {
+  return new Date().toISOString() as ISODateTimeString;
+}
+
+function createHouseholdTaskId(): HouseholdTaskId {
+  return `task-${Date.now()}` as HouseholdTaskId;
+}
+
+function createShoppingItemId(title: string): ShoppingItemId {
+  return `shop-${Date.now()}-${title.toLowerCase().replace(/\s+/g, "-")}` as ShoppingItemId;
+}
+
+function dueLabelToDateTime(dueLabel: string, text: typeof copy.ru): ISODateTimeString | null {
+  if (dueLabel.trim() === text.noDue) {
+    return null;
+  }
+
+  if (dueLabel.trim() === "До 5 июня") {
+    return "2026-06-05T18:00:00+02:00";
+  }
+
+  return "2026-06-03T18:00:00+02:00";
+}
+
+function toTaskItem(task: HouseholdTask, text: typeof copy.ru, language: Language): TaskItem {
+  return {
+    id: task.id,
+    title: task.title,
+    assignee: memberIdToTaskAssignee(task.assigneeMemberId),
+    due: dueDateToLabel(task.dueAt, text, language),
+    reminder: task.reminderAt ? text.thirtyMin : text.noReminder,
+    completed: task.status === "completed"
+  };
+}
+
+function memberIdToTaskAssignee(memberId: HouseholdTask["assigneeMemberId"]): TaskItem["assignee"] {
+  if (memberId === "member-alex") {
+    return "alex";
+  }
+
+  if (memberId === "member-maya") {
+    return "maya";
+  }
+
+  return "shared";
+}
+
+function dueDateToLabel(dueAt: ISODateTimeString | null, text: typeof copy.ru, language: Language) {
+  if (dueAt === null) {
+    return text.noDue;
+  }
+
+  const date = dueAt.slice(0, 10);
+
+  if (date === "2026-06-03") {
+    return language === "ru" ? "Сегодня" : "Dzisiaj";
+  }
+
+  if (date === "2026-06-05") {
+    return language === "ru" ? "До 5 июня" : "Do 5 czerwca";
+  }
+
+  return language === "ru" ? "На неделе" : "W tygodniu";
+}
+
+function toShoppingItem(item: ShoppingListItem, categories: ShoppingCategory[]): ShoppingItem {
+  return {
+    id: item.id,
+    title: item.title,
+    quantity: item.quantity ?? undefined,
+    category: shoppingCategoryName(item.categoryId, categories),
+    purchased: item.status === "purchased"
+  };
+}
+
+function shoppingCategoryName(categoryId: ShoppingCategoryId | null, categories: ShoppingCategory[]) {
+  const category = categories.find((item) => item.id === categoryId);
+  return category?.nameRu ?? "Базовое";
 }
 
 function AppShell({ children }: { children: React.ReactNode }) {
