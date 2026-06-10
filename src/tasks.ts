@@ -3,7 +3,8 @@ import type {
   HouseholdTask,
   HouseholdTaskId,
   ISODateTimeString,
-  NewHouseholdTaskInput
+  NewHouseholdTaskInput,
+  ReopenHouseholdTaskInput
 } from "./types";
 
 export function createHouseholdTask(
@@ -44,6 +45,21 @@ export function completeHouseholdTask(task: HouseholdTask, input: CompleteHouseh
     completedAt: input.completedAt,
     updatedBy: input.completedBy,
     updatedAt: input.completedAt
+  };
+}
+
+export function reopenHouseholdTask(task: HouseholdTask, input: ReopenHouseholdTaskInput): HouseholdTask {
+  if (task.id !== input.taskId || task.status !== "completed") {
+    return task;
+  }
+
+  return {
+    ...task,
+    status: "active",
+    completedBy: null,
+    completedAt: null,
+    updatedBy: input.updatedBy,
+    updatedAt: input.updatedAt
   };
 }
 

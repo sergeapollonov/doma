@@ -4,15 +4,19 @@ import {
   completeTask,
   createInitialLocalAppState,
   purchaseShoppingItem,
+  reopenTask,
   selectDate,
-  setLanguage
+  setLanguage,
+  unpurchaseShoppingItem
 } from "./appState";
 import type {
   AddHouseholdTaskActionInput,
   AddShoppingListItemActionInput,
   CompleteHouseholdTaskInput,
   LocalAppState,
-  PurchaseShoppingListItemInput
+  PurchaseShoppingListItemInput,
+  ReopenHouseholdTaskInput,
+  UnpurchaseShoppingListItemInput
 } from "../types";
 
 type Expect<T extends true> = T;
@@ -45,6 +49,14 @@ const completeTaskInput: CompleteHouseholdTaskInput = {
 
 const completedTaskState: LocalAppState = completeTask(taskState, completeTaskInput);
 
+const reopenTaskInput: ReopenHouseholdTaskInput = {
+  taskId: "task-state-typecheck",
+  updatedBy: "user-alex",
+  updatedAt: "2026-06-04T19:05:00+02:00"
+};
+
+const reopenedTaskState: LocalAppState = reopenTask(completedTaskState, reopenTaskInput);
+
 const addShoppingInput: AddShoppingListItemActionInput = {
   id: "shop-state-typecheck",
   familyId: "family-1",
@@ -55,7 +67,7 @@ const addShoppingInput: AddShoppingListItemActionInput = {
   createdAt: "2026-06-04T09:05:00+02:00"
 };
 
-const shoppingState: LocalAppState = addShoppingItem(completedTaskState, addShoppingInput);
+const shoppingState: LocalAppState = addShoppingItem(reopenedTaskState, addShoppingInput);
 
 const purchaseShoppingInput: PurchaseShoppingListItemInput = {
   itemId: "shop-state-typecheck",
@@ -65,4 +77,12 @@ const purchaseShoppingInput: PurchaseShoppingListItemInput = {
 
 const purchasedShoppingState: LocalAppState = purchaseShoppingItem(shoppingState, purchaseShoppingInput);
 
-void purchasedShoppingState;
+const unpurchaseShoppingInput: UnpurchaseShoppingListItemInput = {
+  itemId: "shop-state-typecheck",
+  updatedBy: "user-maya",
+  updatedAt: "2026-06-04T09:35:00+02:00"
+};
+
+const activeShoppingState: LocalAppState = unpurchaseShoppingItem(purchasedShoppingState, unpurchaseShoppingInput);
+
+void activeShoppingState;

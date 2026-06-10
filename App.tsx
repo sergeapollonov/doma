@@ -23,7 +23,9 @@ import {
   completeTask as completeTaskInState,
   createInitialLocalAppState,
   purchaseShoppingItem as purchaseShoppingItemInState,
-  setLanguage as setAppLanguage
+  reopenTask as reopenTaskInState,
+  setLanguage as setAppLanguage,
+  unpurchaseShoppingItem as unpurchaseShoppingItemInState
 } from "./src/state/appState";
 import { colors, radius, spacing } from "./src/theme";
 import {
@@ -917,23 +919,43 @@ export default function App() {
   }
 
   function toggleTask(id: string) {
-    setAppState((state) =>
-      completeTaskInState(state, {
+    setAppState((state) => {
+      const task = state.householdTasks.find((item) => item.id === id);
+
+      if (task?.status === "completed") {
+        return reopenTaskInState(state, {
+          taskId: id as HouseholdTaskId,
+          updatedBy: state.currentUserId,
+          updatedAt: nowDateTime()
+        });
+      }
+
+      return completeTaskInState(state, {
         taskId: id as HouseholdTaskId,
         completedBy: state.currentUserId,
         completedAt: nowDateTime()
-      })
-    );
+      });
+    });
   }
 
   function toggleShopping(id: string) {
-    setAppState((state) =>
-      purchaseShoppingItemInState(state, {
+    setAppState((state) => {
+      const item = state.shoppingList.items.find((shoppingItem) => shoppingItem.id === id);
+
+      if (item?.status === "purchased") {
+        return unpurchaseShoppingItemInState(state, {
+          itemId: id as ShoppingItemId,
+          updatedBy: state.currentUserId,
+          updatedAt: nowDateTime()
+        });
+      }
+
+      return purchaseShoppingItemInState(state, {
         itemId: id as ShoppingItemId,
         purchasedBy: state.currentUserId,
         purchasedAt: nowDateTime()
-      })
-    );
+      });
+    });
   }
 }
 
