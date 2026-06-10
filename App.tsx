@@ -24,6 +24,7 @@ import {
   createInitialLocalAppState,
   purchaseShoppingItem as purchaseShoppingItemInState,
   reopenTask as reopenTaskInState,
+  selectDate as selectDateInState,
   setLanguage as setAppLanguage,
   unpurchaseShoppingItem as unpurchaseShoppingItemInState
 } from "./src/state/appState";
@@ -32,6 +33,7 @@ import {
   EventItem,
   HouseholdTask,
   HouseholdTaskId,
+  ISODateString,
   ISODateTimeString,
   Language,
   PersonId,
@@ -123,7 +125,6 @@ export default function App() {
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [activeTab, setActiveTab] = useState<TabKey>("today");
   const [sheet, setSheet] = useState<Sheet>(null);
-  const [selectedDay, setSelectedDay] = useState(3);
   const [taskFilter, setTaskFilter] = useState<"all" | "mine" | "maya" | "shared" | "done">("all");
   const [familyName, setFamilyName] = useState("Семья Алексея");
   const [userName, setUserName] = useState("Алексей");
@@ -145,6 +146,13 @@ export default function App() {
   });
 
   const events = appState.events;
+  const selectedDate = appState.selectedDate;
+  const selectedDay = Number(selectedDate.slice(-2));
+  const selectedEvents = useMemo(
+    () => events.filter((event) => eventDateToISODate(event.date) === selectedDate),
+    [events, selectedDate]
+  );
+  const selectedDateLabel = formatSelectedDate(selectedDate, language);
   const tasks = useMemo(
     () => appState.householdTasks.map((task) => toTaskItem(task, text, language)),
     [appState.householdTasks, language, text]
@@ -187,8 +195,10 @@ export default function App() {
       return;
     }
     const participants: PersonId[] = eventDraft.participants === "alex" ? ["alex"] : ["alex", "maya"];
+    const eventDate = eventDateToISODate(eventDraft.date);
     setAppState((state) => ({
       ...state,
+      selectedDate: eventDate ?? state.selectedDate,
       events: [
         ...state.events,
         {
@@ -484,6 +494,7 @@ export default function App() {
               text={text}
               language={language}
               title={activeTab === "today" ? text.brand : text.tabs[activeTab]}
+              todayDateLabel={selectedDateLabel}
               subtitle={
                 activeTab === "tasks"
                   ? language === "ru" ? "Планируйте и делитесь делами\nс семьёй" : "Planujcie i dzielcie się\nsprawami z rodziną"
@@ -553,9 +564,13 @@ export default function App() {
 
         <SectionHeader title={text.upcoming} action={text.seeAll} onPress={() => setActiveTab("calendar")} />
         <Card style={styles.groupCard}>
-          {events.slice(0, 3).map((event, index) => (
-            <EventRow key={event.id} event={event} participantsLabel={participantsLabel(event.participants)} index={index} grouped />
-          ))}
+          {selectedEvents.length > 0 ? (
+            selectedEvents.slice(0, 3).map((event, index) => (
+              <EventRow key={event.id} event={event} participantsLabel={participantsLabel(event.participants)} index={index} grouped />
+            ))
+          ) : (
+            <Text style={styles.caption}>{text.emptyToday}</Text>
+          )}
         </Card>
 
         <SectionHeader title={text.tasks} action={text.seeAll} onPress={() => setActiveTab("tasks")} />
@@ -585,7 +600,7 @@ export default function App() {
             <Text style={styles.widgetBrand}>Doma</Text>
             <Text style={styles.caption}>{text.tabs.today}</Text>
           </View>
-          {events.slice(0, 3).map((event) => (
+          {selectedEvents.slice(0, 3).map((event) => (
             <View key={`widget-${event.id}`} style={styles.widgetRow}>
               <Text style={styles.widgetTime}>{event.time}</Text>
               <Text style={styles.widgetTitle}>{event.title}</Text>
@@ -600,6 +615,7 @@ export default function App() {
   function renderCalendar() {
     const days = Array.from({ length: 30 }, (_, index) => index + 1);
     const weekDays = language === "ru" ? ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"] : ["Pn", "Wt", "Śr", "Cz", "Pt", "Sb", "Nd"];
+    const eventDays = new Set(events.map((event) => eventDateToDay(event.date)).filter((day) => day !== null));
     return (
       <View>
         <View style={styles.monthHeader}>
@@ -619,28 +635,26 @@ export default function App() {
             {days.map((day) => {
               const selected = day === selectedDay;
               const today = day === 3;
-              const dotColor = day % 3 === 0 ? colors.shoppingGreen : day % 3 === 1 ? colors.domaBlue : colors.taskOrange;
+              const hasEvents = eventDays.has(day);
               return (
-                <Pressable key={day} style={[styles.dayCell, selected && styles.dayCellSelected, today && !selected && styles.dayCellToday]} onPress={() => setSelectedDay(day)}>
+                <Pressable key={day} style={[styles.dayCell, selected && styles.dayCellSelected, today && !selected && styles.dayCellToday]} onPress={() => selectCalendarDay(day)}>
                   <Text style={[styles.dayText, selected && styles.dayTextSelected]}>{day}</Text>
                   <View style={styles.dotLine}>
-                    {day === 3 && (
+                    {hasEvents && (
                       <>
                         <View style={[styles.eventDot, { backgroundColor: colors.domaBlue }]} />
                         <View style={[styles.eventDot, { backgroundColor: colors.taskOrange }]} />
-                        <View style={[styles.eventDot, { backgroundColor: colors.shoppingGreen }]} />
                       </>
                     )}
-                    {day !== 3 && day > 1 && <View style={[styles.eventDot, { backgroundColor: dotColor }]} />}
                   </View>
                 </Pressable>
               );
             })}
           </View>
         </View>
-        <SectionHeader title={`${selectedDay} ${language === "ru" ? "июня" : "czerwca"}`} action={text.add} onPress={() => setSheet("event")} />
-        {selectedDay === 3 ? (
-          events.map((event, index) => <CalendarEventRow key={`cal-${event.id}`} event={event} participantsLabel={participantsLabel(event.participants)} index={index} />)
+        <SectionHeader title={formatCalendarSectionDate(selectedDate, language)} action={text.add} onPress={() => setSheet("event")} />
+        {selectedEvents.length > 0 ? (
+          selectedEvents.map((event, index) => <CalendarEventRow key={`cal-${event.id}`} event={event} participantsLabel={participantsLabel(event.participants)} index={index} />)
         ) : (
           <EmptyState title={text.emptyToday} description={text.emptyTodayHint} />
         )}
@@ -957,10 +971,53 @@ export default function App() {
       });
     });
   }
+
+  function selectCalendarDay(day: number) {
+    setAppState((state) => selectDateInState(state, juneDate(day)));
+  }
 }
 
 function nowDateTime(): ISODateTimeString {
   return new Date().toISOString() as ISODateTimeString;
+}
+
+function juneDate(day: number): ISODateString {
+  return `2026-06-${String(day).padStart(2, "0")}` as ISODateString;
+}
+
+function eventDateToDay(dateLabel: string): number | null {
+  const match = dateLabel.match(/^(\d{1,2})\s/);
+
+  if (match === null) {
+    return null;
+  }
+
+  return Number(match[1]);
+}
+
+function eventDateToISODate(dateLabel: string): ISODateString | null {
+  const day = eventDateToDay(dateLabel);
+
+  if (day === null) {
+    return null;
+  }
+
+  return juneDate(day);
+}
+
+function formatSelectedDate(date: ISODateString, language: Language) {
+  const day = Number(date.slice(-2));
+
+  if (date === "2026-06-03") {
+    return language === "ru" ? `Сегодня, ${day} июня` : `Dzisiaj, ${day} czerwca`;
+  }
+
+  return formatCalendarSectionDate(date, language);
+}
+
+function formatCalendarSectionDate(date: ISODateString, language: Language) {
+  const day = Number(date.slice(-2));
+  return language === "ru" ? `${day} июня` : `${day} czerwca`;
 }
 
 function createHouseholdTaskId(): HouseholdTaskId {
@@ -1048,6 +1105,7 @@ function Header({
   text,
   language,
   title,
+  todayDateLabel,
   subtitle,
   onFamily,
   onSettings,
@@ -1057,6 +1115,7 @@ function Header({
   text: typeof copy.ru;
   language: Language;
   title: string;
+  todayDateLabel: string;
   subtitle: string;
   onFamily: () => void;
   onSettings: () => void;
@@ -1086,7 +1145,7 @@ function Header({
       {tab === "today" ? (
         <View style={styles.greetingBlock}>
           <Text style={styles.greetingTitle}>{language === "ru" ? "Доброе утро,\nАлексей 👋" : "Dzień dobry,\nAlex 👋"}</Text>
-          <Text style={styles.greetingDate}>{text.todayDate}</Text>
+          <Text style={styles.greetingDate}>{todayDateLabel}</Text>
         </View>
       ) : (
         <View style={styles.innerHeaderBlock}>
