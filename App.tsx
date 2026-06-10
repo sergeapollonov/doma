@@ -17,17 +17,7 @@ import {
 
 import { people } from "./src/data";
 import { copy } from "./src/i18n";
-import {
-  addHouseholdTask as addHouseholdTaskToState,
-  addShoppingItem as addShoppingItemToState,
-  completeTask as completeTaskInState,
-  createInitialLocalAppState,
-  purchaseShoppingItem as purchaseShoppingItemInState,
-  reopenTask as reopenTaskInState,
-  selectDate as selectDateInState,
-  setLanguage as setAppLanguage,
-  unpurchaseShoppingItem as unpurchaseShoppingItemInState
-} from "./src/state/appState";
+import { useLocalAppStore } from "./src/store/localAppStore";
 import { colors, radius, spacing } from "./src/theme";
 import {
   EventItem,
@@ -115,8 +105,22 @@ const webShell =
     : null;
 
 export default function App() {
-  const [appState, setAppState] = useState(createInitialLocalAppState);
-  const language = appState.language;
+  const language = useLocalAppStore((state) => state.language);
+  const familyId = useLocalAppStore((state) => state.familyId);
+  const currentUserId = useLocalAppStore((state) => state.currentUserId);
+  const selectedDate = useLocalAppStore((state) => state.selectedDate);
+  const events = useLocalAppStore((state) => state.events);
+  const householdTasks = useLocalAppStore((state) => state.householdTasks);
+  const shoppingList = useLocalAppStore((state) => state.shoppingList);
+  const storeSetLanguage = useLocalAppStore((state) => state.setLanguage);
+  const storeSelectDate = useLocalAppStore((state) => state.selectDate);
+  const storeAddEvent = useLocalAppStore((state) => state.addEvent);
+  const storeAddHouseholdTask = useLocalAppStore((state) => state.addHouseholdTask);
+  const storeCompleteTask = useLocalAppStore((state) => state.completeTask);
+  const storeReopenTask = useLocalAppStore((state) => state.reopenTask);
+  const storeAddShoppingItem = useLocalAppStore((state) => state.addShoppingItem);
+  const storePurchaseShoppingItem = useLocalAppStore((state) => state.purchaseShoppingItem);
+  const storeUnpurchaseShoppingItem = useLocalAppStore((state) => state.unpurchaseShoppingItem);
   const text = copy[language] as typeof copy.ru;
   const [stage, setStage] = useState<Stage>("onboarding");
   const [authIntent, setAuthIntent] = useState<AuthIntent>("createFamily");
@@ -145,8 +149,6 @@ export default function App() {
     category: "Базовое"
   });
 
-  const events = appState.events;
-  const selectedDate = appState.selectedDate;
   const selectedDay = Number(selectedDate.slice(-2));
   const selectedEvents = useMemo(
     () => events.filter((event) => eventDateToISODate(event.date) === selectedDate),
@@ -154,14 +156,14 @@ export default function App() {
   );
   const selectedDateLabel = formatSelectedDate(selectedDate, language);
   const tasks = useMemo(
-    () => appState.householdTasks.map((task) => toTaskItem(task, text, language)),
-    [appState.householdTasks, language, text]
+    () => householdTasks.map((task) => toTaskItem(task, text, language)),
+    [householdTasks, language, text]
   );
   const shopping = useMemo(
-    () => appState.shoppingList.items.map((item) => toShoppingItem(item, appState.shoppingList.categories)),
-    [appState.shoppingList.categories, appState.shoppingList.items]
+    () => shoppingList.items.map((item) => toShoppingItem(item, shoppingList.categories)),
+    [shoppingList.categories, shoppingList.items]
   );
-  const frequentShopping = appState.shoppingList.frequentItemTitles;
+  const frequentShopping = shoppingList.frequentItemTitles;
   const activeTasks = useMemo(() => tasks.filter((task) => !task.completed), [tasks]);
   const purchasedCount = shopping.filter((item) => item.purchased).length;
   const pendingShopping = shopping.filter((item) => !item.purchased);
@@ -196,21 +198,17 @@ export default function App() {
     }
     const participants: PersonId[] = eventDraft.participants === "alex" ? ["alex"] : ["alex", "maya"];
     const eventDate = eventDateToISODate(eventDraft.date);
-    setAppState((state) => ({
-      ...state,
-      selectedDate: eventDate ?? state.selectedDate,
-      events: [
-        ...state.events,
-        {
-          id: `event-${Date.now()}`,
-          title: eventDraft.title.trim(),
-          date: eventDraft.date,
-          time: eventDraft.time,
-          participants,
-          reminder: text.thirtyMin
-        }
-      ]
-    }));
+    storeAddEvent(
+      {
+        id: `event-${Date.now()}`,
+        title: eventDraft.title.trim(),
+        date: eventDraft.date,
+        time: eventDraft.time,
+        participants,
+        reminder: text.thirtyMin
+      },
+      eventDate
+    );
     setEventDraft({ title: "", date: "3 июня", time: "09:00", participants: "both" });
     setSheet(null);
     setActiveTab("today");
@@ -220,18 +218,16 @@ export default function App() {
     if (!taskDraft.title.trim()) {
       return;
     }
-    setAppState((state) =>
-      addHouseholdTaskToState(state, {
-        id: createHouseholdTaskId(),
-        familyId: state.familyId,
-        title: taskDraft.title.trim(),
-        assigneeMemberId: taskDraft.assignee === "shared" ? null : taskAssigneeToMemberId[taskDraft.assignee],
-        dueAt: dueLabelToDateTime(taskDraft.due, text),
-        reminderAt: null,
-        createdBy: state.currentUserId,
-        createdAt: nowDateTime()
-      })
-    );
+    storeAddHouseholdTask({
+      id: createHouseholdTaskId(),
+      familyId,
+      title: taskDraft.title.trim(),
+      assigneeMemberId: taskDraft.assignee === "shared" ? null : taskAssigneeToMemberId[taskDraft.assignee],
+      dueAt: dueLabelToDateTime(taskDraft.due, text),
+      reminderAt: null,
+      createdBy: currentUserId,
+      createdAt: nowDateTime()
+    });
     setTaskDraft({ title: "", assignee: "alex", due: text.noDue });
     setSheet(null);
     setActiveTab("tasks");
@@ -242,17 +238,15 @@ export default function App() {
     if (!nextTitle) {
       return;
     }
-    setAppState((state) =>
-      addShoppingItemToState(state, {
-        id: createShoppingItemId(nextTitle),
-        familyId: state.familyId,
-        categoryId: shoppingCategoryNameToId[shoppingDraft.category] ?? "cat-other",
-        title: nextTitle,
-        quantity: title ? null : shoppingDraft.quantity.trim() || null,
-        createdBy: state.currentUserId,
-        createdAt: nowDateTime()
-      })
-    );
+    storeAddShoppingItem({
+      id: createShoppingItemId(nextTitle),
+      familyId,
+      categoryId: shoppingCategoryNameToId[shoppingDraft.category] ?? "cat-other",
+      title: nextTitle,
+      quantity: title ? null : shoppingDraft.quantity.trim() || null,
+      createdBy: currentUserId,
+      createdAt: nowDateTime()
+    });
     setShoppingDraft({ title: "", quantity: "", category: "Базовое" });
     setSheet(null);
     setActiveTab("shopping");
@@ -918,8 +912,8 @@ export default function App() {
         <SheetTitle title={text.settings} />
         <Text style={styles.fieldLabel}>{text.language}</Text>
         <View style={styles.segment}>
-          <Segment label="Русский" active={language === "ru"} onPress={() => setAppState((state) => setAppLanguage(state, "ru"))} />
-          <Segment label="Polski" active={language === "pl"} onPress={() => setAppState((state) => setAppLanguage(state, "pl"))} />
+          <Segment label="Русский" active={language === "ru"} onPress={() => storeSetLanguage("ru")} />
+          <Segment label="Polski" active={language === "pl"} onPress={() => storeSetLanguage("pl")} />
         </View>
         <Card style={styles.offlineCard}>
           <Ionicons name="cloud-offline-outline" size={22} color={colors.domaBlue} />
@@ -933,47 +927,45 @@ export default function App() {
   }
 
   function toggleTask(id: string) {
-    setAppState((state) => {
-      const task = state.householdTasks.find((item) => item.id === id);
+    const task = householdTasks.find((item) => item.id === id);
 
-      if (task?.status === "completed") {
-        return reopenTaskInState(state, {
-          taskId: id as HouseholdTaskId,
-          updatedBy: state.currentUserId,
-          updatedAt: nowDateTime()
-        });
-      }
-
-      return completeTaskInState(state, {
+    if (task?.status === "completed") {
+      storeReopenTask({
         taskId: id as HouseholdTaskId,
-        completedBy: state.currentUserId,
-        completedAt: nowDateTime()
+        updatedBy: currentUserId,
+        updatedAt: nowDateTime()
       });
+      return;
+    }
+
+    storeCompleteTask({
+      taskId: id as HouseholdTaskId,
+      completedBy: currentUserId,
+      completedAt: nowDateTime()
     });
   }
 
   function toggleShopping(id: string) {
-    setAppState((state) => {
-      const item = state.shoppingList.items.find((shoppingItem) => shoppingItem.id === id);
+    const item = shoppingList.items.find((shoppingItem) => shoppingItem.id === id);
 
-      if (item?.status === "purchased") {
-        return unpurchaseShoppingItemInState(state, {
-          itemId: id as ShoppingItemId,
-          updatedBy: state.currentUserId,
-          updatedAt: nowDateTime()
-        });
-      }
-
-      return purchaseShoppingItemInState(state, {
+    if (item?.status === "purchased") {
+      storeUnpurchaseShoppingItem({
         itemId: id as ShoppingItemId,
-        purchasedBy: state.currentUserId,
-        purchasedAt: nowDateTime()
+        updatedBy: currentUserId,
+        updatedAt: nowDateTime()
       });
+      return;
+    }
+
+    storePurchaseShoppingItem({
+      itemId: id as ShoppingItemId,
+      purchasedBy: currentUserId,
+      purchasedAt: nowDateTime()
     });
   }
 
   function selectCalendarDay(day: number) {
-    setAppState((state) => selectDateInState(state, juneDate(day)));
+    storeSelectDate(juneDate(day));
   }
 }
 
