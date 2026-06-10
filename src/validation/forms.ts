@@ -2,6 +2,11 @@ export type FormValidationErrorCode =
   | "title_required"
   | "title_too_short"
   | "title_too_long"
+  | "email_required"
+  | "email_invalid"
+  | "family_name_required"
+  | "user_name_required"
+  | "name_too_long"
   | "date_required"
   | "time_required"
   | "quantity_too_long"
@@ -15,6 +20,8 @@ export type FormValidationResult<Field extends string> = {
 export type EventFormField = "title" | "date" | "time";
 export type TaskFormField = "title" | "due";
 export type ShoppingFormField = "title" | "quantity" | "category";
+export type LoginFormField = "email";
+export type FamilySetupFormField = "familyName" | "userName";
 
 export type EventFormInput = {
   title: string;
@@ -33,9 +40,59 @@ export type ShoppingFormInput = {
   category: string;
 };
 
+export type LoginFormInput = {
+  email: string;
+};
+
+export type FamilySetupFormInput = {
+  familyName: string;
+  userName: string;
+};
+
 const MIN_TITLE_LENGTH = 2;
 const MAX_TITLE_LENGTH = 80;
 const MAX_QUANTITY_LENGTH = 32;
+const MAX_NAME_LENGTH = 60;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function validateLoginForm(input: LoginFormInput): FormValidationResult<LoginFormField> {
+  const errors: FormValidationResult<LoginFormField>["errors"] = {};
+  const email = input.email.trim();
+
+  if (email.length === 0) {
+    errors.email = "email_required";
+  } else if (!EMAIL_PATTERN.test(email)) {
+    errors.email = "email_invalid";
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+}
+
+export function validateFamilySetupForm(input: FamilySetupFormInput): FormValidationResult<FamilySetupFormField> {
+  const errors: FormValidationResult<FamilySetupFormField>["errors"] = {};
+  const familyName = input.familyName.trim();
+  const userName = input.userName.trim();
+
+  if (familyName.length === 0) {
+    errors.familyName = "family_name_required";
+  } else if (familyName.length > MAX_NAME_LENGTH) {
+    errors.familyName = "name_too_long";
+  }
+
+  if (userName.length === 0) {
+    errors.userName = "user_name_required";
+  } else if (userName.length > MAX_NAME_LENGTH) {
+    errors.userName = "name_too_long";
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+}
 
 export function validateEventForm(input: EventFormInput): FormValidationResult<EventFormField> {
   const errors: FormValidationResult<EventFormField>["errors"] = {};
