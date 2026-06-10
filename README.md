@@ -1,6 +1,6 @@
 # Doma
 
-[![CI](https://github.com/sergeapollonov/doma-app/actions/workflows/ci.yml/badge.svg)](https://github.com/sergeapollonov/doma-app/actions/workflows/ci.yml)
+[![CI](https://github.com/sergeapollonov/doma/actions/workflows/ci.yml/badge.svg)](https://github.com/sergeapollonov/doma/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue.svg)](tsconfig.json)
 [![Expo](https://img.shields.io/badge/Expo-React%20Native-000020.svg)](https://expo.dev)
@@ -34,7 +34,9 @@ Current state:
 - bilingual copy structure in `src/i18n`;
 - product, design, flow, privacy, and data model documentation in `docs`;
 - visual references in `design-references`;
-- TypeScript check via `npm run typecheck`.
+- TypeScript check via `npm run typecheck`;
+- unit tests via `npm test`;
+- Expo web export verification via `npm run verify:web`.
 
 Not implemented yet:
 
@@ -101,6 +103,18 @@ Run TypeScript checks:
 npm run typecheck
 ```
 
+Run unit tests:
+
+```bash
+npm test
+```
+
+Verify the Expo web export:
+
+```bash
+npm run verify:web
+```
+
 ## Documentation
 
 Start here:
@@ -111,6 +125,7 @@ Start here:
 - `docs/screens.md` - screen specifications;
 - `docs/user-flows.md` - core user flows;
 - `docs/data-model.md` - planned data model;
+- `docs/testing.md` - local and CI verification workflow;
 - `docs/privacy-notes.md` - privacy principles;
 - `docs/oss-roadmap.md` - public open-source roadmap.
 

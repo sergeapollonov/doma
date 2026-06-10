@@ -25,6 +25,7 @@ import type {
 } from "../types";
 
 type LocalAppStore = LocalAppState & {
+  reset: () => void;
   setLanguage: (language: Language) => void;
   selectDate: (selectedDate: ISODateString) => void;
   addEvent: (event: EventItem, selectedDate?: ISODateString | null) => void;
@@ -38,6 +39,7 @@ type LocalAppStore = LocalAppState & {
 
 export const useLocalAppStore = create<LocalAppStore>((set) => ({
   ...createInitialLocalAppState(),
+  reset: () => set(createInitialLocalAppState()),
   setLanguage: (language) => set((state) => setLanguage(state, language)),
   selectDate: (selectedDate) => set((state) => selectDate(state, selectedDate)),
   addEvent: (event, selectedDate) =>

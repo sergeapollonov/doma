@@ -79,3 +79,4 @@ storeState.purchaseShoppingItem(purchaseShoppingInput);
 storeState.unpurchaseShoppingItem(unpurchaseShoppingInput);
 storeState.setLanguage("pl");
 storeState.selectDate("2026-06-05");
+storeState.reset();
