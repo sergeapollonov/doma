@@ -28,3 +28,6 @@ jobs:
 
       - name: Run TypeScript check
         run: npm run typecheck
+
+      - name: Verify web export
+        run: npm run verify:web
