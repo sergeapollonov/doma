@@ -105,6 +105,7 @@ Read these after the main source-of-truth docs:
 /docs/mock-data.md
 /docs/recurrence.md
 /docs/analytics.md
+/docs/testing.md
 /docs/privacy-notes.md
 /docs/milestones.md
 /docs/definition-of-done.md
