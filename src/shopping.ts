@@ -4,7 +4,8 @@ import type {
   ShoppingCategoryId,
   ShoppingItemId,
   ShoppingListItem,
-  ISODateTimeString
+  ISODateTimeString,
+  UnpurchaseShoppingListItemInput
 } from "./types";
 
 export function createShoppingListItem(
@@ -46,6 +47,24 @@ export function purchaseShoppingListItem(
     purchasedAt: input.purchasedAt,
     updatedBy: input.purchasedBy,
     updatedAt: input.purchasedAt
+  };
+}
+
+export function unpurchaseShoppingListItem(
+  item: ShoppingListItem,
+  input: UnpurchaseShoppingListItemInput
+): ShoppingListItem {
+  if (item.id !== input.itemId || item.status !== "purchased") {
+    return item;
+  }
+
+  return {
+    ...item,
+    status: "active",
+    purchasedBy: null,
+    purchasedAt: null,
+    updatedBy: input.updatedBy,
+    updatedAt: input.updatedAt
   };
 }
 

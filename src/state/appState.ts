@@ -3,8 +3,8 @@ import {
   initialHouseholdTasks,
   initialShoppingListState
 } from "../data";
-import { completeHouseholdTask, createHouseholdTask } from "../tasks";
-import { createShoppingListItem, purchaseShoppingListItem } from "../shopping";
+import { completeHouseholdTask, createHouseholdTask, reopenHouseholdTask } from "../tasks";
+import { createShoppingListItem, purchaseShoppingListItem, unpurchaseShoppingListItem } from "../shopping";
 import type {
   AddHouseholdTaskActionInput,
   AddShoppingListItemActionInput,
@@ -14,6 +14,8 @@ import type {
   Language,
   LocalAppState,
   PurchaseShoppingListItemInput,
+  ReopenHouseholdTaskInput,
+  UnpurchaseShoppingListItemInput,
   UserId
 } from "../types";
 
@@ -68,6 +70,13 @@ export function completeTask(state: LocalAppState, input: CompleteHouseholdTaskI
   };
 }
 
+export function reopenTask(state: LocalAppState, input: ReopenHouseholdTaskInput): LocalAppState {
+  return {
+    ...state,
+    householdTasks: state.householdTasks.map((task) => reopenHouseholdTask(task, input))
+  };
+}
+
 export function addShoppingItem(state: LocalAppState, input: AddShoppingListItemActionInput): LocalAppState {
   const item = createShoppingListItem(input, input.id, input.createdAt);
 
@@ -86,6 +95,16 @@ export function purchaseShoppingItem(state: LocalAppState, input: PurchaseShoppi
     shoppingList: {
       ...state.shoppingList,
       items: state.shoppingList.items.map((item) => purchaseShoppingListItem(item, input))
+    }
+  };
+}
+
+export function unpurchaseShoppingItem(state: LocalAppState, input: UnpurchaseShoppingListItemInput): LocalAppState {
+  return {
+    ...state,
+    shoppingList: {
+      ...state.shoppingList,
+      items: state.shoppingList.items.map((item) => unpurchaseShoppingListItem(item, input))
     }
   };
 }

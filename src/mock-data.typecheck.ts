@@ -8,8 +8,8 @@ import {
   initialTasks,
   people
 } from "./data";
-import { completeHouseholdTask, createHouseholdTask } from "./tasks";
-import { createShoppingListItem, purchaseShoppingListItem } from "./shopping";
+import { completeHouseholdTask, createHouseholdTask, reopenHouseholdTask } from "./tasks";
+import { createShoppingListItem, purchaseShoppingListItem, unpurchaseShoppingListItem } from "./shopping";
 import type {
   CompleteHouseholdTaskInput,
   EventItem,
@@ -18,10 +18,12 @@ import type {
   NewShoppingListItemInput,
   PersonId,
   PurchaseShoppingListItemInput,
+  ReopenHouseholdTaskInput,
   ShoppingCategory,
   ShoppingItem,
   ShoppingListItem,
   ShoppingListState,
+  UnpurchaseShoppingListItemInput,
   TaskItem
 } from "./types";
 
@@ -61,6 +63,14 @@ const completeTaskInput: CompleteHouseholdTaskInput = {
 
 const completedTask: HouseholdTask = completeHouseholdTask(createdTask, completeTaskInput);
 
+const reopenTaskInput: ReopenHouseholdTaskInput = {
+  taskId: createdTask.id,
+  updatedBy: "user-alex",
+  updatedAt: "2026-06-04T11:05:00+02:00"
+};
+
+const reopenedTask: HouseholdTask = reopenHouseholdTask(completedTask, reopenTaskInput);
+
 const newShoppingItemInput: NewShoppingListItemInput = {
   familyId: "family-1",
   categoryId: "cat-dairy",
@@ -83,5 +93,18 @@ const purchaseShoppingItemInput: PurchaseShoppingListItemInput = {
 
 const purchasedShoppingItem: ShoppingListItem = purchaseShoppingListItem(createdShoppingItem, purchaseShoppingItemInput);
 
+const unpurchaseShoppingItemInput: UnpurchaseShoppingListItemInput = {
+  itemId: createdShoppingItem.id,
+  updatedBy: "user-maya",
+  updatedAt: "2026-06-04T09:35:00+02:00"
+};
+
+const activeShoppingItem: ShoppingListItem = unpurchaseShoppingListItem(
+  purchasedShoppingItem,
+  unpurchaseShoppingItemInput
+);
+
 void completedTask;
+void reopenedTask;
 void purchasedShoppingItem;
+void activeShoppingItem;

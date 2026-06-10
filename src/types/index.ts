@@ -65,6 +65,12 @@ export type CompleteHouseholdTaskInput = {
   completedAt: ISODateTimeString;
 };
 
+export type ReopenHouseholdTaskInput = {
+  taskId: HouseholdTaskId;
+  updatedBy: UserId;
+  updatedAt: ISODateTimeString;
+};
+
 export type ShoppingCategory = {
   id: ShoppingCategoryId;
   familyId: FamilyId | null;
@@ -115,6 +121,12 @@ export type PurchaseShoppingListItemInput = {
   itemId: ShoppingItemId;
   purchasedBy: UserId;
   purchasedAt: ISODateTimeString;
+};
+
+export type UnpurchaseShoppingListItemInput = {
+  itemId: ShoppingItemId;
+  updatedBy: UserId;
+  updatedAt: ISODateTimeString;
 };
 
 export type LocalAppState = {
