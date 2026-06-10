@@ -38,11 +38,22 @@ describe("form validation", () => {
     expect(result.isValid).toBe(false);
     expect(result.errors.familyName).toBe("family_name_required");
     expect(result.errors.userName).toBe("user_name_required");
+    expect(
+      validateFamilySetupForm({
+        familyName: "С".repeat(61),
+        userName: "Алексей"
+      }).errors.familyName
+    ).toBe("name_too_long");
   });
 
   it("validates event, task, and shopping titles", () => {
     expect(validateEventForm({ title: "", date: "3 июня", time: "09:00" }).errors.title).toBe("title_required");
+    expect(validateEventForm({ title: "Врач", date: "", time: "" }).errors).toEqual({
+      date: "date_required",
+      time: "time_required"
+    });
     expect(validateTaskForm({ title: "A", due: "Сегодня" }).errors.title).toBe("title_too_short");
+    expect(validateTaskForm({ title: "A".repeat(81), due: "Сегодня" }).errors.title).toBe("title_too_long");
     expect(validateShoppingForm({ title: "Молоко", quantity: "2 л", category: "Молочное" }).isValid).toBe(true);
   });
 

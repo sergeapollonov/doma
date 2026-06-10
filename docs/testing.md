@@ -15,14 +15,14 @@ npm run verify:web
 ## What Each Check Covers
 
 - `npm run typecheck` verifies strict TypeScript contracts.
-- `npm test` runs Vitest unit tests for validation, domain actions, and local state.
+- `npm test` runs Vitest unit tests for Zod validation schemas, domain actions, and local state.
 - `npm run verify:web` exports the Expo web bundle without relying on a local dev server port.
 
 ## Test Scope
 
 Current unit tests cover:
 
-- form validation rules;
+- Zod form validation schemas;
 - household task domain actions;
 - shopping list domain actions;
 - local app state actions;
