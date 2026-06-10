@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type FormValidationErrorCode =
   | "title_required"
   | "title_too_short"
@@ -53,110 +55,115 @@ const MIN_TITLE_LENGTH = 2;
 const MAX_TITLE_LENGTH = 80;
 const MAX_QUANTITY_LENGTH = 32;
 const MAX_NAME_LENGTH = 60;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const titleSchema = z
+  .string()
+  .trim()
+  .min(1, "title_required")
+  .min(MIN_TITLE_LENGTH, "title_too_short")
+  .max(MAX_TITLE_LENGTH, "title_too_long");
+
+const loginFormSchema = z.object({
+  email: z.string().trim().min(1, "email_required").email("email_invalid")
+});
+
+const familySetupFormSchema = z.object({
+  familyName: z.string().trim().min(1, "family_name_required").max(MAX_NAME_LENGTH, "name_too_long"),
+  userName: z.string().trim().min(1, "user_name_required").max(MAX_NAME_LENGTH, "name_too_long")
+});
+
+const eventFormSchema = z.object({
+  title: titleSchema,
+  date: z.string().trim().min(1, "date_required"),
+  time: z.string().trim().min(1, "time_required")
+});
+
+const taskFormSchema = z.object({
+  title: titleSchema,
+  due: z.string()
+});
+
+const shoppingFormSchema = z.object({
+  title: titleSchema,
+  quantity: z.string().trim().max(MAX_QUANTITY_LENGTH, "quantity_too_long"),
+  category: z.string().trim().min(1, "category_required")
+});
 
 export function validateLoginForm(input: LoginFormInput): FormValidationResult<LoginFormField> {
-  const errors: FormValidationResult<LoginFormField>["errors"] = {};
-  const email = input.email.trim();
-
-  if (email.length === 0) {
-    errors.email = "email_required";
-  } else if (!EMAIL_PATTERN.test(email)) {
-    errors.email = "email_invalid";
-  }
-
-  return {
-    isValid: Object.keys(errors).length === 0,
-    errors
-  };
+  return validateForm(loginFormSchema, input);
 }
 
 export function validateFamilySetupForm(input: FamilySetupFormInput): FormValidationResult<FamilySetupFormField> {
-  const errors: FormValidationResult<FamilySetupFormField>["errors"] = {};
-  const familyName = input.familyName.trim();
-  const userName = input.userName.trim();
-
-  if (familyName.length === 0) {
-    errors.familyName = "family_name_required";
-  } else if (familyName.length > MAX_NAME_LENGTH) {
-    errors.familyName = "name_too_long";
-  }
-
-  if (userName.length === 0) {
-    errors.userName = "user_name_required";
-  } else if (userName.length > MAX_NAME_LENGTH) {
-    errors.userName = "name_too_long";
-  }
-
-  return {
-    isValid: Object.keys(errors).length === 0,
-    errors
-  };
+  return validateForm(familySetupFormSchema, input);
 }
 
 export function validateEventForm(input: EventFormInput): FormValidationResult<EventFormField> {
-  const errors: FormValidationResult<EventFormField>["errors"] = {};
-  assignTitleError(errors, input.title);
-
-  if (input.date.trim().length === 0) {
-    errors.date = "date_required";
-  }
-
-  if (input.time.trim().length === 0) {
-    errors.time = "time_required";
-  }
-
-  return {
-    isValid: Object.keys(errors).length === 0,
-    errors
-  };
+  return validateForm(eventFormSchema, input);
 }
 
 export function validateTaskForm(input: TaskFormInput): FormValidationResult<TaskFormField> {
-  const errors: FormValidationResult<TaskFormField>["errors"] = {};
-  assignTitleError(errors, input.title);
-
-  return {
-    isValid: Object.keys(errors).length === 0,
-    errors
-  };
+  return validateForm(taskFormSchema, input);
 }
 
 export function validateShoppingForm(input: ShoppingFormInput): FormValidationResult<ShoppingFormField> {
-  const errors: FormValidationResult<ShoppingFormField>["errors"] = {};
-  assignTitleError(errors, input.title);
+  return validateForm(shoppingFormSchema, input);
+}
 
-  if (input.quantity.trim().length > MAX_QUANTITY_LENGTH) {
-    errors.quantity = "quantity_too_long";
-  }
+function validateForm<Field extends string, Input>(
+  schema: z.ZodType<Input>,
+  input: Input
+): FormValidationResult<Field> {
+  const result = schema.safeParse(input);
 
-  if (input.category.trim().length === 0) {
-    errors.category = "category_required";
+  if (result.success) {
+    return {
+      isValid: true,
+      errors: {}
+    };
   }
 
   return {
-    isValid: Object.keys(errors).length === 0,
-    errors
+    isValid: false,
+    errors: issuesToErrors<Field>(result.error.issues)
   };
 }
 
-function assignTitleError<Field extends string>(
-  errors: Partial<Record<Field | "title", FormValidationErrorCode>>,
-  title: string
-) {
-  const trimmedTitle = title.trim();
+function issuesToErrors<Field extends string>(issues: z.ZodIssue[]): Partial<Record<Field, FormValidationErrorCode>> {
+  return issues.reduce<Partial<Record<Field, FormValidationErrorCode>>>((errors, issue) => {
+    const field = issue.path[0];
 
-  if (trimmedTitle.length === 0) {
-    errors.title = "title_required";
-    return;
+    if (typeof field !== "string" || errors[field as Field] !== undefined) {
+      return errors;
+    }
+
+    errors[field as Field] = toErrorCode(issue.message);
+    return errors;
+  }, {});
+}
+
+function toErrorCode(message: string): FormValidationErrorCode {
+  if (isFormValidationErrorCode(message)) {
+    return message;
   }
 
-  if (trimmedTitle.length < MIN_TITLE_LENGTH) {
-    errors.title = "title_too_short";
-    return;
-  }
+  return "title_required";
+}
 
-  if (trimmedTitle.length > MAX_TITLE_LENGTH) {
-    errors.title = "title_too_long";
-  }
+function isFormValidationErrorCode(message: string): message is FormValidationErrorCode {
+  const errorCodes = new Set<FormValidationErrorCode>([
+    "title_required",
+    "title_too_short",
+    "title_too_long",
+    "email_required",
+    "email_invalid",
+    "family_name_required",
+    "user_name_required",
+    "name_too_long",
+    "date_required",
+    "time_required",
+    "quantity_too_long",
+    "category_required"
+  ]);
+
+  return errorCodes.has(message as FormValidationErrorCode);
 }
