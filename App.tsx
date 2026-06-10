@@ -35,6 +35,17 @@ import {
   TabKey,
   TaskItem
 } from "./src/types";
+import {
+  validateEventForm,
+  validateShoppingForm,
+  validateTaskForm
+} from "./src/validation/forms";
+import type {
+  EventFormField,
+  FormValidationErrorCode,
+  ShoppingFormField,
+  TaskFormField
+} from "./src/validation/forms";
 
 type Stage = "onboarding" | "login" | "family" | "invite" | "acceptInvite" | "app";
 type AuthIntent = "createFamily" | "acceptInvite";
@@ -138,16 +149,19 @@ export default function App() {
     time: "09:00",
     participants: "both"
   });
+  const [eventErrors, setEventErrors] = useState<Partial<Record<EventFormField, FormValidationErrorCode>>>({});
   const [taskDraft, setTaskDraft] = useState({
     title: "",
     assignee: "alex" as PersonId | "shared",
     due: text.noDue
   });
+  const [taskErrors, setTaskErrors] = useState<Partial<Record<TaskFormField, FormValidationErrorCode>>>({});
   const [shoppingDraft, setShoppingDraft] = useState({
     title: "",
     quantity: "",
     category: "Базовое"
   });
+  const [shoppingErrors, setShoppingErrors] = useState<Partial<Record<ShoppingFormField, FormValidationErrorCode>>>({});
 
   const selectedDay = Number(selectedDate.slice(-2));
   const selectedEvents = useMemo(
@@ -193,9 +207,13 @@ export default function App() {
   }
 
   function addEvent() {
-    if (!eventDraft.title.trim()) {
+    const validation = validateEventForm(eventDraft);
+
+    if (!validation.isValid) {
+      setEventErrors(validation.errors);
       return;
     }
+
     const participants: PersonId[] = eventDraft.participants === "alex" ? ["alex"] : ["alex", "maya"];
     const eventDate = eventDateToISODate(eventDraft.date);
     storeAddEvent(
@@ -209,15 +227,20 @@ export default function App() {
       },
       eventDate
     );
+    setEventErrors({});
     setEventDraft({ title: "", date: "3 июня", time: "09:00", participants: "both" });
     setSheet(null);
     setActiveTab("today");
   }
 
   function addTask() {
-    if (!taskDraft.title.trim()) {
+    const validation = validateTaskForm(taskDraft);
+
+    if (!validation.isValid) {
+      setTaskErrors(validation.errors);
       return;
     }
+
     storeAddHouseholdTask({
       id: createHouseholdTaskId(),
       familyId,
@@ -228,6 +251,7 @@ export default function App() {
       createdBy: currentUserId,
       createdAt: nowDateTime()
     });
+    setTaskErrors({});
     setTaskDraft({ title: "", assignee: "alex", due: text.noDue });
     setSheet(null);
     setActiveTab("tasks");
@@ -235,9 +259,13 @@ export default function App() {
 
   function addShoppingItem(title?: string) {
     const nextTitle = (title ?? shoppingDraft.title).trim();
-    if (!nextTitle) {
+    const validation = validateShoppingForm({ ...shoppingDraft, title: nextTitle });
+
+    if (!validation.isValid) {
+      setShoppingErrors(validation.errors);
       return;
     }
+
     storeAddShoppingItem({
       id: createShoppingItemId(nextTitle),
       familyId,
@@ -247,6 +275,7 @@ export default function App() {
       createdBy: currentUserId,
       createdAt: nowDateTime()
     });
+    setShoppingErrors({});
     setShoppingDraft({ title: "", quantity: "", category: "Базовое" });
     setSheet(null);
     setActiveTab("shopping");
@@ -813,6 +842,8 @@ export default function App() {
   }
 
   function renderEventForm() {
+    const eventErrorMessage = firstValidationMessage(eventErrors, language);
+
     return (
       <View>
         <View style={styles.eventSheetBrand}>
@@ -826,7 +857,10 @@ export default function App() {
             <TextInput
               style={styles.eventFormValueInput}
               value={eventDraft.title}
-              onChangeText={(title) => setEventDraft((draft) => ({ ...draft, title }))}
+              onChangeText={(title) => {
+                setEventDraft((draft) => ({ ...draft, title }));
+                setEventErrors((errors) => ({ ...errors, title: undefined }));
+              }}
               placeholder="Врач"
               placeholderTextColor={colors.domaBlue}
               autoFocus
@@ -843,10 +877,11 @@ export default function App() {
           <EventFormRow icon="notifications-outline" color={colors.domaGold} label={text.reminder} value={text.thirtyMin} chevron />
           <EventFormRow icon="repeat-outline" color={colors.domaBlue} label={language === "ru" ? "Повтор" : "Powtarzanie"} value={language === "ru" ? "Не повторять" : "Nie powtarzaj"} chevron last />
         </Card>
+        {eventErrorMessage !== null && <Text style={styles.formError}>{eventErrorMessage}</Text>}
         <Card style={styles.eventCommentCard}>
           <EventFormRow icon="chatbubble-outline" color={colors.domaBlue} label={language === "ru" ? "Комментарий" : "Komentarz"} value={language === "ru" ? "Добавить комментарий..." : "Dodaj komentarz..."} last />
         </Card>
-        <PrimaryButton label={text.save} onPress={addEvent} disabled={!eventDraft.title.trim()} />
+        <PrimaryButton label={text.save} onPress={addEvent} />
       </View>
     );
   }
@@ -855,7 +890,16 @@ export default function App() {
     return (
       <View>
         <SheetTitle title={text.newTask} />
-        <Input label={text.title} value={taskDraft.title} onChangeText={(title) => setTaskDraft((draft) => ({ ...draft, title }))} autoFocus />
+        <Input
+          label={text.title}
+          value={taskDraft.title}
+          onChangeText={(title) => {
+            setTaskDraft((draft) => ({ ...draft, title }));
+            setTaskErrors((errors) => ({ ...errors, title: undefined }));
+          }}
+          error={taskErrors.title ? validationMessage(taskErrors.title, language) : undefined}
+          autoFocus
+        />
         <Text style={styles.fieldLabel}>{text.assignee}</Text>
         <View style={styles.segment}>
           <Segment label="Алексей" active={taskDraft.assignee === "alex"} onPress={() => setTaskDraft((draft) => ({ ...draft, assignee: "alex" }))} />
@@ -863,7 +907,7 @@ export default function App() {
           <Segment label={text.shared} active={taskDraft.assignee === "shared"} onPress={() => setTaskDraft((draft) => ({ ...draft, assignee: "shared" }))} />
         </View>
         <Input label={text.due} value={taskDraft.due} onChangeText={(due) => setTaskDraft((draft) => ({ ...draft, due }))} />
-        <PrimaryButton label={text.save} onPress={addTask} disabled={!taskDraft.title.trim()} />
+        <PrimaryButton label={text.save} onPress={addTask} />
       </View>
     );
   }
@@ -872,12 +916,39 @@ export default function App() {
     return (
       <View>
         <SheetTitle title={text.newShopping} />
-        <Input label={text.title} value={shoppingDraft.title} onChangeText={(title) => setShoppingDraft((draft) => ({ ...draft, title }))} autoFocus />
+        <Input
+          label={text.title}
+          value={shoppingDraft.title}
+          onChangeText={(title) => {
+            setShoppingDraft((draft) => ({ ...draft, title }));
+            setShoppingErrors((errors) => ({ ...errors, title: undefined }));
+          }}
+          error={shoppingErrors.title ? validationMessage(shoppingErrors.title, language) : undefined}
+          autoFocus
+        />
         <View style={styles.formRow}>
-          <Input compact label={text.quantity} value={shoppingDraft.quantity} onChangeText={(quantity) => setShoppingDraft((draft) => ({ ...draft, quantity }))} />
-          <Input compact label={text.category} value={shoppingDraft.category} onChangeText={(category) => setShoppingDraft((draft) => ({ ...draft, category }))} />
+          <Input
+            compact
+            label={text.quantity}
+            value={shoppingDraft.quantity}
+            onChangeText={(quantity) => {
+              setShoppingDraft((draft) => ({ ...draft, quantity }));
+              setShoppingErrors((errors) => ({ ...errors, quantity: undefined }));
+            }}
+            error={shoppingErrors.quantity ? validationMessage(shoppingErrors.quantity, language) : undefined}
+          />
+          <Input
+            compact
+            label={text.category}
+            value={shoppingDraft.category}
+            onChangeText={(category) => {
+              setShoppingDraft((draft) => ({ ...draft, category }));
+              setShoppingErrors((errors) => ({ ...errors, category: undefined }));
+            }}
+            error={shoppingErrors.category ? validationMessage(shoppingErrors.category, language) : undefined}
+          />
         </View>
-        <PrimaryButton label={text.add} onPress={() => addShoppingItem()} disabled={!shoppingDraft.title.trim()} />
+        <PrimaryButton label={text.add} onPress={() => addShoppingItem()} />
       </View>
     );
   }
@@ -1086,6 +1157,39 @@ function toShoppingItem(item: ShoppingListItem, categories: ShoppingCategory[]):
 function shoppingCategoryName(categoryId: ShoppingCategoryId | null, categories: ShoppingCategory[]) {
   const category = categories.find((item) => item.id === categoryId);
   return category?.nameRu ?? "Базовое";
+}
+
+function firstValidationMessage<Field extends string>(
+  errors: Partial<Record<Field, FormValidationErrorCode>>,
+  language: Language
+) {
+  const firstCode = Object.values(errors).find((code): code is FormValidationErrorCode => code !== undefined);
+  return firstCode ? validationMessage(firstCode, language) : null;
+}
+
+function validationMessage(code: FormValidationErrorCode, language: Language) {
+  const messages: Record<Language, Record<FormValidationErrorCode, string>> = {
+    ru: {
+      title_required: "Добавьте название.",
+      title_too_short: "Название должно быть не короче 2 символов.",
+      title_too_long: "Название должно быть не длиннее 80 символов.",
+      date_required: "Выберите дату.",
+      time_required: "Выберите время.",
+      quantity_too_long: "Количество должно быть не длиннее 32 символов.",
+      category_required: "Укажите категорию."
+    },
+    pl: {
+      title_required: "Dodaj nazwę.",
+      title_too_short: "Nazwa musi mieć co najmniej 2 znaki.",
+      title_too_long: "Nazwa może mieć maksymalnie 80 znaków.",
+      date_required: "Wybierz datę.",
+      time_required: "Wybierz godzinę.",
+      quantity_too_long: "Ilość może mieć maksymalnie 32 znaki.",
+      category_required: "Podaj kategorię."
+    }
+  };
+
+  return messages[language][code];
 }
 
 function AppShell({ children }: { children: React.ReactNode }) {
@@ -1427,12 +1531,14 @@ function Input({
   label,
   value,
   onChangeText,
+  error,
   compact,
   autoFocus
 }: {
   label: string;
   value: string;
   onChangeText: (value: string) => void;
+  error?: string;
   compact?: boolean;
   autoFocus?: boolean;
 }) {
@@ -1440,12 +1546,13 @@ function Input({
     <View style={[styles.inputWrap, compact && styles.inputCompact]}>
       <Text style={styles.fieldLabel}>{label}</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, error && styles.inputError]}
         value={value}
         onChangeText={onChangeText}
         placeholderTextColor={colors.textTertiary}
         autoFocus={autoFocus}
       />
+      {error && <Text style={styles.formError}>{error}</Text>}
     </View>
   );
 }
@@ -2632,6 +2739,16 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 16,
     fontWeight: "600"
+  },
+  inputError: {
+    borderColor: colors.dangerRed
+  },
+  formError: {
+    color: colors.dangerRed,
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: "700",
+    marginTop: 7
   },
   formRow: {
     flexDirection: "row",
