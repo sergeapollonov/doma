@@ -37,12 +37,16 @@ import {
 } from "./src/types";
 import {
   validateEventForm,
+  validateFamilySetupForm,
+  validateLoginForm,
   validateShoppingForm,
   validateTaskForm
 } from "./src/validation/forms";
 import type {
   EventFormField,
+  FamilySetupFormField,
   FormValidationErrorCode,
+  LoginFormField,
   ShoppingFormField,
   TaskFormField
 } from "./src/validation/forms";
@@ -137,12 +141,14 @@ export default function App() {
   const [authIntent, setAuthIntent] = useState<AuthIntent>("createFamily");
   const [email, setEmail] = useState("alex@example.com");
   const [loginTouched, setLoginTouched] = useState(false);
+  const [loginErrors, setLoginErrors] = useState<Partial<Record<LoginFormField, FormValidationErrorCode>>>({});
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [activeTab, setActiveTab] = useState<TabKey>("today");
   const [sheet, setSheet] = useState<Sheet>(null);
   const [taskFilter, setTaskFilter] = useState<"all" | "mine" | "maya" | "shared" | "done">("all");
   const [familyName, setFamilyName] = useState("Семья Алексея");
   const [userName, setUserName] = useState("Алексей");
+  const [familyTouched, setFamilyTouched] = useState<Partial<Record<FamilySetupFormField, boolean>>>({});
   const [eventDraft, setEventDraft] = useState({
     title: "",
     date: "3 июня",
@@ -181,7 +187,8 @@ export default function App() {
   const activeTasks = useMemo(() => tasks.filter((task) => !task.completed), [tasks]);
   const purchasedCount = shopping.filter((item) => item.purchased).length;
   const pendingShopping = shopping.filter((item) => !item.purchased);
-  const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const loginValidation = validateLoginForm({ email });
+  const familyValidation = validateFamilySetupForm({ familyName, userName });
 
   function completeOnboarding() {
     if (onboardingStep < 2) {
@@ -195,15 +202,30 @@ export default function App() {
     setAuthIntent(intent);
     setEmail(intent === "createFamily" ? "alex@example.com" : "maya@example.com");
     setLoginTouched(false);
+    setLoginErrors({});
     setStage("login");
   }
 
   function continueLogin() {
     setLoginTouched(true);
-    if (!emailIsValid) {
+    setLoginErrors(loginValidation.errors);
+
+    if (!loginValidation.isValid) {
       return;
     }
+
+    setLoginErrors({});
     setStage(authIntent === "createFamily" ? "family" : "acceptInvite");
+  }
+
+  function continueFamilySetup() {
+    setFamilyTouched({ familyName: true, userName: true });
+
+    if (!familyValidation.isValid) {
+      return;
+    }
+
+    setStage("invite");
   }
 
   function addEvent() {
@@ -348,6 +370,8 @@ export default function App() {
 
   if (stage === "login") {
     const isInvite = authIntent === "acceptInvite";
+    const loginEmailError = loginTouched ? loginValidation.errors.email ?? loginErrors.email : undefined;
+
     return (
       <AppShell>
         <StatusBar style="dark" />
@@ -374,16 +398,21 @@ export default function App() {
             <Card style={styles.authCard}>
               <Text style={styles.fieldLabel}>Email</Text>
               <TextInput
-                style={[styles.authInput, loginTouched && !emailIsValid && styles.authInputError]}
+                style={[styles.authInput, loginEmailError && styles.authInputError]}
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(nextEmail) => {
+                  setEmail(nextEmail);
+                  setLoginTouched(true);
+                  setLoginErrors({});
+                }}
+                onBlur={() => setLoginTouched(true)}
                 autoCapitalize="none"
                 keyboardType="email-address"
                 placeholder="alex@example.com"
                 placeholderTextColor={colors.textTertiary}
               />
-              {loginTouched && !emailIsValid ? (
-                <Text style={styles.validationText}>{language === "ru" ? "Введите корректный email" : "Wpisz poprawny email"}</Text>
+              {loginEmailError ? (
+                <Text style={styles.validationText}>{validationMessage(loginEmailError, language)}</Text>
               ) : (
                 <Text style={styles.authHelp}>
                   {language === "ru"
@@ -393,7 +422,7 @@ export default function App() {
               )}
             </Card>
 
-            <PrimaryButton label={language === "ru" ? "Продолжить" : "Kontynuuj"} onPress={continueLogin} arrow />
+            <PrimaryButton label={language === "ru" ? "Продолжить" : "Kontynuuj"} onPress={continueLogin} disabled={!loginValidation.isValid} arrow />
 
             <View style={styles.socialBlock}>
               <Text style={styles.socialDivider}>{language === "ru" ? "или" : "albo"}</Text>
@@ -419,6 +448,9 @@ export default function App() {
   }
 
   if (stage === "family") {
+    const familyNameError = familyTouched.familyName ? familyValidation.errors.familyName : undefined;
+    const userNameError = familyTouched.userName ? familyValidation.errors.userName : undefined;
+
     return (
       <AppShell>
         <StatusBar style="dark" />
@@ -431,13 +463,29 @@ export default function App() {
                 ? "Это семейное пространство для событий, дел, покупок и спокойной синхронизации."
                 : "To rodzinna przestrzeń na wydarzenia, sprawy, zakupy i spokojną synchronizację."}
             </Text>
-            <Input label={language === "ru" ? "Название семьи" : "Nazwa rodziny"} value={familyName} onChangeText={setFamilyName} />
-            <Input label={language === "ru" ? "Ваше имя" : "Twoje imię"} value={userName} onChangeText={setUserName} />
+            <Input
+              label={language === "ru" ? "Название семьи" : "Nazwa rodziny"}
+              value={familyName}
+              onChangeText={(nextFamilyName) => {
+                setFamilyName(nextFamilyName);
+                setFamilyTouched((touched) => ({ ...touched, familyName: true }));
+              }}
+              error={familyNameError ? validationMessage(familyNameError, language) : undefined}
+            />
+            <Input
+              label={language === "ru" ? "Ваше имя" : "Twoje imię"}
+              value={userName}
+              onChangeText={(nextUserName) => {
+                setUserName(nextUserName);
+                setFamilyTouched((touched) => ({ ...touched, userName: true }));
+              }}
+              error={userNameError ? validationMessage(userNameError, language) : undefined}
+            />
             <Pressable style={styles.photoButton}>
               <Ionicons name="camera-outline" size={20} color={colors.domaBlue} />
               <Text style={styles.photoButtonText}>{language === "ru" ? "Добавить фото" : "Dodaj zdjęcie"}</Text>
             </Pressable>
-            <PrimaryButton label={text.createFamily} onPress={() => setStage("invite")} />
+            <PrimaryButton label={text.createFamily} onPress={continueFamilySetup} disabled={!familyValidation.isValid} />
           </ScrollView>
         </SafeAreaView>
       </AppShell>
@@ -1173,6 +1221,11 @@ function validationMessage(code: FormValidationErrorCode, language: Language) {
       title_required: "Добавьте название.",
       title_too_short: "Название должно быть не короче 2 символов.",
       title_too_long: "Название должно быть не длиннее 80 символов.",
+      email_required: "Введите email.",
+      email_invalid: "Введите корректный email.",
+      family_name_required: "Введите название семьи.",
+      user_name_required: "Введите ваше имя.",
+      name_too_long: "Имя должно быть не длиннее 60 символов.",
       date_required: "Выберите дату.",
       time_required: "Выберите время.",
       quantity_too_long: "Количество должно быть не длиннее 32 символов.",
@@ -1182,6 +1235,11 @@ function validationMessage(code: FormValidationErrorCode, language: Language) {
       title_required: "Dodaj nazwę.",
       title_too_short: "Nazwa musi mieć co najmniej 2 znaki.",
       title_too_long: "Nazwa może mieć maksymalnie 80 znaków.",
+      email_required: "Wpisz email.",
+      email_invalid: "Wpisz poprawny email.",
+      family_name_required: "Wpisz nazwę rodziny.",
+      user_name_required: "Wpisz swoje imię.",
+      name_too_long: "Nazwa może mieć maksymalnie 60 znaków.",
       date_required: "Wybierz datę.",
       time_required: "Wybierz godzinę.",
       quantity_too_long: "Ilość może mieć maksymalnie 32 znaki.",
