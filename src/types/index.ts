@@ -172,6 +172,7 @@ export type ShoppingItem = {
   id: string;
   title: string;
   quantity?: string;
+  categoryId: ShoppingCategoryId | null;
   category: string;
   purchased: boolean;
 };

@@ -9,11 +9,13 @@ import { Avatar } from "../family";
 type TaskRowProps = {
   task: TaskItem;
   assignee: string;
+  completedLabel: string;
+  noReminderLabel: string;
   onToggle: () => void;
   grouped?: boolean;
 };
 
-export function TaskRow({ task, assignee, onToggle, grouped = false }: TaskRowProps) {
+export function TaskRow({ task, assignee, completedLabel, noReminderLabel, onToggle, grouped = false }: TaskRowProps) {
   return (
     <Pressable style={[styles.taskRow, grouped && styles.groupedRow]}>
       <View style={[styles.taskAccent, task.completed && styles.taskAccentDone]} />
@@ -24,11 +26,11 @@ export function TaskRow({ task, assignee, onToggle, grouped = false }: TaskRowPr
         <Text style={[styles.rowTitle, task.completed && styles.completedText]}>{task.title}</Text>
         <View style={styles.inlineMeta}>
           <Ionicons
-            name={task.reminder === "Не напоминать" ? "calendar-outline" : "notifications-outline"}
+            name={task.reminder === noReminderLabel ? "calendar-outline" : "notifications-outline"}
             size={15}
             color={task.completed ? colors.shoppingGreen : colors.taskOrange}
           />
-          <Text style={styles.caption}>{task.completed ? "Выполнено сегодня" : `${task.due} · ${assignee}`}</Text>
+          <Text style={styles.caption}>{task.completed ? completedLabel : `${task.due} · ${assignee}`}</Text>
         </View>
       </View>
       {task.assignee !== "shared" ? <Avatar person={task.assignee} size={28} /> : <Ionicons name="people-outline" size={22} color={colors.familySand} />}
