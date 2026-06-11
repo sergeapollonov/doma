@@ -28,10 +28,14 @@ Doma is in early alpha.
 
 Current state:
 
-- Expo + React Native + TypeScript project skeleton;
-- static app prototype with local mock data;
+- Expo + React Native + TypeScript alpha prototype;
+- static app screens backed by deterministic local mock data;
+- reusable UI components in `src/components`;
+- local Zustand store for events, tasks, shopping, selected date, and language;
+- local add/complete/purchase flows for events, household tasks, and shopping items;
+- React Hook Form + Zod validation for Login, Create Family, New Event, New Task, and New Shopping Item forms;
 - design tokens in `src/theme`;
-- bilingual copy structure in `src/i18n`;
+- bilingual RU/PL copy structure in `src/i18n`;
 - product, design, flow, privacy, and data model documentation in `docs`;
 - visual references in `design-references`;
 - TypeScript check via `npm run typecheck`;
@@ -42,6 +46,7 @@ Not implemented yet:
 
 - real authentication;
 - persistent local store;
+- pending mutation queue;
 - Supabase backend;
 - realtime sync;
 - push notifications;
@@ -67,11 +72,12 @@ The repository includes design references used to guide implementation.
 - TypeScript
 - React Native Web
 - Expo Vector Icons
+- Zustand
+- React Hook Form
+- Zod
 
 Planned stack:
 
-- Zustand for local app state;
-- React Hook Form + Zod for forms and validation;
 - i18next / react-i18next for localization;
 - Supabase Auth, PostgreSQL, Realtime, and Storage;
 - expo-notifications for reminders;
@@ -148,11 +154,11 @@ Near-term OSS goals:
 Good starting areas:
 
 - improve Polish localization coverage;
-- audit visible strings and move them into i18n files;
+- audit remaining demo copy and localization terminology;
 - add component-level tests;
 - improve accessibility labels;
 - document setup steps for iOS and Android;
-- convert repeated UI patterns into reusable components;
+- add usage notes for reusable UI components;
 - improve privacy and security documentation.
 
 See `docs/issue-drafts` for prepared issue ideas.

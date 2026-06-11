@@ -15,6 +15,28 @@ Build Doma in small, reviewable milestones.
 - Each milestone should pass TypeScript checks.
 - Each milestone should avoid unrelated changes.
 
+## Current public alpha status
+
+Last synchronized: 2026-06-11.
+
+```text
+Completed: Milestone 0 — Project understanding
+Completed: Milestone 1 — App skeleton
+Completed: Milestone 2 — Static UI screens
+Completed: Milestone 3 — Base components
+Completed: Milestone 4 — Local state and interactions
+Completed: Milestone 5 — Forms and validation
+Next: Milestone 6 — Supabase foundation
+```
+
+Notes:
+
+- The app still runs without backend credentials.
+- Local state is intentionally non-persistent for now.
+- Forms use React Hook Form + Zod with localized validation messages.
+- Reusable UI components exist, but component-level UI tests remain a follow-up task.
+- Accessibility and privacy threat-model work remain open quality milestones.
+
 ## 3. Milestone 0 — Project understanding
 
 ### Goal
@@ -385,21 +407,20 @@ Doma
 
 Do not implement widget before core app and local data are stable.
 
-## 17. Recommended first development prompt
+## 17. Recommended next development prompt
 
 ```text
 Read /docs/PROJECT-INDEX.md and /docs/milestones.md.
 
-Proceed only with Milestone 1:
-- create Expo React Native TypeScript project structure;
-- create folder structure;
-- add theme tokens;
-- add i18n RU/PL structure;
-- add placeholder auth screens;
-- add placeholder bottom tabs: Today, Calendar, Tasks, Shopping.
+Proceed only with Milestone 6:
+- add Supabase foundation;
+- document required environment variables;
+- add schema and RLS planning artifacts;
+- keep the app runnable without backend credentials;
+- keep local/mock mode intact.
 
 Do not connect backend.
-Do not implement real screens.
+Do not migrate app screens to backend data yet.
 Do not redesign UI.
-After finishing, show created files and explain architecture.
+After finishing, show created files and explain backend foundation boundaries.
 ```

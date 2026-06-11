@@ -4,6 +4,22 @@ Doma is an early-stage open-source, privacy-first family planning app and a reus
 
 This roadmap describes how the public project should grow in small, reviewable milestones.
 
+## Current Status
+
+Last synchronized: 2026-06-11.
+
+```text
+Completed: Milestone A — Public Repository Readiness
+Completed: Milestone B — Component Foundation
+Completed: Milestone C — Localization Cleanup
+Completed: Milestone D — Local State
+Completed: Milestone E — Forms and Validation
+Partially complete: Milestone F — Privacy and Security Baseline
+Not started: Milestone G — Backend Foundation
+```
+
+Open follow-up work should focus on tests, accessibility, privacy threat modeling, and localization polish before backend features expand.
+
 ## Open Source Goals
 
 Doma should be useful to:
@@ -24,6 +40,8 @@ Doma should be useful to:
 - Multilingual by design: Russian and Polish support are part of the MVP, not an afterthought.
 
 ## Milestone A: Public Repository Readiness
+
+Status: completed for public alpha.
 
 Goal: make the repository safe and understandable for public contributors.
 
@@ -48,6 +66,8 @@ Exit criteria:
 - README explains project status and contribution paths.
 
 ## Milestone B: Component Foundation
+
+Status: completed for public alpha; component-level tests remain open follow-up work.
 
 Goal: turn repeated UI patterns into reusable components.
 
@@ -79,6 +99,8 @@ Exit criteria:
 
 ## Milestone C: Localization Cleanup
 
+Status: completed for visible app copy; Polish copy audit remains open follow-up work.
+
 Goal: make Russian and Polish localization maintainable.
 
 Scope:
@@ -95,6 +117,8 @@ Exit criteria:
 - TypeScript passes.
 
 ## Milestone D: Local State
+
+Status: completed for non-persistent local alpha flows.
 
 Goal: make Doma usable without a backend.
 
@@ -118,6 +142,8 @@ Exit criteria:
 
 ## Milestone E: Forms and Validation
 
+Status: completed for the five documented MVP forms.
+
 Goal: add reliable form flows.
 
 Scope:
@@ -140,6 +166,8 @@ Exit criteria:
 
 ## Milestone F: Privacy and Security Baseline
 
+Status: partially complete; public policy files exist, but the privacy threat model issue remains open.
+
 Goal: prepare for backend work without leaking sensitive data.
 
 Scope:
@@ -159,6 +187,8 @@ Exit criteria:
 - backend milestones have explicit security gates.
 
 ## Milestone G: Backend Foundation
+
+Status: not started.
 
 Goal: introduce Supabase after UI and local flows are stable.
 
