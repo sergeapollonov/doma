@@ -1,18 +1,21 @@
 import { z } from "zod";
 
-export type FormValidationErrorCode =
-  | "title_required"
-  | "title_too_short"
-  | "title_too_long"
-  | "email_required"
-  | "email_invalid"
-  | "family_name_required"
-  | "user_name_required"
-  | "name_too_long"
-  | "date_required"
-  | "time_required"
-  | "quantity_too_long"
-  | "category_required";
+export const formValidationErrorCodes = [
+  "title_required",
+  "title_too_short",
+  "title_too_long",
+  "email_required",
+  "email_invalid",
+  "family_name_required",
+  "user_name_required",
+  "name_too_long",
+  "date_required",
+  "time_required",
+  "quantity_too_long",
+  "category_required"
+] as const;
+
+export type FormValidationErrorCode = (typeof formValidationErrorCodes)[number];
 
 export type FormValidationResult<Field extends string> = {
   isValid: boolean;
@@ -153,21 +156,6 @@ function toErrorCode(message: string): FormValidationErrorCode {
   return "title_required";
 }
 
-function isFormValidationErrorCode(message: string): message is FormValidationErrorCode {
-  const errorCodes = new Set<FormValidationErrorCode>([
-    "title_required",
-    "title_too_short",
-    "title_too_long",
-    "email_required",
-    "email_invalid",
-    "family_name_required",
-    "user_name_required",
-    "name_too_long",
-    "date_required",
-    "time_required",
-    "quantity_too_long",
-    "category_required"
-  ]);
-
-  return errorCodes.has(message as FormValidationErrorCode);
+export function isFormValidationErrorCode(message: string): message is FormValidationErrorCode {
+  return formValidationErrorCodes.some((code) => code === message);
 }
