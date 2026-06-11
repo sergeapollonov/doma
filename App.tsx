@@ -54,6 +54,7 @@ import {
 import {
   eventFormSchema,
   familySetupFormSchema,
+  isFormValidationErrorCode,
   loginFormSchema,
   shoppingFormSchema,
   taskFormSchema
@@ -136,7 +137,6 @@ export default function App() {
     resolver: zodResolver(shoppingFormSchema)
   });
 
-  const loginValues = loginForm.watch();
   const familyValues = familySetupForm.watch();
   const eventValues = eventForm.watch();
   const familyName = familyValues.familyName;
@@ -159,14 +159,22 @@ export default function App() {
   const activeTasks = useMemo(() => tasks.filter((task) => !task.completed), [tasks]);
   const purchasedCount = shopping.filter((item) => item.purchased).length;
   const pendingShopping = shopping.filter((item) => !item.purchased);
-  const loginIsValid = loginFormSchema.safeParse(loginValues).success;
-  const familySetupIsValid = familySetupFormSchema.safeParse(familyValues).success;
+  const loginIsValid = loginForm.formState.isValid;
+  const familySetupIsValid = familySetupForm.formState.isValid;
+  const eventIsValid = eventForm.formState.isValid;
+  const taskIsValid = taskForm.formState.isValid;
+  const shoppingIsValid = shoppingForm.formState.isValid;
 
   useEffect(() => {
-    eventForm.setValue("date", text.formatMonthDay(3));
-    taskForm.setValue("due", text.noDue);
-    shoppingForm.setValue("category", text.categoryOther);
+    eventForm.setValue("date", text.formatMonthDay(3), { shouldValidate: true });
+    taskForm.setValue("due", text.noDue, { shouldValidate: true });
+    shoppingForm.setValue("category", text.categoryOther, { shouldValidate: true });
   }, [eventForm, language, shoppingForm, taskForm, text]);
+
+  useEffect(() => {
+    void loginForm.trigger();
+    void familySetupForm.trigger();
+  }, [familySetupForm, loginForm]);
 
   function completeOnboarding() {
     if (onboardingStep < 2) {
@@ -179,6 +187,7 @@ export default function App() {
   function openLogin(intent: AuthIntent) {
     setAuthIntent(intent);
     loginForm.reset({ email: intent === "createFamily" ? "alex@example.com" : "maya@example.com" });
+    void loginForm.trigger("email");
     setStage("login");
   }
 
@@ -849,7 +858,7 @@ export default function App() {
         <Card style={styles.eventCommentCard}>
           <EventFormRow icon="chatbubble-outline" color={colors.domaBlue} label={text.comment} value={text.addComment} last />
         </Card>
-        <PrimaryButton label={text.save} onPress={addEvent} />
+        <PrimaryButton label={text.save} onPress={addEvent} disabled={!eventIsValid} />
       </View>
     );
   }
@@ -889,7 +898,7 @@ export default function App() {
             <Input label={text.due} value={value} onChangeText={onChange} error={taskDueError} />
           )}
         />
-        <PrimaryButton label={text.save} onPress={addTask} />
+        <PrimaryButton label={text.save} onPress={addTask} disabled={!taskIsValid} />
       </View>
     );
   }
@@ -937,7 +946,7 @@ export default function App() {
             )}
           />
         </View>
-        <PrimaryButton label={text.add} onPress={() => addShoppingItem()} />
+        <PrimaryButton label={text.add} onPress={() => addShoppingItem()} disabled={!shoppingIsValid} />
       </View>
     );
   }
@@ -1158,29 +1167,14 @@ function shoppingCategoryLabelToId(categoryLabel: string, categories: ShoppingCa
   return category?.id ?? "cat-other";
 }
 
-const formValidationErrorCodes = new Set<FormValidationErrorCode>([
-  "title_required",
-  "title_too_short",
-  "title_too_long",
-  "email_required",
-  "email_invalid",
-  "family_name_required",
-  "user_name_required",
-  "name_too_long",
-  "date_required",
-  "time_required",
-  "quantity_too_long",
-  "category_required"
-]);
-
 function fieldValidationMessage(error: { message?: unknown } | undefined, language: Language) {
   const code = error?.message;
 
-  if (typeof code !== "string" || !formValidationErrorCodes.has(code as FormValidationErrorCode)) {
+  if (typeof code !== "string" || !isFormValidationErrorCode(code)) {
     return undefined;
   }
 
-  return validationMessage(code as FormValidationErrorCode, language);
+  return validationMessage(code, language);
 }
 
 function validationMessage(code: FormValidationErrorCode, language: Language) {

@@ -3,12 +3,18 @@ import { describe, expect, it } from "vitest";
 import {
   validateEventForm,
   validateFamilySetupForm,
+  isFormValidationErrorCode,
   validateLoginForm,
   validateShoppingForm,
   validateTaskForm
 } from "./forms";
 
 describe("form validation", () => {
+  it("exposes a shared typed error code guard", () => {
+    expect(isFormValidationErrorCode("email_invalid")).toBe(true);
+    expect(isFormValidationErrorCode("unexpected_error")).toBe(false);
+  });
+
   it("accepts valid login and family setup input", () => {
     expect(validateLoginForm({ email: "alex@example.com" })).toEqual({
       isValid: true,
