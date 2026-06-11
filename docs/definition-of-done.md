@@ -53,9 +53,10 @@ Every UI screen must:
 Every visible string must exist in:
 
 ```text
-/src/i18n/ru.json
-/src/i18n/pl.json
+/src/i18n/index.ts
 ```
+
+If the project later migrates to JSON-backed localization, RU and PL keys must stay aligned in `src/i18n/ru.json` and `src/i18n/pl.json`.
 
 No hardcoded Russian/Polish strings inside components, except temporary mock data.
 

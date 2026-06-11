@@ -211,6 +211,47 @@ EAS Build
 
 Do not change the stack without explicit approval.
 
+Current public alpha implementation:
+
+```text
+Expo + React Native + TypeScript
+React Native Web
+Zustand local app store
+React Hook Form + Zod form validation
+Typed in-repo RU / PL copy module
+Vitest unit tests
+Expo web export verification
+```
+
+Planned but not connected yet:
+
+```text
+Supabase Auth / PostgreSQL / Realtime / Storage
+TanStack Query
+i18next / react-i18next
+expo-notifications
+date-fns
+EAS Build
+```
+
+## 9.1 Current code map
+
+```text
+App.tsx                         Main alpha screen orchestration
+src/components/ui               Reusable UI primitives
+src/components/layout           App shell, header, tabs, bottom sheet
+src/components/family           Avatar and family display components
+src/components/calendar         Calendar and event display components
+src/components/tasks            Task row components
+src/components/shopping         Shopping list components
+src/state                       Pure local app state actions
+src/store                       Zustand local app store
+src/validation                  Zod schemas, typed form inputs and error codes
+src/i18n                        Typed RU / PL copy
+src/theme                       Design tokens and theme exports
+src/types                       Shared domain and UI types
+```
+
 ## 10. Design system summary
 
 Doma style:
@@ -271,14 +312,25 @@ First:
 Milestone 0 — Project understanding
 Milestone 1 — App skeleton
 Milestone 2 — Static UI
-Milestone 3 — Local state
-Milestone 4 — Forms
-Milestone 5 — Supabase backend
-Milestone 6 — Auth + family
-Milestone 7 — Realtime sync
-Milestone 8 — Reminders
-Milestone 9 — Polish + QA
-Milestone 10 — Widget
+Milestone 3 — Base components
+Milestone 4 — Local state and interactions
+Milestone 5 — Forms and validation
+Milestone 6 — Supabase foundation
+Milestone 7 — Auth + family flow
+Milestone 8 — Backend-connected features
+Milestone 9 — Reminders and notifications
+Milestone 10 — Empty, loading, error and offline states
+Milestone 11 — Localization polish
+Milestone 12 — QA and cleanup
+Milestone 13 — Widget planning / implementation
+```
+
+Current implementation status:
+
+```text
+Completed in public alpha: Milestones 0-5.
+Next major implementation area: Milestone 6 — Supabase foundation.
+Still open as follow-up quality work: component tests, accessibility audit, privacy threat model, and Polish copy audit.
 ```
 
 ## 13. First task for Codex
