@@ -21,7 +21,8 @@ type IsAssignable<Actual, Expected> = Actual extends Expected ? true : false;
 const eventResult = validateEventForm({
   title: "Врач",
   date: "3 июня",
-  time: "09:00"
+  time: "09:00",
+  participants: "both"
 });
 
 const loginResult = validateLoginForm({
@@ -35,6 +36,7 @@ const familySetupResult = validateFamilySetupForm({
 
 const taskResult = validateTaskForm({
   title: "Позвонить мастеру",
+  assignee: "alex",
   due: "Сегодня"
 });
 

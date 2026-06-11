@@ -19,8 +19,8 @@ export type FormValidationResult<Field extends string> = {
   errors: Partial<Record<Field, FormValidationErrorCode>>;
 };
 
-export type EventFormField = "title" | "date" | "time";
-export type TaskFormField = "title" | "due";
+export type EventFormField = "title" | "date" | "time" | "participants";
+export type TaskFormField = "title" | "assignee" | "due";
 export type ShoppingFormField = "title" | "quantity" | "category";
 export type LoginFormField = "email";
 export type FamilySetupFormField = "familyName" | "userName";
@@ -29,10 +29,12 @@ export type EventFormInput = {
   title: string;
   date: string;
   time: string;
+  participants: "both" | "alex";
 };
 
 export type TaskFormInput = {
   title: string;
+  assignee: "alex" | "maya" | "shared";
   due: string;
 };
 
@@ -56,34 +58,36 @@ const MAX_TITLE_LENGTH = 80;
 const MAX_QUANTITY_LENGTH = 32;
 const MAX_NAME_LENGTH = 60;
 
-const titleSchema = z
+export const titleSchema = z
   .string()
   .trim()
   .min(1, "title_required")
   .min(MIN_TITLE_LENGTH, "title_too_short")
   .max(MAX_TITLE_LENGTH, "title_too_long");
 
-const loginFormSchema = z.object({
+export const loginFormSchema = z.object({
   email: z.string().trim().min(1, "email_required").email("email_invalid")
 });
 
-const familySetupFormSchema = z.object({
+export const familySetupFormSchema = z.object({
   familyName: z.string().trim().min(1, "family_name_required").max(MAX_NAME_LENGTH, "name_too_long"),
   userName: z.string().trim().min(1, "user_name_required").max(MAX_NAME_LENGTH, "name_too_long")
 });
 
-const eventFormSchema = z.object({
+export const eventFormSchema = z.object({
   title: titleSchema,
   date: z.string().trim().min(1, "date_required"),
-  time: z.string().trim().min(1, "time_required")
+  time: z.string().trim().min(1, "time_required"),
+  participants: z.enum(["both", "alex"])
 });
 
-const taskFormSchema = z.object({
+export const taskFormSchema = z.object({
   title: titleSchema,
+  assignee: z.enum(["alex", "maya", "shared"]),
   due: z.string()
 });
 
-const shoppingFormSchema = z.object({
+export const shoppingFormSchema = z.object({
   title: titleSchema,
   quantity: z.string().trim().max(MAX_QUANTITY_LENGTH, "quantity_too_long"),
   category: z.string().trim().min(1, "category_required")

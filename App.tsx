@@ -1,6 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { StatusBar } from "expo-status-bar";
 import React, { useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   KeyboardAvoidingView,
   Image,
@@ -36,19 +38,19 @@ import {
   TaskItem
 } from "./src/types";
 import {
-  validateEventForm,
-  validateFamilySetupForm,
-  validateLoginForm,
-  validateShoppingForm,
-  validateTaskForm
+  eventFormSchema,
+  familySetupFormSchema,
+  loginFormSchema,
+  shoppingFormSchema,
+  taskFormSchema
 } from "./src/validation/forms";
 import type {
-  EventFormField,
-  FamilySetupFormField,
+  EventFormInput,
+  FamilySetupFormInput,
   FormValidationErrorCode,
-  LoginFormField,
-  ShoppingFormField,
-  TaskFormField
+  LoginFormInput,
+  ShoppingFormInput,
+  TaskFormInput
 } from "./src/validation/forms";
 
 type Stage = "onboarding" | "login" | "family" | "invite" | "acceptInvite" | "app";
@@ -139,36 +141,41 @@ export default function App() {
   const text = copy[language] as typeof copy.ru;
   const [stage, setStage] = useState<Stage>("onboarding");
   const [authIntent, setAuthIntent] = useState<AuthIntent>("createFamily");
-  const [email, setEmail] = useState("alex@example.com");
-  const [loginTouched, setLoginTouched] = useState(false);
-  const [loginErrors, setLoginErrors] = useState<Partial<Record<LoginFormField, FormValidationErrorCode>>>({});
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [activeTab, setActiveTab] = useState<TabKey>("today");
   const [sheet, setSheet] = useState<Sheet>(null);
   const [taskFilter, setTaskFilter] = useState<"all" | "mine" | "maya" | "shared" | "done">("all");
-  const [familyName, setFamilyName] = useState("Семья Алексея");
-  const [userName, setUserName] = useState("Алексей");
-  const [familyTouched, setFamilyTouched] = useState<Partial<Record<FamilySetupFormField, boolean>>>({});
-  const [eventDraft, setEventDraft] = useState({
-    title: "",
-    date: "3 июня",
-    time: "09:00",
-    participants: "both"
+  const loginForm = useForm<LoginFormInput>({
+    defaultValues: { email: "alex@example.com" },
+    mode: "onChange",
+    resolver: zodResolver(loginFormSchema)
   });
-  const [eventErrors, setEventErrors] = useState<Partial<Record<EventFormField, FormValidationErrorCode>>>({});
-  const [taskDraft, setTaskDraft] = useState({
-    title: "",
-    assignee: "alex" as PersonId | "shared",
-    due: text.noDue
+  const familySetupForm = useForm<FamilySetupFormInput>({
+    defaultValues: { familyName: "Семья Алексея", userName: "Алексей" },
+    mode: "onChange",
+    resolver: zodResolver(familySetupFormSchema)
   });
-  const [taskErrors, setTaskErrors] = useState<Partial<Record<TaskFormField, FormValidationErrorCode>>>({});
-  const [shoppingDraft, setShoppingDraft] = useState({
-    title: "",
-    quantity: "",
-    category: "Базовое"
+  const eventForm = useForm<EventFormInput>({
+    defaultValues: { title: "", date: "3 июня", time: "09:00", participants: "both" },
+    mode: "onChange",
+    resolver: zodResolver(eventFormSchema)
   });
-  const [shoppingErrors, setShoppingErrors] = useState<Partial<Record<ShoppingFormField, FormValidationErrorCode>>>({});
+  const taskForm = useForm<TaskFormInput>({
+    defaultValues: { title: "", assignee: "alex", due: text.noDue },
+    mode: "onChange",
+    resolver: zodResolver(taskFormSchema)
+  });
+  const shoppingForm = useForm<ShoppingFormInput>({
+    defaultValues: { title: "", quantity: "", category: "Базовое" },
+    mode: "onChange",
+    resolver: zodResolver(shoppingFormSchema)
+  });
 
+  const loginValues = loginForm.watch();
+  const familyValues = familySetupForm.watch();
+  const eventValues = eventForm.watch();
+  const familyName = familyValues.familyName;
+  const userName = familyValues.userName;
   const selectedDay = Number(selectedDate.slice(-2));
   const selectedEvents = useMemo(
     () => events.filter((event) => eventDateToISODate(event.date) === selectedDate),
@@ -187,8 +194,8 @@ export default function App() {
   const activeTasks = useMemo(() => tasks.filter((task) => !task.completed), [tasks]);
   const purchasedCount = shopping.filter((item) => item.purchased).length;
   const pendingShopping = shopping.filter((item) => !item.purchased);
-  const loginValidation = validateLoginForm({ email });
-  const familyValidation = validateFamilySetupForm({ familyName, userName });
+  const loginIsValid = loginFormSchema.safeParse(loginValues).success;
+  const familySetupIsValid = familySetupFormSchema.safeParse(familyValues).success;
 
   function completeOnboarding() {
     if (onboardingStep < 2) {
@@ -200,105 +207,89 @@ export default function App() {
 
   function openLogin(intent: AuthIntent) {
     setAuthIntent(intent);
-    setEmail(intent === "createFamily" ? "alex@example.com" : "maya@example.com");
-    setLoginTouched(false);
-    setLoginErrors({});
+    loginForm.reset({ email: intent === "createFamily" ? "alex@example.com" : "maya@example.com" });
     setStage("login");
   }
 
   function continueLogin() {
-    setLoginTouched(true);
-    setLoginErrors(loginValidation.errors);
-
-    if (!loginValidation.isValid) {
-      return;
-    }
-
-    setLoginErrors({});
-    setStage(authIntent === "createFamily" ? "family" : "acceptInvite");
+    void loginForm.handleSubmit(() => {
+      setStage(authIntent === "createFamily" ? "family" : "acceptInvite");
+    })();
   }
 
   function continueFamilySetup() {
-    setFamilyTouched({ familyName: true, userName: true });
-
-    if (!familyValidation.isValid) {
-      return;
-    }
-
-    setStage("invite");
+    void familySetupForm.handleSubmit(() => {
+      setStage("invite");
+    })();
   }
 
   function addEvent() {
-    const validation = validateEventForm(eventDraft);
-
-    if (!validation.isValid) {
-      setEventErrors(validation.errors);
-      return;
-    }
-
-    const participants: PersonId[] = eventDraft.participants === "alex" ? ["alex"] : ["alex", "maya"];
-    const eventDate = eventDateToISODate(eventDraft.date);
-    storeAddEvent(
-      {
-        id: `event-${Date.now()}`,
-        title: eventDraft.title.trim(),
-        date: eventDraft.date,
-        time: eventDraft.time,
-        participants,
-        reminder: text.thirtyMin
-      },
-      eventDate
-    );
-    setEventErrors({});
-    setEventDraft({ title: "", date: "3 июня", time: "09:00", participants: "both" });
-    setSheet(null);
-    setActiveTab("today");
+    void eventForm.handleSubmit((values) => {
+      const participants: PersonId[] = values.participants === "alex" ? ["alex"] : ["alex", "maya"];
+      const eventDate = eventDateToISODate(values.date);
+      storeAddEvent(
+        {
+          id: `event-${Date.now()}`,
+          title: values.title.trim(),
+          date: values.date,
+          time: values.time,
+          participants,
+          reminder: text.thirtyMin
+        },
+        eventDate
+      );
+      eventForm.reset({ title: "", date: "3 июня", time: "09:00", participants: "both" });
+      setSheet(null);
+      setActiveTab("today");
+    })();
   }
 
   function addTask() {
-    const validation = validateTaskForm(taskDraft);
-
-    if (!validation.isValid) {
-      setTaskErrors(validation.errors);
-      return;
-    }
-
-    storeAddHouseholdTask({
-      id: createHouseholdTaskId(),
-      familyId,
-      title: taskDraft.title.trim(),
-      assigneeMemberId: taskDraft.assignee === "shared" ? null : taskAssigneeToMemberId[taskDraft.assignee],
-      dueAt: dueLabelToDateTime(taskDraft.due, text),
-      reminderAt: null,
-      createdBy: currentUserId,
-      createdAt: nowDateTime()
-    });
-    setTaskErrors({});
-    setTaskDraft({ title: "", assignee: "alex", due: text.noDue });
-    setSheet(null);
-    setActiveTab("tasks");
+    void taskForm.handleSubmit((values) => {
+      storeAddHouseholdTask({
+        id: createHouseholdTaskId(),
+        familyId,
+        title: values.title.trim(),
+        assigneeMemberId: values.assignee === "shared" ? null : taskAssigneeToMemberId[values.assignee],
+        dueAt: dueLabelToDateTime(values.due, text),
+        reminderAt: null,
+        createdBy: currentUserId,
+        createdAt: nowDateTime()
+      });
+      taskForm.reset({ title: "", assignee: "alex", due: text.noDue });
+      setSheet(null);
+      setActiveTab("tasks");
+    })();
   }
 
   function addShoppingItem(title?: string) {
-    const nextTitle = (title ?? shoppingDraft.title).trim();
-    const validation = validateShoppingForm({ ...shoppingDraft, title: nextTitle });
+    if (title) {
+      const result = shoppingFormSchema.safeParse({ ...shoppingForm.getValues(), title, quantity: "" });
 
-    if (!validation.isValid) {
-      setShoppingErrors(validation.errors);
+      if (!result.success) {
+        void shoppingForm.trigger();
+        return;
+      }
+
+      submitShoppingItem(result.data);
       return;
     }
 
+    void shoppingForm.handleSubmit(submitShoppingItem)();
+  }
+
+  function submitShoppingItem(values: ShoppingFormInput) {
+    const nextTitle = values.title.trim();
     storeAddShoppingItem({
       id: createShoppingItemId(nextTitle),
       familyId,
-      categoryId: shoppingCategoryNameToId[shoppingDraft.category] ?? "cat-other",
+      categoryId: shoppingCategoryNameToId[values.category] ?? "cat-other",
       title: nextTitle,
-      quantity: title ? null : shoppingDraft.quantity.trim() || null,
+      quantity: values.quantity.trim() || null,
       createdBy: currentUserId,
       createdAt: nowDateTime()
     });
-    setShoppingErrors({});
-    setShoppingDraft({ title: "", quantity: "", category: "Базовое" });
+    shoppingForm.reset({ title: "", quantity: "", category: "Базовое" });
     setSheet(null);
     setActiveTab("shopping");
   }
@@ -370,7 +361,7 @@ export default function App() {
 
   if (stage === "login") {
     const isInvite = authIntent === "acceptInvite";
-    const loginEmailError = loginTouched ? loginValidation.errors.email ?? loginErrors.email : undefined;
+    const loginEmailError = fieldValidationMessage(loginForm.formState.errors.email, language);
 
     return (
       <AppShell>
@@ -397,22 +388,24 @@ export default function App() {
 
             <Card style={styles.authCard}>
               <Text style={styles.fieldLabel}>Email</Text>
-              <TextInput
-                style={[styles.authInput, loginEmailError && styles.authInputError]}
-                value={email}
-                onChangeText={(nextEmail) => {
-                  setEmail(nextEmail);
-                  setLoginTouched(true);
-                  setLoginErrors({});
-                }}
-                onBlur={() => setLoginTouched(true)}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                placeholder="alex@example.com"
-                placeholderTextColor={colors.textTertiary}
+              <Controller
+                control={loginForm.control}
+                name="email"
+                render={({ field: { value, onBlur, onChange } }) => (
+                  <TextInput
+                    style={[styles.authInput, loginEmailError && styles.authInputError]}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                    placeholder="alex@example.com"
+                    placeholderTextColor={colors.textTertiary}
+                  />
+                )}
               />
               {loginEmailError ? (
-                <Text style={styles.validationText}>{validationMessage(loginEmailError, language)}</Text>
+                <Text style={styles.validationText}>{loginEmailError}</Text>
               ) : (
                 <Text style={styles.authHelp}>
                   {language === "ru"
@@ -422,7 +415,7 @@ export default function App() {
               )}
             </Card>
 
-            <PrimaryButton label={language === "ru" ? "Продолжить" : "Kontynuuj"} onPress={continueLogin} disabled={!loginValidation.isValid} arrow />
+            <PrimaryButton label={language === "ru" ? "Продолжить" : "Kontynuuj"} onPress={continueLogin} disabled={!loginIsValid} arrow />
 
             <View style={styles.socialBlock}>
               <Text style={styles.socialDivider}>{language === "ru" ? "или" : "albo"}</Text>
@@ -448,8 +441,8 @@ export default function App() {
   }
 
   if (stage === "family") {
-    const familyNameError = familyTouched.familyName ? familyValidation.errors.familyName : undefined;
-    const userNameError = familyTouched.userName ? familyValidation.errors.userName : undefined;
+    const familyNameError = fieldValidationMessage(familySetupForm.formState.errors.familyName, language);
+    const userNameError = fieldValidationMessage(familySetupForm.formState.errors.userName, language);
 
     return (
       <AppShell>
@@ -463,29 +456,35 @@ export default function App() {
                 ? "Это семейное пространство для событий, дел, покупок и спокойной синхронизации."
                 : "To rodzinna przestrzeń na wydarzenia, sprawy, zakupy i spokojną synchronizację."}
             </Text>
-            <Input
-              label={language === "ru" ? "Название семьи" : "Nazwa rodziny"}
-              value={familyName}
-              onChangeText={(nextFamilyName) => {
-                setFamilyName(nextFamilyName);
-                setFamilyTouched((touched) => ({ ...touched, familyName: true }));
-              }}
-              error={familyNameError ? validationMessage(familyNameError, language) : undefined}
+            <Controller
+              control={familySetupForm.control}
+              name="familyName"
+              render={({ field: { value, onChange } }) => (
+                <Input
+                  label={language === "ru" ? "Название семьи" : "Nazwa rodziny"}
+                  value={value}
+                  onChangeText={onChange}
+                  error={familyNameError}
+                />
+              )}
             />
-            <Input
-              label={language === "ru" ? "Ваше имя" : "Twoje imię"}
-              value={userName}
-              onChangeText={(nextUserName) => {
-                setUserName(nextUserName);
-                setFamilyTouched((touched) => ({ ...touched, userName: true }));
-              }}
-              error={userNameError ? validationMessage(userNameError, language) : undefined}
+            <Controller
+              control={familySetupForm.control}
+              name="userName"
+              render={({ field: { value, onChange } }) => (
+                <Input
+                  label={language === "ru" ? "Ваше имя" : "Twoje imię"}
+                  value={value}
+                  onChangeText={onChange}
+                  error={userNameError}
+                />
+              )}
             />
             <Pressable style={styles.photoButton}>
               <Ionicons name="camera-outline" size={20} color={colors.domaBlue} />
               <Text style={styles.photoButtonText}>{language === "ru" ? "Добавить фото" : "Dodaj zdjęcie"}</Text>
             </Pressable>
-            <PrimaryButton label={text.createFamily} onPress={continueFamilySetup} disabled={!familyValidation.isValid} />
+            <PrimaryButton label={text.createFamily} onPress={continueFamilySetup} disabled={!familySetupIsValid} />
           </ScrollView>
         </SafeAreaView>
       </AppShell>
@@ -890,7 +889,11 @@ export default function App() {
   }
 
   function renderEventForm() {
-    const eventErrorMessage = firstValidationMessage(eventErrors, language);
+    const eventErrorMessage =
+      fieldValidationMessage(eventForm.formState.errors.title, language) ??
+      fieldValidationMessage(eventForm.formState.errors.date, language) ??
+      fieldValidationMessage(eventForm.formState.errors.time, language) ??
+      fieldValidationMessage(eventForm.formState.errors.participants, language);
 
     return (
       <View>
@@ -902,24 +905,28 @@ export default function App() {
         <Text style={styles.eventSheetTitle}>{text.newEvent}</Text>
         <Card style={styles.eventFormCard}>
           <EventFormRow icon="pencil-outline" color={colors.domaGold} label={text.title}>
-            <TextInput
-              style={styles.eventFormValueInput}
-              value={eventDraft.title}
-              onChangeText={(title) => {
-                setEventDraft((draft) => ({ ...draft, title }));
-                setEventErrors((errors) => ({ ...errors, title: undefined }));
-              }}
-              placeholder="Врач"
-              placeholderTextColor={colors.domaBlue}
-              autoFocus
+            <Controller
+              control={eventForm.control}
+              name="title"
+              render={({ field: { value, onBlur, onChange } }) => (
+                <TextInput
+                  style={styles.eventFormValueInput}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="Врач"
+                  placeholderTextColor={colors.domaBlue}
+                  autoFocus
+                />
+              )}
             />
           </EventFormRow>
-          <EventFormRow icon="calendar-outline" color={colors.domaBlue} label={text.date} value={eventDraft.date} chevron />
-          <EventFormRow icon="time-outline" color={colors.taskOrange} label={text.time} value={eventDraft.time} chevron />
+          <EventFormRow icon="calendar-outline" color={colors.domaBlue} label={text.date} value={eventValues.date} chevron />
+          <EventFormRow icon="time-outline" color={colors.taskOrange} label={text.time} value={eventValues.time} chevron />
           <EventFormRow icon="people-outline" color={colors.domaBlue} label={text.participants} chevron>
             <View style={styles.eventParticipantsValue}>
-              <MiniAvatarGroup participants={eventDraft.participants === "both" ? ["alex", "maya"] : ["alex"]} small />
-              <Text style={styles.eventFormValue}>{eventDraft.participants === "both" ? text.both : "Алексей"}</Text>
+              <MiniAvatarGroup participants={eventValues.participants === "both" ? ["alex", "maya"] : ["alex"]} small />
+              <Text style={styles.eventFormValue}>{eventValues.participants === "both" ? text.both : "Алексей"}</Text>
             </View>
           </EventFormRow>
           <EventFormRow icon="notifications-outline" color={colors.domaGold} label={text.reminder} value={text.thirtyMin} chevron />
@@ -935,65 +942,86 @@ export default function App() {
   }
 
   function renderTaskForm() {
+    const taskTitleError = fieldValidationMessage(taskForm.formState.errors.title, language);
+    const taskAssigneeError = fieldValidationMessage(taskForm.formState.errors.assignee, language);
+    const taskDueError = fieldValidationMessage(taskForm.formState.errors.due, language);
+
     return (
       <View>
         <SheetTitle title={text.newTask} />
-        <Input
-          label={text.title}
-          value={taskDraft.title}
-          onChangeText={(title) => {
-            setTaskDraft((draft) => ({ ...draft, title }));
-            setTaskErrors((errors) => ({ ...errors, title: undefined }));
-          }}
-          error={taskErrors.title ? validationMessage(taskErrors.title, language) : undefined}
-          autoFocus
+        <Controller
+          control={taskForm.control}
+          name="title"
+          render={({ field: { value, onChange } }) => (
+            <Input label={text.title} value={value} onChangeText={onChange} error={taskTitleError} autoFocus />
+          )}
         />
         <Text style={styles.fieldLabel}>{text.assignee}</Text>
-        <View style={styles.segment}>
-          <Segment label="Алексей" active={taskDraft.assignee === "alex"} onPress={() => setTaskDraft((draft) => ({ ...draft, assignee: "alex" }))} />
-          <Segment label="Мая" active={taskDraft.assignee === "maya"} onPress={() => setTaskDraft((draft) => ({ ...draft, assignee: "maya" }))} />
-          <Segment label={text.shared} active={taskDraft.assignee === "shared"} onPress={() => setTaskDraft((draft) => ({ ...draft, assignee: "shared" }))} />
-        </View>
-        <Input label={text.due} value={taskDraft.due} onChangeText={(due) => setTaskDraft((draft) => ({ ...draft, due }))} />
+        <Controller
+          control={taskForm.control}
+          name="assignee"
+          render={({ field: { value, onChange } }) => (
+            <View style={styles.segment}>
+              <Segment label="Алексей" active={value === "alex"} onPress={() => onChange("alex")} />
+              <Segment label="Мая" active={value === "maya"} onPress={() => onChange("maya")} />
+              <Segment label={text.shared} active={value === "shared"} onPress={() => onChange("shared")} />
+            </View>
+          )}
+        />
+        {taskAssigneeError ? <Text style={styles.formError}>{taskAssigneeError}</Text> : null}
+        <Controller
+          control={taskForm.control}
+          name="due"
+          render={({ field: { value, onChange } }) => (
+            <Input label={text.due} value={value} onChangeText={onChange} error={taskDueError} />
+          )}
+        />
         <PrimaryButton label={text.save} onPress={addTask} />
       </View>
     );
   }
 
   function renderShoppingForm() {
+    const shoppingTitleError = fieldValidationMessage(shoppingForm.formState.errors.title, language);
+    const shoppingQuantityError = fieldValidationMessage(shoppingForm.formState.errors.quantity, language);
+    const shoppingCategoryError = fieldValidationMessage(shoppingForm.formState.errors.category, language);
+
     return (
       <View>
         <SheetTitle title={text.newShopping} />
-        <Input
-          label={text.title}
-          value={shoppingDraft.title}
-          onChangeText={(title) => {
-            setShoppingDraft((draft) => ({ ...draft, title }));
-            setShoppingErrors((errors) => ({ ...errors, title: undefined }));
-          }}
-          error={shoppingErrors.title ? validationMessage(shoppingErrors.title, language) : undefined}
-          autoFocus
+        <Controller
+          control={shoppingForm.control}
+          name="title"
+          render={({ field: { value, onChange } }) => (
+            <Input label={text.title} value={value} onChangeText={onChange} error={shoppingTitleError} autoFocus />
+          )}
         />
         <View style={styles.formRow}>
-          <Input
-            compact
-            label={text.quantity}
-            value={shoppingDraft.quantity}
-            onChangeText={(quantity) => {
-              setShoppingDraft((draft) => ({ ...draft, quantity }));
-              setShoppingErrors((errors) => ({ ...errors, quantity: undefined }));
-            }}
-            error={shoppingErrors.quantity ? validationMessage(shoppingErrors.quantity, language) : undefined}
+          <Controller
+            control={shoppingForm.control}
+            name="quantity"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                compact
+                label={text.quantity}
+                value={value}
+                onChangeText={onChange}
+                error={shoppingQuantityError}
+              />
+            )}
           />
-          <Input
-            compact
-            label={text.category}
-            value={shoppingDraft.category}
-            onChangeText={(category) => {
-              setShoppingDraft((draft) => ({ ...draft, category }));
-              setShoppingErrors((errors) => ({ ...errors, category: undefined }));
-            }}
-            error={shoppingErrors.category ? validationMessage(shoppingErrors.category, language) : undefined}
+          <Controller
+            control={shoppingForm.control}
+            name="category"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                compact
+                label={text.category}
+                value={value}
+                onChangeText={onChange}
+                error={shoppingCategoryError}
+              />
+            )}
           />
         </View>
         <PrimaryButton label={text.add} onPress={() => addShoppingItem()} />
@@ -1207,12 +1235,29 @@ function shoppingCategoryName(categoryId: ShoppingCategoryId | null, categories:
   return category?.nameRu ?? "Базовое";
 }
 
-function firstValidationMessage<Field extends string>(
-  errors: Partial<Record<Field, FormValidationErrorCode>>,
-  language: Language
-) {
-  const firstCode = Object.values(errors).find((code): code is FormValidationErrorCode => code !== undefined);
-  return firstCode ? validationMessage(firstCode, language) : null;
+const formValidationErrorCodes = new Set<FormValidationErrorCode>([
+  "title_required",
+  "title_too_short",
+  "title_too_long",
+  "email_required",
+  "email_invalid",
+  "family_name_required",
+  "user_name_required",
+  "name_too_long",
+  "date_required",
+  "time_required",
+  "quantity_too_long",
+  "category_required"
+]);
+
+function fieldValidationMessage(error: { message?: unknown } | undefined, language: Language) {
+  const code = error?.message;
+
+  if (typeof code !== "string" || !formValidationErrorCodes.has(code as FormValidationErrorCode)) {
+    return undefined;
+  }
+
+  return validationMessage(code as FormValidationErrorCode, language);
 }
 
 function validationMessage(code: FormValidationErrorCode, language: Language) {
