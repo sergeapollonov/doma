@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { StatusBar } from "expo-status-bar";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Image,
@@ -86,14 +86,6 @@ const taskAssigneeToMemberId: Record<PersonId, HouseholdTask["assigneeMemberId"]
   maya: "member-maya"
 };
 
-const shoppingCategoryNameToId: Record<string, ShoppingCategoryId> = {
-  Молочное: "cat-dairy",
-  "Овощи и фрукты": "cat-fruit-veg",
-  Дом: "cat-home",
-  "Мясо и рыба": "cat-meat-fish",
-  Базовое: "cat-other"
-};
-
 export default function App() {
   const language = useLocalAppStore((state) => state.language);
   const familyId = useLocalAppStore((state) => state.familyId);
@@ -124,12 +116,12 @@ export default function App() {
     resolver: zodResolver(loginFormSchema)
   });
   const familySetupForm = useForm<FamilySetupFormInput>({
-    defaultValues: { familyName: "Семья Алексея", userName: "Алексей" },
+    defaultValues: { familyName: text.defaultFamilyName, userName: text.defaultUserName },
     mode: "onChange",
     resolver: zodResolver(familySetupFormSchema)
   });
   const eventForm = useForm<EventFormInput>({
-    defaultValues: { title: "", date: "3 июня", time: "09:00", participants: "both" },
+    defaultValues: { title: "", date: text.formatMonthDay(3), time: "09:00", participants: "both" },
     mode: "onChange",
     resolver: zodResolver(eventFormSchema)
   });
@@ -139,7 +131,7 @@ export default function App() {
     resolver: zodResolver(taskFormSchema)
   });
   const shoppingForm = useForm<ShoppingFormInput>({
-    defaultValues: { title: "", quantity: "", category: "Базовое" },
+    defaultValues: { title: "", quantity: "", category: text.categoryOther },
     mode: "onChange",
     resolver: zodResolver(shoppingFormSchema)
   });
@@ -154,14 +146,14 @@ export default function App() {
     () => events.filter((event) => eventDateToISODate(event.date) === selectedDate),
     [events, selectedDate]
   );
-  const selectedDateLabel = formatSelectedDate(selectedDate, language);
+  const selectedDateLabel = formatSelectedDate(selectedDate, text);
   const tasks = useMemo(
     () => householdTasks.map((task) => toTaskItem(task, text, language)),
     [householdTasks, language, text]
   );
   const shopping = useMemo(
-    () => shoppingList.items.map((item) => toShoppingItem(item, shoppingList.categories)),
-    [shoppingList.categories, shoppingList.items]
+    () => shoppingList.items.map((item) => toShoppingItem(item, shoppingList.categories, language, text)),
+    [language, shoppingList.categories, shoppingList.items, text]
   );
   const frequentShopping = shoppingList.frequentItemTitles;
   const activeTasks = useMemo(() => tasks.filter((task) => !task.completed), [tasks]);
@@ -169,6 +161,12 @@ export default function App() {
   const pendingShopping = shopping.filter((item) => !item.purchased);
   const loginIsValid = loginFormSchema.safeParse(loginValues).success;
   const familySetupIsValid = familySetupFormSchema.safeParse(familyValues).success;
+
+  useEffect(() => {
+    eventForm.setValue("date", text.formatMonthDay(3));
+    taskForm.setValue("due", text.noDue);
+    shoppingForm.setValue("category", text.categoryOther);
+  }, [eventForm, language, shoppingForm, taskForm, text]);
 
   function completeOnboarding() {
     if (onboardingStep < 2) {
@@ -211,7 +209,7 @@ export default function App() {
         },
         eventDate
       );
-      eventForm.reset({ title: "", date: "3 июня", time: "09:00", participants: "both" });
+      eventForm.reset({ title: "", date: text.formatMonthDay(3), time: "09:00", participants: "both" });
       setSheet(null);
       setActiveTab("today");
     })();
@@ -256,13 +254,13 @@ export default function App() {
     storeAddShoppingItem({
       id: createShoppingItemId(nextTitle),
       familyId,
-      categoryId: shoppingCategoryNameToId[values.category] ?? "cat-other",
+      categoryId: shoppingCategoryLabelToId(values.category, shoppingList.categories),
       title: nextTitle,
       quantity: values.quantity.trim() || null,
       createdBy: currentUserId,
       createdAt: nowDateTime()
     });
-    shoppingForm.reset({ title: "", quantity: "", category: "Базовое" });
+    shoppingForm.reset({ title: "", quantity: "", category: text.categoryOther });
     setSheet(null);
     setActiveTab("shopping");
   }
@@ -308,12 +306,10 @@ export default function App() {
             </View>
             <Text style={styles.welcomeTitle}>{text.tagline}</Text>
             <Text style={styles.welcomeText}>
-              {language === "ru"
-                ? "События, дела и покупки —\nв одном спокойном месте."
-                : "Wydarzenia, sprawy i zakupy —\nw jednym spokojnym miejscu."}
+              {text.welcomeSubtitle}
             </Text>
 
-            <WelcomePreview />
+            <WelcomePreview text={text} />
 
             <View style={styles.welcomeActions}>
               <PrimaryButton label={text.createFamilyAction} onPress={() => openLogin("createFamily")} arrow />
@@ -322,9 +318,7 @@ export default function App() {
               </Pressable>
             </View>
             <Text style={styles.legalText}>
-              {language === "ru"
-                ? "Продолжая, вы соглашаетесь\nс условиями использования и политикой конфиденциальности."
-                : "Kontynuując, akceptujesz\nwarunki korzystania i politykę prywatności."}
+              {text.legalText}
             </Text>
           </ScrollView>
         </SafeAreaView>
@@ -348,19 +342,13 @@ export default function App() {
               <DomaLogo />
               <View style={styles.authBackSpacer} />
             </View>
-            <Text style={styles.authTitle}>{language === "ru" ? "Войти в Doma" : "Zaloguj się do Doma"}</Text>
+            <Text style={styles.authTitle}>{text.authLoginTitle}</Text>
             <Text style={styles.authSubtitle}>
-              {isInvite
-                ? language === "ru"
-                  ? "Введите email, чтобы принять приглашение Алексея."
-                  : "Wpisz email, aby przyjąć zaproszenie Alexa."
-                : language === "ru"
-                  ? "Введите email, чтобы продолжить. Мы отправим ссылку для входа."
-                  : "Wpisz email, aby kontynuować. Wyślemy link do logowania."}
+              {isInvite ? text.authInviteSubtitle : text.authLoginSubtitle}
             </Text>
 
             <Card style={styles.authCard}>
-              <Text style={styles.fieldLabel}>Email</Text>
+              <Text style={styles.fieldLabel}>{text.authEmailLabel}</Text>
               <Controller
                 control={loginForm.control}
                 name="email"
@@ -380,32 +368,26 @@ export default function App() {
               {loginEmailError ? (
                 <Text style={styles.validationText}>{loginEmailError}</Text>
               ) : (
-                <Text style={styles.authHelp}>
-                  {language === "ru"
-                    ? "Мы используем email только для входа и синхронизации вашего семейного плана."
-                    : "Używamy emaila tylko do logowania i synchronizacji rodzinnego planu."}
-                </Text>
+                <Text style={styles.authHelp}>{text.authEmailHelp}</Text>
               )}
             </Card>
 
-            <PrimaryButton label={language === "ru" ? "Продолжить" : "Kontynuuj"} onPress={continueLogin} disabled={!loginIsValid} arrow />
+            <PrimaryButton label={text.authContinue} onPress={continueLogin} disabled={!loginIsValid} arrow />
 
             <View style={styles.socialBlock}>
-              <Text style={styles.socialDivider}>{language === "ru" ? "или" : "albo"}</Text>
+              <Text style={styles.socialDivider}>{text.authOr}</Text>
               <Pressable style={styles.socialButton}>
                 <Ionicons name="logo-apple" size={20} color={colors.textPrimary} />
-                <Text style={styles.socialButtonText}>{language === "ru" ? "Войти через Apple" : "Zaloguj przez Apple"}</Text>
+                <Text style={styles.socialButtonText}>{text.authApple}</Text>
               </Pressable>
               <Pressable style={styles.socialButton}>
                 <Ionicons name="logo-google" size={20} color={colors.textPrimary} />
-                <Text style={styles.socialButtonText}>{language === "ru" ? "Войти через Google" : "Zaloguj przez Google"}</Text>
+                <Text style={styles.socialButtonText}>{text.authGoogle}</Text>
               </Pressable>
             </View>
 
             <Text style={styles.legalText}>
-              {language === "ru"
-                ? "Продолжая, вы соглашаетесь\nс условиями использования и политикой конфиденциальности."
-                : "Kontynuując, akceptujesz\nwarunki korzystania i politykę prywatności."}
+              {text.legalText}
             </Text>
           </ScrollView>
         </SafeAreaView>
@@ -423,18 +405,14 @@ export default function App() {
         <SafeAreaView style={styles.safe}>
           <ScrollView contentContainerStyle={styles.setupScreen}>
             <Text style={styles.wordmarkSmall}>Doma</Text>
-            <Text style={styles.screenTitle}>{language === "ru" ? "Создайте общий план" : "Utwórz wspólny plan"}</Text>
-            <Text style={styles.setupCopy}>
-              {language === "ru"
-                ? "Это семейное пространство для событий, дел, покупок и спокойной синхронизации."
-                : "To rodzinna przestrzeń na wydarzenia, sprawy, zakupy i spokojną synchronizację."}
-            </Text>
+            <Text style={styles.screenTitle}>{text.familySetupTitle}</Text>
+            <Text style={styles.setupCopy}>{text.familySetupCopy}</Text>
             <Controller
               control={familySetupForm.control}
               name="familyName"
               render={({ field: { value, onChange } }) => (
                 <Input
-                  label={language === "ru" ? "Название семьи" : "Nazwa rodziny"}
+                  label={text.familyNameLabel}
                   value={value}
                   onChangeText={onChange}
                   error={familyNameError}
@@ -446,7 +424,7 @@ export default function App() {
               name="userName"
               render={({ field: { value, onChange } }) => (
                 <Input
-                  label={language === "ru" ? "Ваше имя" : "Twoje imię"}
+                  label={text.userNameLabel}
                   value={value}
                   onChangeText={onChange}
                   error={userNameError}
@@ -455,7 +433,7 @@ export default function App() {
             />
             <Pressable style={styles.photoButton}>
               <Ionicons name="camera-outline" size={20} color={colors.domaBlue} />
-              <Text style={styles.photoButtonText}>{language === "ru" ? "Добавить фото" : "Dodaj zdjęcie"}</Text>
+              <Text style={styles.photoButtonText}>{text.addPhoto}</Text>
             </Pressable>
             <PrimaryButton label={text.createFamily} onPress={continueFamilySetup} disabled={!familySetupIsValid} />
           </ScrollView>
@@ -472,11 +450,7 @@ export default function App() {
           <View style={styles.inviteScreen}>
             <AvatarStack />
             <Text style={styles.screenTitle}>{text.invitePartner}</Text>
-            <Text style={styles.setupCopy}>
-              {language === "ru"
-                ? "Отправьте ссылку, чтобы подключить общий план. Мая появится рядом с вами в Doma."
-                : "Wyślij link, aby połączyć wspólny plan. Maja pojawi się obok Ciebie w Doma."}
-            </Text>
+            <Text style={styles.setupCopy}>{text.inviteCopy}</Text>
             <View style={styles.inviteCard}>
               <Ionicons name="link-outline" size={24} color={colors.domaGold} />
               <Text style={styles.inviteLink}>doma.app/invite/alex-maya</Text>
@@ -502,24 +476,20 @@ export default function App() {
               </View>
               <Avatar person="maya" size={72} />
             </View>
-            <Text style={styles.screenTitle}>{language === "ru" ? "Вас пригласили в Doma" : "Zaproszono Cię do Doma"}</Text>
-            <Text style={styles.setupCopy}>
-              {language === "ru"
-                ? "Алексей приглашает вас в общий план семьи. После подключения вы оба будете видеть события, дела и покупки."
-                : "Alex zaprasza Cię do wspólnego planu rodziny. Po dołączeniu zobaczycie wydarzenia, sprawy i zakupy."}
-            </Text>
+            <Text style={styles.screenTitle}>{text.acceptInviteTitle}</Text>
+            <Text style={styles.setupCopy}>{text.acceptInviteCopy}</Text>
             <Card style={styles.invitePreviewCard}>
               <View style={styles.invitePreviewRow}>
                 <Ionicons name="home-outline" size={22} color={colors.domaGold} />
                 <View style={styles.rowGrow}>
                   <Text style={styles.cardTitle}>{familyName}</Text>
-                  <Text style={styles.caption}>{language === "ru" ? "Алексей · Мая" : "Alex · Maja"}</Text>
+                  <Text style={styles.caption}>{text.acceptInviteFamilyMeta}</Text>
                 </View>
                 <Ionicons name="checkmark-circle" size={22} color={colors.shoppingGreen} />
               </View>
             </Card>
-            <PrimaryButton label={language === "ru" ? "Присоединиться" : "Dołącz"} onPress={() => setStage("app")} />
-            <SecondaryButton label={language === "ru" ? "Войти другим аккаунтом" : "Zaloguj na inne konto"} onPress={() => openLogin("acceptInvite")} />
+            <PrimaryButton label={text.acceptInviteJoin} onPress={() => setStage("app")} />
+            <SecondaryButton label={text.acceptInviteSwitchAccount} onPress={() => openLogin("acceptInvite")} />
           </View>
         </SafeAreaView>
       </AppShell>
@@ -534,16 +504,16 @@ export default function App() {
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             <Header
               tab={activeTab}
-              language={language}
+              greetingTitle={text.todayGreeting}
               title={activeTab === "today" ? text.brand : text.tabs[activeTab]}
               todayDateLabel={selectedDateLabel}
               subtitle={
                 activeTab === "tasks"
-                  ? language === "ru" ? "Планируйте и делитесь делами\nс семьёй" : "Planujcie i dzielcie się\nsprawami z rodziną"
+                  ? text.tasksSubtitle
                   : activeTab === "shopping"
-                    ? language === "ru" ? "Список покупок для дома\nи любимых людей" : "Lista zakupów dla domu\ni bliskich"
+                    ? text.shoppingSubtitle
                     : activeTab === "calendar"
-                      ? language === "ru" ? "Месяц с событиями и планом" : "Miesiąc wydarzeń i planów"
+                      ? text.calendarSubtitle
                       : text.morning
               }
               onFamily={() => setSheet("family")}
@@ -573,8 +543,8 @@ export default function App() {
     const remainingShopping = Math.max(pendingShopping.length - 3, 0);
     const shoppingCaption =
       remainingShopping > 0
-        ? `+ ещё ${remainingShopping} товара · куплено ${purchasedCount}`
-        : `Куплено ${purchasedCount}`;
+        ? text.shoppingSummaryMore(remainingShopping, purchasedCount)
+        : text.shoppingSummaryBought(purchasedCount);
 
     return (
       <View>
@@ -582,11 +552,11 @@ export default function App() {
           <View style={styles.syncPeople}>
             <View style={styles.syncPerson}>
               <Avatar person="alex" size={58} />
-              <Text style={styles.syncName}>Алексей</Text>
+              <Text style={styles.syncName}>{people.alex.name}</Text>
             </View>
             <View style={styles.syncPerson}>
               <Avatar person="maya" size={58} />
-              <Text style={styles.syncName}>Мая</Text>
+              <Text style={styles.syncName}>{people.maya.name}</Text>
             </View>
           </View>
           <View style={styles.syncDivider} />
@@ -618,7 +588,15 @@ export default function App() {
         <SectionHeader title={text.tasks} action={text.seeAll} onPress={() => setActiveTab("tasks")} />
         <Card style={styles.groupCard}>
           {activeTasks.slice(0, 2).map((task) => (
-            <TaskRow key={task.id} task={task} assignee={assigneeLabel(task.assignee)} onToggle={() => toggleTask(task.id)} grouped />
+            <TaskRow
+              key={task.id}
+              task={task}
+              assignee={assigneeLabel(task.assignee)}
+              completedLabel={text.completedToday}
+              noReminderLabel={text.noReminder}
+              onToggle={() => toggleTask(task.id)}
+              grouped
+            />
           ))}
         </Card>
 
@@ -656,12 +634,12 @@ export default function App() {
 
   function renderCalendar() {
     const days = Array.from({ length: 30 }, (_, index) => index + 1);
-    const weekDays = language === "ru" ? ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"] : ["Pn", "Wt", "Śr", "Cz", "Pt", "Sb", "Nd"];
+    const weekDays = text.weekDays;
     const eventDays = new Set(events.map((event) => eventDateToDay(event.date)).filter((day) => day !== null));
     return (
       <View>
         <CalendarMonth
-          title={language === "ru" ? "Июнь 2026" : "Czerwiec 2026"}
+          title={text.monthJune2026}
           days={days}
           weekDays={weekDays}
           selectedDay={selectedDay}
@@ -669,7 +647,7 @@ export default function App() {
           eventDays={eventDays}
           onSelectDay={selectCalendarDay}
         />
-        <SectionHeader title={formatCalendarSectionDate(selectedDate, language)} action={text.add} onPress={() => setSheet("event")} />
+        <SectionHeader title={formatCalendarSectionDate(selectedDate, text)} action={text.add} onPress={() => setSheet("event")} />
         {selectedEvents.length > 0 ? (
           selectedEvents.map((event, index) => <CalendarEventCard key={`cal-${event.id}`} event={event} participantsLabel={participantsLabel(event.participants)} index={index} />)
         ) : (
@@ -680,15 +658,15 @@ export default function App() {
   }
 
   function renderTasks() {
-    const todayLabel = language === "ru" ? "Сегодня" : "Dzisiaj";
+    const todayLabel = text.taskToday;
     const todayTasks = tasks.filter((task) => !task.completed && task.due === todayLabel);
     const weekTasks = tasks.filter((task) => !task.completed && task.due !== todayLabel && task.due !== text.noDue);
     const noDueTasks = tasks.filter((task) => !task.completed && task.due === text.noDue);
     const doneTasks = tasks.filter((task) => task.completed);
     const groups = [
-      { title: language === "ru" ? "Сегодня" : "Dzisiaj", items: todayTasks },
-      { title: language === "ru" ? "На неделе" : "W tym tygodniu", items: weekTasks },
-      { title: language === "ru" ? "Без срока" : "Bez terminu", items: noDueTasks },
+      { title: text.taskToday, items: todayTasks },
+      { title: text.taskWeek, items: weekTasks },
+      { title: text.taskNoDue, items: noDueTasks },
       { title: text.done, items: doneTasks }
     ].filter((group) => group.items.length > 0);
 
@@ -697,7 +675,7 @@ export default function App() {
         <View style={styles.chipRow}>
           <Chip label={text.all} active={taskFilter === "all"} onPress={() => setTaskFilter("all")} />
           <Chip label={text.mine} active={taskFilter === "mine"} onPress={() => setTaskFilter("mine")} />
-          <Chip label="Маи" active={taskFilter === "maya"} onPress={() => setTaskFilter("maya")} />
+          <Chip label={text.taskMaya} active={taskFilter === "maya"} onPress={() => setTaskFilter("maya")} />
           <Chip label={text.shared} active={taskFilter === "shared"} onPress={() => setTaskFilter("shared")} />
           <Chip label={text.done} active={taskFilter === "done"} onPress={() => setTaskFilter("done")} />
         </View>
@@ -707,7 +685,15 @@ export default function App() {
               <SectionHeader title={group.title} action={`${group.items.length}`} />
               <Card style={styles.groupCard}>
                 {group.items.map((task) => (
-                  <TaskRow key={`tasks-${task.id}`} task={task} assignee={assigneeLabel(task.assignee)} onToggle={() => toggleTask(task.id)} grouped />
+                  <TaskRow
+                    key={`tasks-${task.id}`}
+                    task={task}
+                    assignee={assigneeLabel(task.assignee)}
+                    completedLabel={text.completedToday}
+                    noReminderLabel={text.noReminder}
+                    onToggle={() => toggleTask(task.id)}
+                    grouped
+                  />
                 ))}
               </Card>
             </View>
@@ -715,7 +701,15 @@ export default function App() {
         ) : (
           <Card style={styles.groupCard}>
             {filteredTasks.map((task) => (
-              <TaskRow key={`tasks-${task.id}`} task={task} assignee={assigneeLabel(task.assignee)} onToggle={() => toggleTask(task.id)} grouped />
+              <TaskRow
+                key={`tasks-${task.id}`}
+                task={task}
+                assignee={assigneeLabel(task.assignee)}
+                completedLabel={text.completedToday}
+                noReminderLabel={text.noReminder}
+                onToggle={() => toggleTask(task.id)}
+                grouped
+              />
             ))}
           </Card>
         )}
@@ -725,7 +719,7 @@ export default function App() {
           </View>
           <View style={styles.rowGrow}>
             <Text style={styles.cardTitle}>{text.newTask}</Text>
-            <Text style={styles.caption}>{language === "ru" ? "Быстро добавьте дело для себя или семьи" : "Szybko dodaj sprawę dla siebie albo rodziny"}</Text>
+            <Text style={styles.caption}>{text.newTaskHint}</Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
         </Pressable>
@@ -735,11 +729,12 @@ export default function App() {
 
   function renderShopping() {
     const sortedShopping = [...shopping].sort((a, b) => Number(a.purchased) - Number(b.purchased));
-    const categoryOrder = ["Молочное", "Овощи и фрукты", "Дом", "Мясо и рыба", "Базовое"];
+    const categoryOrder: ShoppingCategoryId[] = ["cat-dairy", "cat-fruit-veg", "cat-home", "cat-meat-fish", "cat-other"];
     const groupedShopping = categoryOrder
-      .map((category) => ({
-        category,
-        items: sortedShopping.filter((item) => item.category === category)
+      .map((categoryId) => ({
+        categoryId,
+        category: shoppingCategoryName(categoryId, shoppingList.categories, language, text),
+        items: sortedShopping.filter((item) => item.categoryId === categoryId)
       }))
       .filter((group) => group.items.length > 0);
     return (
@@ -748,10 +743,10 @@ export default function App() {
           <View style={styles.addFieldIcon}>
             <Ionicons name="add" size={26} color={colors.domaGold} />
           </View>
-          <Text style={styles.addFieldText}>{language === "ru" ? "Добавить товар" : "Dodaj produkt"}</Text>
+          <Text style={styles.addFieldText}>{text.shoppingAddItem}</Text>
         </Pressable>
         <Card style={styles.frequentCard}>
-          <Text style={styles.shoppingSectionTitle}>{language === "ru" ? "Часто покупаем" : "Często kupowane"}</Text>
+          <Text style={styles.shoppingSectionTitle}>{text.shoppingFrequent}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.frequentTiles}>
             {frequentShopping.map((item) => {
               const visual = frequentVisuals[item] ?? frequentVisuals["Молоко"];
@@ -767,17 +762,15 @@ export default function App() {
           </ScrollView>
         </Card>
         {groupedShopping.map((group) => (
-          <ShoppingCategorySection key={group.category} category={group.category} items={group.items} onToggleItem={toggleShopping} />
+          <ShoppingCategorySection key={group.categoryId} categoryId={group.categoryId} category={group.category} items={group.items} onToggleItem={toggleShopping} />
         ))}
         <Pressable style={styles.quickShoppingHelp} onPress={() => setSheet("shopping")}>
           <View style={styles.previewBasket}>
             <Ionicons name="basket-outline" size={34} color={colors.domaGold} />
           </View>
           <View style={styles.rowGrow}>
-            <Text style={styles.cardTitle}>{language === "ru" ? "Быстро добавляйте товары" : "Dodawaj produkty szybko"}</Text>
-            <Text style={styles.caption}>
-              {language === "ru" ? "Введите название, например «Молоко 2 л»" : "Wpisz nazwę, np. „Mleko 2 l”"}
-            </Text>
+            <Text style={styles.cardTitle}>{text.shoppingQuickTitle}</Text>
+            <Text style={styles.caption}>{text.shoppingQuickHint}</Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
         </Pressable>
@@ -794,7 +787,7 @@ export default function App() {
     ];
     return (
       <View>
-        <SheetTitle title={language === "ru" ? "Что добавить?" : "Co dodać?"} />
+        <SheetTitle title={text.quickAddTitle} />
         {options.map((option) => (
           <Pressable key={option.label} style={styles.sheetOption} onPress={() => setSheet(option.next)}>
             <View style={[styles.sheetOptionIcon, { backgroundColor: `${option.color}18` }]}>
@@ -834,7 +827,7 @@ export default function App() {
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  placeholder="Врач"
+                  placeholder={text.eventTitlePlaceholder}
                   placeholderTextColor={colors.domaBlue}
                   autoFocus
                 />
@@ -846,15 +839,15 @@ export default function App() {
           <EventFormRow icon="people-outline" color={colors.domaBlue} label={text.participants} chevron>
             <View style={styles.eventParticipantsValue}>
               <AvatarGroup participants={eventValues.participants === "both" ? ["alex", "maya"] : ["alex"]} small />
-              <Text style={styles.eventFormValue}>{eventValues.participants === "both" ? text.both : "Алексей"}</Text>
+              <Text style={styles.eventFormValue}>{eventValues.participants === "both" ? text.both : people.alex.name}</Text>
             </View>
           </EventFormRow>
           <EventFormRow icon="notifications-outline" color={colors.domaGold} label={text.reminder} value={text.thirtyMin} chevron />
-          <EventFormRow icon="repeat-outline" color={colors.domaBlue} label={language === "ru" ? "Повтор" : "Powtarzanie"} value={language === "ru" ? "Не повторять" : "Nie powtarzaj"} chevron last />
+          <EventFormRow icon="repeat-outline" color={colors.domaBlue} label={text.repeat} value={text.noRepeat} chevron last />
         </Card>
         {eventErrorMessage !== null && <Text style={styles.formError}>{eventErrorMessage}</Text>}
         <Card style={styles.eventCommentCard}>
-          <EventFormRow icon="chatbubble-outline" color={colors.domaBlue} label={language === "ru" ? "Комментарий" : "Komentarz"} value={language === "ru" ? "Добавить комментарий..." : "Dodaj komentarz..."} last />
+          <EventFormRow icon="chatbubble-outline" color={colors.domaBlue} label={text.comment} value={text.addComment} last />
         </Card>
         <PrimaryButton label={text.save} onPress={addEvent} />
       </View>
@@ -882,8 +875,8 @@ export default function App() {
           name="assignee"
           render={({ field: { value, onChange } }) => (
             <View style={styles.segment}>
-              <Segment label="Алексей" active={value === "alex"} onPress={() => onChange("alex")} />
-              <Segment label="Мая" active={value === "maya"} onPress={() => onChange("maya")} />
+              <Segment label={people.alex.name} active={value === "alex"} onPress={() => onChange("alex")} />
+              <Segment label={people.maya.name} active={value === "maya"} onPress={() => onChange("maya")} />
               <Segment label={text.shared} active={value === "shared"} onPress={() => onChange("shared")} />
             </View>
           )}
@@ -957,14 +950,14 @@ export default function App() {
           <Avatar person="alex" size={44} />
           <View style={styles.rowGrow}>
             <Text style={styles.cardTitle}>{userName}</Text>
-            <Text style={styles.caption}>{language === "ru" ? "Android · владелец" : "Android · właściciel"}</Text>
+            <Text style={styles.caption}>{text.ownerDevice}</Text>
           </View>
         </Card>
         <Card style={styles.memberCard}>
           <Avatar person="maya" size={44} />
           <View style={styles.rowGrow}>
-            <Text style={styles.cardTitle}>Мая</Text>
-            <Text style={styles.caption}>{language === "ru" ? "iPhone · подключена" : "iPhone · połączona"}</Text>
+            <Text style={styles.cardTitle}>{people.maya.name}</Text>
+            <Text style={styles.caption}>{text.connectedDevice}</Text>
           </View>
           <Ionicons name="checkmark-circle" size={20} color={colors.shoppingGreen} />
         </Card>
@@ -979,8 +972,8 @@ export default function App() {
         <SheetTitle title={text.settings} />
         <Text style={styles.fieldLabel}>{text.language}</Text>
         <View style={styles.segment}>
-          <Segment label="Русский" active={language === "ru"} onPress={() => storeSetLanguage("ru")} />
-          <Segment label="Polski" active={language === "pl"} onPress={() => storeSetLanguage("pl")} />
+          <Segment label={text.languageRussian} active={language === "ru"} onPress={() => storeSetLanguage("ru")} />
+          <Segment label={text.languagePolish} active={language === "pl"} onPress={() => storeSetLanguage("pl")} />
         </View>
         <Card style={styles.offlineCard}>
           <Ionicons name="cloud-offline-outline" size={22} color={colors.domaBlue} />
@@ -1064,19 +1057,19 @@ function eventDateToISODate(dateLabel: string): ISODateString | null {
   return juneDate(day);
 }
 
-function formatSelectedDate(date: ISODateString, language: Language) {
+function formatSelectedDate(date: ISODateString, text: typeof copy.ru) {
   const day = Number(date.slice(-2));
 
   if (date === "2026-06-03") {
-    return language === "ru" ? `Сегодня, ${day} июня` : `Dzisiaj, ${day} czerwca`;
+    return text.formatTodayDate(day);
   }
 
-  return formatCalendarSectionDate(date, language);
+  return formatCalendarSectionDate(date, text);
 }
 
-function formatCalendarSectionDate(date: ISODateString, language: Language) {
+function formatCalendarSectionDate(date: ISODateString, text: typeof copy.ru) {
   const day = Number(date.slice(-2));
-  return language === "ru" ? `${day} июня` : `${day} czerwca`;
+  return text.formatMonthDay(day);
 }
 
 function createHouseholdTaskId(): HouseholdTaskId {
@@ -1092,7 +1085,7 @@ function dueLabelToDateTime(dueLabel: string, text: typeof copy.ru): ISODateTime
     return null;
   }
 
-  if (dueLabel.trim() === "До 5 июня") {
+  if (dueLabel.trim() === text.dueJune5) {
     return "2026-06-05T18:00:00+02:00";
   }
 
@@ -1104,7 +1097,7 @@ function toTaskItem(task: HouseholdTask, text: typeof copy.ru, language: Languag
     id: task.id,
     title: task.title,
     assignee: memberIdToTaskAssignee(task.assigneeMemberId),
-    due: dueDateToLabel(task.dueAt, text, language),
+    due: dueDateToLabel(task.dueAt, text),
     reminder: task.reminderAt ? text.thirtyMin : text.noReminder,
     completed: task.status === "completed"
   };
@@ -1122,7 +1115,7 @@ function memberIdToTaskAssignee(memberId: HouseholdTask["assigneeMemberId"]): Ta
   return "shared";
 }
 
-function dueDateToLabel(dueAt: ISODateTimeString | null, text: typeof copy.ru, language: Language) {
+function dueDateToLabel(dueAt: ISODateTimeString | null, text: typeof copy.ru) {
   if (dueAt === null) {
     return text.noDue;
   }
@@ -1130,29 +1123,39 @@ function dueDateToLabel(dueAt: ISODateTimeString | null, text: typeof copy.ru, l
   const date = dueAt.slice(0, 10);
 
   if (date === "2026-06-03") {
-    return language === "ru" ? "Сегодня" : "Dzisiaj";
+    return text.taskToday;
   }
 
   if (date === "2026-06-05") {
-    return language === "ru" ? "До 5 июня" : "Do 5 czerwca";
+    return text.dueJune5;
   }
 
-  return language === "ru" ? "На неделе" : "W tygodniu";
+  return text.dueWeek;
 }
 
-function toShoppingItem(item: ShoppingListItem, categories: ShoppingCategory[]): ShoppingItem {
+function toShoppingItem(item: ShoppingListItem, categories: ShoppingCategory[], language: Language, text: typeof copy.ru): ShoppingItem {
   return {
     id: item.id,
     title: item.title,
     quantity: item.quantity ?? undefined,
-    category: shoppingCategoryName(item.categoryId, categories),
+    categoryId: item.categoryId,
+    category: shoppingCategoryName(item.categoryId, categories, language, text),
     purchased: item.status === "purchased"
   };
 }
 
-function shoppingCategoryName(categoryId: ShoppingCategoryId | null, categories: ShoppingCategory[]) {
+function shoppingCategoryName(categoryId: ShoppingCategoryId | null, categories: ShoppingCategory[], language: Language, text: typeof copy.ru) {
   const category = categories.find((item) => item.id === categoryId);
-  return category?.nameRu ?? "Базовое";
+  return category ? (language === "pl" ? category.namePl : category.nameRu) : text.categoryOther;
+}
+
+function shoppingCategoryLabelToId(categoryLabel: string, categories: ShoppingCategory[]) {
+  const normalizedLabel = categoryLabel.trim().toLowerCase();
+  const category = categories.find(
+    (item) => item.nameRu.toLowerCase() === normalizedLabel || item.namePl.toLowerCase() === normalizedLabel
+  );
+
+  return category?.id ?? "cat-other";
 }
 
 const formValidationErrorCodes = new Set<FormValidationErrorCode>([
@@ -1181,41 +1184,10 @@ function fieldValidationMessage(error: { message?: unknown } | undefined, langua
 }
 
 function validationMessage(code: FormValidationErrorCode, language: Language) {
-  const messages: Record<Language, Record<FormValidationErrorCode, string>> = {
-    ru: {
-      title_required: "Добавьте название.",
-      title_too_short: "Название должно быть не короче 2 символов.",
-      title_too_long: "Название должно быть не длиннее 80 символов.",
-      email_required: "Введите email.",
-      email_invalid: "Введите корректный email.",
-      family_name_required: "Введите название семьи.",
-      user_name_required: "Введите ваше имя.",
-      name_too_long: "Имя должно быть не длиннее 60 символов.",
-      date_required: "Выберите дату.",
-      time_required: "Выберите время.",
-      quantity_too_long: "Количество должно быть не длиннее 32 символов.",
-      category_required: "Укажите категорию."
-    },
-    pl: {
-      title_required: "Dodaj nazwę.",
-      title_too_short: "Nazwa musi mieć co najmniej 2 znaki.",
-      title_too_long: "Nazwa może mieć maksymalnie 80 znaków.",
-      email_required: "Wpisz email.",
-      email_invalid: "Wpisz poprawny email.",
-      family_name_required: "Wpisz nazwę rodziny.",
-      user_name_required: "Wpisz swoje imię.",
-      name_too_long: "Nazwa może mieć maksymalnie 60 znaków.",
-      date_required: "Wybierz datę.",
-      time_required: "Wybierz godzinę.",
-      quantity_too_long: "Ilość może mieć maksymalnie 32 znaki.",
-      category_required: "Podaj kategorię."
-    }
-  };
-
-  return messages[language][code];
+  return copy[language].validation[code];
 }
 
-function WelcomePreview() {
+function WelcomePreview({ text }: { text: typeof copy.ru }) {
   return (
     <View style={styles.previewShell}>
       <View style={styles.previewCard}>
@@ -1223,9 +1195,9 @@ function WelcomePreview() {
           <View style={[styles.previewIconCircle, { backgroundColor: "rgba(73,159,199,0.18)" }]}>
             <Ionicons name="calendar-outline" size={20} color={colors.domaBlue} />
           </View>
-          <Text style={styles.previewSectionTitle}>Сегодня</Text>
+          <Text style={styles.previewSectionTitle}>{text.preview.today}</Text>
           <View style={styles.previewPill}>
-            <Text style={styles.previewPillText}>Все события</Text>
+            <Text style={styles.previewPillText}>{text.preview.allEvents}</Text>
           </View>
         </View>
         <View style={styles.previewLine} />
@@ -1245,9 +1217,9 @@ function WelcomePreview() {
           <View style={[styles.previewIconCircle, { backgroundColor: "rgba(239,138,31,0.16)" }]}>
             <Ionicons name="checkmark-circle" size={20} color={colors.taskOrange} />
           </View>
-          <Text style={styles.previewSectionTitle}>Дела</Text>
+          <Text style={styles.previewSectionTitle}>{text.preview.tasks}</Text>
           <View style={styles.previewPill}>
-            <Text style={styles.previewPillText}>Все дела</Text>
+            <Text style={styles.previewPillText}>{text.preview.allTasks}</Text>
           </View>
         </View>
         <View style={styles.previewLine} />
@@ -1266,15 +1238,15 @@ function WelcomePreview() {
           <View style={[styles.previewIconCircle, { backgroundColor: "rgba(95,150,105,0.16)" }]}>
             <Ionicons name="bag-outline" size={20} color={colors.shoppingGreen} />
           </View>
-          <Text style={styles.previewSectionTitle}>Покупки</Text>
+          <Text style={styles.previewSectionTitle}>{text.preview.shopping}</Text>
           <View style={styles.previewPill}>
-            <Text style={styles.previewPillText}>Список</Text>
+            <Text style={styles.previewPillText}>{text.preview.list}</Text>
           </View>
         </View>
         <View style={styles.previewShoppingRow}>
           <View>
             <Text style={styles.previewShoppingTitle}>Молоко, хлеб, яйца, бананы</Text>
-            <Text style={styles.caption}>4 товара</Text>
+            <Text style={styles.caption}>{text.preview.itemCount}</Text>
           </View>
           <View style={styles.previewBasket}>
             <Ionicons name="basket-outline" size={34} color={colors.shoppingGreen} />

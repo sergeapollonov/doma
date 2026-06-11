@@ -3,13 +3,13 @@ import React from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors } from "../../theme";
-import type { Language, TabKey } from "../../types";
+import type { TabKey } from "../../types";
 import { Avatar } from "../family";
 import { DomaLogo, IconButton } from "../ui";
 
 type HeaderProps = {
   tab: TabKey;
-  language: Language;
+  greetingTitle: string;
   title: string;
   todayDateLabel: string;
   subtitle: string;
@@ -18,7 +18,7 @@ type HeaderProps = {
   onAdd: () => void;
 };
 
-export function Header({ tab, language, title, todayDateLabel, subtitle, onFamily, onSettings, onAdd }: HeaderProps) {
+export function Header({ tab, greetingTitle, title, todayDateLabel, subtitle, onFamily, onSettings, onAdd }: HeaderProps) {
   return (
     <View style={[styles.header, tab === "today" && styles.todayHeader]}>
       {tab === "today" && <View style={styles.sunWash} />}
@@ -42,7 +42,7 @@ export function Header({ tab, language, title, todayDateLabel, subtitle, onFamil
       </View>
       {tab === "today" ? (
         <View style={styles.greetingBlock}>
-          <Text style={styles.greetingTitle}>{language === "ru" ? "Доброе утро,\nАлексей 👋" : "Dzień dobry,\nAlex 👋"}</Text>
+          <Text style={styles.greetingTitle}>{greetingTitle}</Text>
           <Text style={styles.greetingDate}>{todayDateLabel}</Text>
         </View>
       ) : (

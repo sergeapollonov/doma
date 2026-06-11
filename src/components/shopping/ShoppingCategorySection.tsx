@@ -3,26 +3,27 @@ import React from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 
 import { colors } from "../../theme";
-import type { ShoppingItem } from "../../types";
+import type { ShoppingCategoryId, ShoppingItem } from "../../types";
 import { Card, type IconName } from "../ui";
 import { ShoppingItemRow } from "./ShoppingItemRow";
 
-const shoppingVisuals: Record<string, { icon: IconName; color: string; tint: string }> = {
-  Молочное: { icon: "cafe-outline", color: colors.domaGold, tint: "rgba(214,154,69,0.12)" },
-  "Овощи и фрукты": { icon: "leaf-outline", color: colors.shoppingGreen, tint: "rgba(95,150,105,0.14)" },
-  Дом: { icon: "home-outline", color: colors.domaBlue, tint: "rgba(22,58,95,0.11)" },
-  "Мясо и рыба": { icon: "flame-outline", color: colors.dangerRed, tint: "rgba(216,92,74,0.12)" },
-  Базовое: { icon: "basket-outline", color: colors.shoppingGreen, tint: "rgba(95,150,105,0.14)" }
+const shoppingVisuals: Record<ShoppingCategoryId, { icon: IconName; color: string; tint: string }> = {
+  "cat-dairy": { icon: "cafe-outline", color: colors.domaGold, tint: "rgba(214,154,69,0.12)" },
+  "cat-fruit-veg": { icon: "leaf-outline", color: colors.shoppingGreen, tint: "rgba(95,150,105,0.14)" },
+  "cat-home": { icon: "home-outline", color: colors.domaBlue, tint: "rgba(22,58,95,0.11)" },
+  "cat-meat-fish": { icon: "flame-outline", color: colors.dangerRed, tint: "rgba(216,92,74,0.12)" },
+  "cat-other": { icon: "basket-outline", color: colors.shoppingGreen, tint: "rgba(95,150,105,0.14)" }
 };
 
 type ShoppingCategorySectionProps = {
+  categoryId: ShoppingCategoryId;
   category: string;
   items: ShoppingItem[];
   onToggleItem: (itemId: string) => void;
 };
 
-export function ShoppingCategorySection({ category, items, onToggleItem }: ShoppingCategorySectionProps) {
-  const visual = shoppingVisuals[category] ?? shoppingVisuals["Базовое"];
+export function ShoppingCategorySection({ categoryId, category, items, onToggleItem }: ShoppingCategorySectionProps) {
+  const visual = shoppingVisuals[categoryId] ?? shoppingVisuals["cat-other"];
 
   return (
     <Card style={styles.shoppingCategoryCard}>

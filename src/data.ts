@@ -210,13 +210,13 @@ export const initialTasks: TaskItem[] = [
 ];
 
 export const initialShopping: ShoppingItem[] = [
-  { id: "shop-1", title: "Молоко", quantity: "2 л", category: "Молочное", purchased: false },
-  { id: "shop-2", title: "Сыр", category: "Молочное", purchased: false },
-  { id: "shop-3", title: "Помидоры", quantity: "500 г", category: "Овощи и фрукты", purchased: false },
-  { id: "shop-4", title: "Огурцы", category: "Овощи и фрукты", purchased: false },
-  { id: "shop-5", title: "Бумажные полотенца", category: "Дом", purchased: false },
-  { id: "shop-6", title: "Средство для мытья посуды", category: "Дом", purchased: false },
-  { id: "shop-7", title: "Куриное филе", category: "Мясо и рыба", purchased: false }
+  { id: "shop-1", title: "Молоко", quantity: "2 л", categoryId: "cat-dairy", category: "Молочное", purchased: false },
+  { id: "shop-2", title: "Сыр", categoryId: "cat-dairy", category: "Молочное", purchased: false },
+  { id: "shop-3", title: "Помидоры", quantity: "500 г", categoryId: "cat-fruit-veg", category: "Овощи и фрукты", purchased: false },
+  { id: "shop-4", title: "Огурцы", categoryId: "cat-fruit-veg", category: "Овощи и фрукты", purchased: false },
+  { id: "shop-5", title: "Бумажные полотенца", categoryId: "cat-home", category: "Дом", purchased: false },
+  { id: "shop-6", title: "Средство для мытья посуды", categoryId: "cat-home", category: "Дом", purchased: false },
+  { id: "shop-7", title: "Куриное филе", categoryId: "cat-meat-fish", category: "Мясо и рыба", purchased: false }
 ];
 
 export const initialShoppingCategories = [
