@@ -18,6 +18,8 @@ npm run verify:web
 - `npm test` runs Vitest unit tests for Zod validation schemas, domain actions, and local state.
 - `npm run verify:web` exports the Expo web bundle without relying on a local dev server port.
 
+Form flow pull requests should keep React Hook Form state, Zod schemas, localized validation messages, and local submit handlers in sync.
+
 ## Test Scope
 
 Current unit tests cover:

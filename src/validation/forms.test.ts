@@ -47,13 +47,17 @@ describe("form validation", () => {
   });
 
   it("validates event, task, and shopping titles", () => {
-    expect(validateEventForm({ title: "", date: "3 июня", time: "09:00" }).errors.title).toBe("title_required");
-    expect(validateEventForm({ title: "Врач", date: "", time: "" }).errors).toEqual({
+    expect(validateEventForm({ title: "", date: "3 июня", time: "09:00", participants: "both" }).errors.title).toBe(
+      "title_required"
+    );
+    expect(validateEventForm({ title: "Врач", date: "", time: "", participants: "both" }).errors).toEqual({
       date: "date_required",
       time: "time_required"
     });
-    expect(validateTaskForm({ title: "A", due: "Сегодня" }).errors.title).toBe("title_too_short");
-    expect(validateTaskForm({ title: "A".repeat(81), due: "Сегодня" }).errors.title).toBe("title_too_long");
+    expect(validateTaskForm({ title: "A", assignee: "alex", due: "Сегодня" }).errors.title).toBe("title_too_short");
+    expect(validateTaskForm({ title: "A".repeat(81), assignee: "alex", due: "Сегодня" }).errors.title).toBe(
+      "title_too_long"
+    );
     expect(validateShoppingForm({ title: "Молоко", quantity: "2 л", category: "Молочное" }).isValid).toBe(true);
   });
 
