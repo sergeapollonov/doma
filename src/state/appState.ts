@@ -9,6 +9,7 @@ import type {
   AddHouseholdTaskActionInput,
   AddShoppingListItemActionInput,
   CompleteHouseholdTaskInput,
+  EventItem,
   FamilyId,
   ISODateString,
   Language,
@@ -51,6 +52,14 @@ export function selectDate(state: LocalAppState, selectedDate: ISODateString): L
   return {
     ...state,
     selectedDate
+  };
+}
+
+export function addEvent(state: LocalAppState, event: EventItem, selectedDate?: ISODateString | null): LocalAppState {
+  return {
+    ...state,
+    selectedDate: selectedDate ?? state.selectedDate,
+    events: [...state.events, event]
   };
 }
 

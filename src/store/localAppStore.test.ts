@@ -54,4 +54,64 @@ describe("local app Zustand store", () => {
 
     expect(useLocalAppStore.getState().householdTasks[0].status).toBe("completed");
   });
+
+  it("reopens a completed task through store actions", () => {
+    const state = useLocalAppStore.getState();
+
+    state.addHouseholdTask({
+      id: "task-store-reopen-test",
+      familyId: state.familyId,
+      title: "Проверить календарь",
+      assigneeMemberId: "member-alex",
+      createdBy: state.currentUserId,
+      createdAt: "2026-06-04T09:00:00+02:00"
+    });
+
+    useLocalAppStore.getState().completeTask({
+      taskId: "task-store-reopen-test",
+      completedBy: state.currentUserId,
+      completedAt: "2026-06-04T10:00:00+02:00"
+    });
+    useLocalAppStore.getState().reopenTask({
+      taskId: "task-store-reopen-test",
+      updatedBy: state.currentUserId,
+      updatedAt: "2026-06-04T10:05:00+02:00"
+    });
+
+    expect(useLocalAppStore.getState().householdTasks[0].status).toBe("active");
+    expect(useLocalAppStore.getState().householdTasks[0].completedAt).toBeNull();
+  });
+
+  it("adds, purchases, and unpurchases shopping items through store actions", () => {
+    const state = useLocalAppStore.getState();
+
+    state.addShoppingItem({
+      id: "shop-store-test",
+      familyId: state.familyId,
+      categoryId: "cat-home",
+      title: "Салфетки",
+      quantity: "1 уп",
+      createdBy: state.currentUserId,
+      createdAt: "2026-06-04T09:00:00+02:00"
+    });
+
+    expect(useLocalAppStore.getState().shoppingList.items[0].id).toBe("shop-store-test");
+
+    useLocalAppStore.getState().purchaseShoppingItem({
+      itemId: "shop-store-test",
+      purchasedBy: state.currentUserId,
+      purchasedAt: "2026-06-04T09:10:00+02:00"
+    });
+
+    expect(useLocalAppStore.getState().shoppingList.items[0].status).toBe("purchased");
+
+    useLocalAppStore.getState().unpurchaseShoppingItem({
+      itemId: "shop-store-test",
+      updatedBy: state.currentUserId,
+      updatedAt: "2026-06-04T09:15:00+02:00"
+    });
+
+    expect(useLocalAppStore.getState().shoppingList.items[0].status).toBe("active");
+    expect(useLocalAppStore.getState().shoppingList.items[0].purchasedAt).toBeNull();
+  });
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  addEvent,
   addHouseholdTask,
   addShoppingItem,
   completeTask,
@@ -13,6 +14,22 @@ import {
 } from "./appState";
 
 describe("local app state actions", () => {
+  it("creates deterministic privacy-safe local app state copies", () => {
+    const firstState = createInitialLocalAppState();
+    const secondState = createInitialLocalAppState();
+
+    expect(firstState.familyId).toBe("family-1");
+    expect(firstState.currentUserId).toBe("user-alex");
+    expect(firstState.selectedDate).toBe("2026-06-03");
+    expect(firstState.language).toBe("ru");
+    expect(firstState.events[0].id).toBe("event-1");
+    expect(firstState.householdTasks[0].id).toBe("task-1");
+    expect(firstState.shoppingList.items[0].id).toBe("shop-1");
+    expect(firstState.events).not.toBe(secondState.events);
+    expect(firstState.householdTasks).not.toBe(secondState.householdTasks);
+    expect(firstState.shoppingList.items).not.toBe(secondState.shoppingList.items);
+  });
+
   it("updates language and selected date", () => {
     const state = createInitialLocalAppState();
     const languageState = setLanguage(state, "pl");
@@ -20,6 +37,35 @@ describe("local app state actions", () => {
 
     expect(languageState.language).toBe("pl");
     expect(dateState.selectedDate).toBe("2026-06-05");
+  });
+
+  it("adds local events and optionally moves the selected date", () => {
+    const state = createInitialLocalAppState();
+    const withEvent = addEvent(
+      state,
+      {
+        id: "event-local-test",
+        title: "Семейный завтрак",
+        date: "4 июня",
+        time: "09:00",
+        participants: ["alex", "maya"],
+        reminder: "За 30 минут"
+      },
+      "2026-06-04"
+    );
+    const withoutDateMove = addEvent(withEvent, {
+      id: "event-local-test-2",
+      title: "Звонок",
+      date: "5 июня",
+      time: "12:00",
+      participants: ["alex"],
+      reminder: "За 30 минут"
+    });
+
+    expect(withEvent.events).toHaveLength(state.events.length + 1);
+    expect(withEvent.events.at(-1)?.id).toBe("event-local-test");
+    expect(withEvent.selectedDate).toBe("2026-06-04");
+    expect(withoutDateMove.selectedDate).toBe("2026-06-04");
   });
 
   it("adds, completes, and reopens household tasks", () => {
