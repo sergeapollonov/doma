@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import {
+  addEvent,
   addHouseholdTask,
   addShoppingItem,
   completeTask,
@@ -42,12 +43,7 @@ export const useLocalAppStore = create<LocalAppStore>((set) => ({
   reset: () => set(createInitialLocalAppState()),
   setLanguage: (language) => set((state) => setLanguage(state, language)),
   selectDate: (selectedDate) => set((state) => selectDate(state, selectedDate)),
-  addEvent: (event, selectedDate) =>
-    set((state) => ({
-      ...state,
-      selectedDate: selectedDate ?? state.selectedDate,
-      events: [...state.events, event]
-    })),
+  addEvent: (event, selectedDate) => set((state) => addEvent(state, event, selectedDate)),
   addHouseholdTask: (input) => set((state) => addHouseholdTask(state, input)),
   completeTask: (input) => set((state) => completeTask(state, input)),
   reopenTask: (input) => set((state) => reopenTask(state, input)),

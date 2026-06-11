@@ -1,4 +1,5 @@
 import {
+  addEvent,
   addHouseholdTask,
   addShoppingItem,
   completeTask,
@@ -13,6 +14,7 @@ import type {
   AddHouseholdTaskActionInput,
   AddShoppingListItemActionInput,
   CompleteHouseholdTaskInput,
+  EventItem,
   LocalAppState,
   PurchaseShoppingListItemInput,
   ReopenHouseholdTaskInput,
@@ -29,6 +31,17 @@ type _InitialStateMatchesLocalAppState = Expect<IsAssignable<typeof initialState
 const languageState: LocalAppState = setLanguage(initialState, "pl");
 const selectedDateState: LocalAppState = selectDate(languageState, "2026-06-04");
 
+const eventInput: EventItem = {
+  id: "event-state-typecheck",
+  title: "Семейный завтрак",
+  date: "4 июня",
+  time: "09:00",
+  participants: ["alex", "maya"],
+  reminder: "За 30 минут"
+};
+
+const eventState: LocalAppState = addEvent(selectedDateState, eventInput, "2026-06-04");
+
 const addTaskInput: AddHouseholdTaskActionInput = {
   id: "task-state-typecheck",
   familyId: "family-1",
@@ -39,7 +52,7 @@ const addTaskInput: AddHouseholdTaskActionInput = {
   createdAt: "2026-06-04T09:00:00+02:00"
 };
 
-const taskState: LocalAppState = addHouseholdTask(selectedDateState, addTaskInput);
+const taskState: LocalAppState = addHouseholdTask(eventState, addTaskInput);
 
 const completeTaskInput: CompleteHouseholdTaskInput = {
   taskId: "task-state-typecheck",
