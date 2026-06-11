@@ -4,9 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import React, { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  KeyboardAvoidingView,
   Image,
-  Modal,
   Platform,
   Pressable,
   SafeAreaView,
@@ -17,12 +15,28 @@ import {
   View
 } from "react-native";
 
+import { CalendarEventCard, CalendarMonth, EventCard } from "./src/components/calendar";
+import { Avatar, AvatarGroup, AvatarStack } from "./src/components/family";
+import { AppShell, BottomSheet, Header, TabBar } from "./src/components/layout";
+import { ShoppingCategorySection } from "./src/components/shopping";
+import { TaskRow } from "./src/components/tasks";
+import {
+  Card,
+  Chip,
+  DomaLogo,
+  Input,
+  PrimaryButton,
+  SecondaryButton,
+  SectionHeader,
+  Segment,
+  SheetTitle,
+  type IconName
+} from "./src/components/ui";
 import { people } from "./src/data";
 import { copy } from "./src/i18n";
 import { useLocalAppStore } from "./src/store/localAppStore";
 import { colors, radius, spacing } from "./src/theme";
 import {
-  EventItem,
   HouseholdTask,
   HouseholdTaskId,
   ISODateString,
@@ -56,35 +70,8 @@ import type {
 type Stage = "onboarding" | "login" | "family" | "invite" | "acceptInvite" | "app";
 type AuthIntent = "createFamily" | "acceptInvite";
 type Sheet = "quick" | "event" | "task" | "shopping" | "family" | "settings" | null;
-type IconName = keyof typeof Ionicons.glyphMap;
-
-const tabIcons: Record<TabKey, IconName> = {
-  today: "home-outline",
-  calendar: "calendar-outline",
-  tasks: "checkmark-circle-outline",
-  shopping: "bag-outline"
-};
-
-const avatarSources: Record<PersonId, number> = {
-  alex: require("./assets/alex-avatar.png"),
-  maya: require("./assets/maya-avatar.png")
-};
 
 const appIconSource = require("./assets/app-icon.png");
-
-const eventVisuals = [
-  { color: colors.domaBlue, icon: "calendar-outline" as IconName },
-  { color: colors.taskOrange, icon: "cube-outline" as IconName },
-  { color: colors.domaGold, icon: "restaurant-outline" as IconName }
-];
-
-const shoppingVisuals: Record<string, { icon: IconName; color: string; tint: string }> = {
-  Молочное: { icon: "cafe-outline", color: colors.domaGold, tint: "rgba(214,154,69,0.12)" },
-  "Овощи и фрукты": { icon: "leaf-outline", color: colors.shoppingGreen, tint: "rgba(95,150,105,0.14)" },
-  Дом: { icon: "home-outline", color: colors.domaBlue, tint: "rgba(22,58,95,0.11)" },
-  "Мясо и рыба": { icon: "flame-outline", color: colors.dangerRed, tint: "rgba(216,92,74,0.12)" },
-  Базовое: { icon: "basket-outline", color: colors.shoppingGreen, tint: "rgba(95,150,105,0.14)" }
-};
 
 const frequentVisuals: Record<string, { icon: IconName; tint: string }> = {
   Молоко: { icon: "water-outline", tint: "rgba(176,210,226,0.45)" },
@@ -106,20 +93,6 @@ const shoppingCategoryNameToId: Record<string, ShoppingCategoryId> = {
   "Мясо и рыба": "cat-meat-fish",
   Базовое: "cat-other"
 };
-
-const webShell =
-  Platform.OS === "web"
-    ? ({
-        maxWidth: 460,
-        width: "100%",
-        marginLeft: "auto",
-        marginRight: "auto",
-        alignSelf: "center",
-        height: "100vh",
-        overflow: "hidden",
-        boxShadow: "0 22px 80px rgba(55, 38, 20, 0.16)"
-      } as object)
-    : null;
 
 export default function App() {
   const language = useLocalAppStore((state) => state.language);
@@ -561,7 +534,6 @@ export default function App() {
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             <Header
               tab={activeTab}
-              text={text}
               language={language}
               title={activeTab === "today" ? text.brand : text.tabs[activeTab]}
               todayDateLabel={selectedDateLabel}
@@ -636,7 +608,7 @@ export default function App() {
         <Card style={styles.groupCard}>
           {selectedEvents.length > 0 ? (
             selectedEvents.slice(0, 3).map((event, index) => (
-              <EventRow key={event.id} event={event} participantsLabel={participantsLabel(event.participants)} index={index} grouped />
+              <EventCard key={event.id} event={event} participantsLabel={participantsLabel(event.participants)} index={index} grouped />
             ))
           ) : (
             <Text style={styles.caption}>{text.emptyToday}</Text>
@@ -688,43 +660,18 @@ export default function App() {
     const eventDays = new Set(events.map((event) => eventDateToDay(event.date)).filter((day) => day !== null));
     return (
       <View>
-        <View style={styles.monthHeader}>
-          <IconButton icon="chevron-back" />
-          <Text style={styles.monthTitle}>{language === "ru" ? "Июнь 2026" : "Czerwiec 2026"}</Text>
-          <IconButton icon="chevron-forward" />
-        </View>
-        <View style={styles.calendarCard}>
-          <View style={styles.weekRow}>
-            {weekDays.map((day) => (
-              <Text key={day} style={styles.weekDay}>
-                {day}
-              </Text>
-            ))}
-          </View>
-          <View style={styles.calendarGrid}>
-            {days.map((day) => {
-              const selected = day === selectedDay;
-              const today = day === 3;
-              const hasEvents = eventDays.has(day);
-              return (
-                <Pressable key={day} style={[styles.dayCell, selected && styles.dayCellSelected, today && !selected && styles.dayCellToday]} onPress={() => selectCalendarDay(day)}>
-                  <Text style={[styles.dayText, selected && styles.dayTextSelected]}>{day}</Text>
-                  <View style={styles.dotLine}>
-                    {hasEvents && (
-                      <>
-                        <View style={[styles.eventDot, { backgroundColor: colors.domaBlue }]} />
-                        <View style={[styles.eventDot, { backgroundColor: colors.taskOrange }]} />
-                      </>
-                    )}
-                  </View>
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
+        <CalendarMonth
+          title={language === "ru" ? "Июнь 2026" : "Czerwiec 2026"}
+          days={days}
+          weekDays={weekDays}
+          selectedDay={selectedDay}
+          todayDay={3}
+          eventDays={eventDays}
+          onSelectDay={selectCalendarDay}
+        />
         <SectionHeader title={formatCalendarSectionDate(selectedDate, language)} action={text.add} onPress={() => setSheet("event")} />
         {selectedEvents.length > 0 ? (
-          selectedEvents.map((event, index) => <CalendarEventRow key={`cal-${event.id}`} event={event} participantsLabel={participantsLabel(event.participants)} index={index} />)
+          selectedEvents.map((event, index) => <CalendarEventCard key={`cal-${event.id}`} event={event} participantsLabel={participantsLabel(event.participants)} index={index} />)
         ) : (
           <EmptyState title={text.emptyToday} description={text.emptyTodayHint} />
         )}
@@ -819,36 +766,9 @@ export default function App() {
             })}
           </ScrollView>
         </Card>
-        {groupedShopping.map((group) => {
-          const visual = shoppingVisuals[group.category] ?? shoppingVisuals["Базовое"];
-          return (
-            <Card key={group.category} style={styles.shoppingCategoryCard}>
-              <View style={styles.shoppingCategoryHeader}>
-                <View style={[styles.categoryIcon, { backgroundColor: visual.tint }]}>
-                  <Ionicons name={visual.icon} size={20} color={visual.color} />
-                </View>
-                <Text style={styles.shoppingCategoryTitle}>{group.category}</Text>
-                <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
-              </View>
-              {group.items.map((item) => (
-                <Pressable key={item.id} style={styles.shoppingRow} onPress={() => toggleShopping(item.id)}>
-                  <View style={[styles.shoppingCheckbox, item.purchased && styles.shoppingCheckboxDone]}>
-                    {item.purchased && <Ionicons name="checkmark" size={15} color="#FFFFFF" />}
-                  </View>
-                  <View style={styles.rowGrow}>
-                    <Text style={[styles.shoppingItemTitle, item.purchased && styles.completedText]}>{item.title}</Text>
-                  </View>
-                  {item.quantity ? (
-                    <View style={styles.quantityPill}>
-                      <Text style={styles.quantityText}>{item.quantity}</Text>
-                    </View>
-                  ) : null}
-                  <Ionicons name="reorder-two-outline" size={24} color="rgba(111,116,124,0.48)" />
-                </Pressable>
-              ))}
-            </Card>
-          );
-        })}
+        {groupedShopping.map((group) => (
+          <ShoppingCategorySection key={group.category} category={group.category} items={group.items} onToggleItem={toggleShopping} />
+        ))}
         <Pressable style={styles.quickShoppingHelp} onPress={() => setSheet("shopping")}>
           <View style={styles.previewBasket}>
             <Ionicons name="basket-outline" size={34} color={colors.domaGold} />
@@ -925,7 +845,7 @@ export default function App() {
           <EventFormRow icon="time-outline" color={colors.taskOrange} label={text.time} value={eventValues.time} chevron />
           <EventFormRow icon="people-outline" color={colors.domaBlue} label={text.participants} chevron>
             <View style={styles.eventParticipantsValue}>
-              <MiniAvatarGroup participants={eventValues.participants === "both" ? ["alex", "maya"] : ["alex"]} small />
+              <AvatarGroup participants={eventValues.participants === "both" ? ["alex", "maya"] : ["alex"]} small />
               <Text style={styles.eventFormValue}>{eventValues.participants === "both" ? text.both : "Алексей"}</Text>
             </View>
           </EventFormRow>
@@ -1295,87 +1215,6 @@ function validationMessage(code: FormValidationErrorCode, language: Language) {
   return messages[language][code];
 }
 
-function AppShell({ children }: { children: React.ReactNode }) {
-  return <View style={[styles.shell, webShell]}>{children}</View>;
-}
-
-function Header({
-  tab,
-  text,
-  language,
-  title,
-  todayDateLabel,
-  subtitle,
-  onFamily,
-  onSettings,
-  onAdd
-}: {
-  tab: TabKey;
-  text: typeof copy.ru;
-  language: Language;
-  title: string;
-  todayDateLabel: string;
-  subtitle: string;
-  onFamily: () => void;
-  onSettings: () => void;
-  onAdd: () => void;
-}) {
-  return (
-    <View style={[styles.header, tab === "today" && styles.todayHeader]}>
-      {tab === "today" && <View style={styles.sunWash} />}
-      <View style={styles.phoneStatus}>
-        <Text style={styles.statusTime}>9:41</Text>
-        <View style={styles.statusIcons}>
-          <Ionicons name="cellular" size={17} color="#050505" />
-          <Ionicons name="wifi" size={17} color="#050505" />
-          <Ionicons name="battery-full" size={23} color="#050505" />
-        </View>
-      </View>
-      <View style={styles.brandHeaderRow}>
-        <DomaLogo />
-        <View style={styles.headerActions}>
-          {tab === "today" ? (
-            <IconButton icon="notifications-outline" onPress={onSettings} badge />
-          ) : (
-            <IconButton icon="add" onPress={onAdd} />
-          )}
-        </View>
-      </View>
-      {tab === "today" ? (
-        <View style={styles.greetingBlock}>
-          <Text style={styles.greetingTitle}>{language === "ru" ? "Доброе утро,\nАлексей 👋" : "Dzień dobry,\nAlex 👋"}</Text>
-          <Text style={styles.greetingDate}>{todayDateLabel}</Text>
-        </View>
-      ) : (
-        <View style={styles.innerHeaderBlock}>
-          <View>
-            <Text style={styles.innerScreenTitle}>{title}</Text>
-            <Text style={styles.headerSubtitle}>{subtitle}</Text>
-          </View>
-          {tab === "tasks" || tab === "shopping" ? (
-            <Pressable onPress={onFamily} style={styles.taskHeaderAvatars}>
-              <Avatar person="alex" size={58} />
-              <Avatar person="maya" size={58} />
-            </Pressable>
-          ) : null}
-        </View>
-      )}
-    </View>
-  );
-}
-
-function DomaLogo({ large = false }: { large?: boolean }) {
-  return (
-    <View style={styles.logoRow}>
-      <View style={[styles.logoMark, large && styles.logoMarkLarge]}>
-        <Ionicons name="home-outline" size={31} color={colors.domaGold} />
-        <Ionicons name="heart-outline" size={15} color={colors.domaGold} style={styles.logoHeart} />
-      </View>
-      <Text style={[styles.logoText, large && styles.logoTextLarge]}>Doma</Text>
-    </View>
-  );
-}
-
 function WelcomePreview() {
   return (
     <View style={styles.previewShell}>
@@ -1397,7 +1236,7 @@ function WelcomePreview() {
             <Text style={styles.previewItemTitle}>Врач</Text>
             <Text style={styles.caption}>Клиника на Сенной</Text>
           </View>
-          <MiniAvatarGroup participants={["alex", "maya"]} small />
+          <AvatarGroup participants={["alex", "maya"]} small />
         </View>
       </View>
 
@@ -1446,119 +1285,6 @@ function WelcomePreview() {
   );
 }
 
-function TabBar({
-  activeTab,
-  onChange,
-  labels
-}: {
-  activeTab: TabKey;
-  onChange: (tab: TabKey) => void;
-  labels: Record<TabKey, string>;
-}) {
-  const tabs: TabKey[] = ["today", "calendar", "tasks", "shopping"];
-  return (
-    <View style={styles.tabBar}>
-      {tabs.map((tab) => {
-        const active = tab === activeTab;
-        return (
-          <Pressable key={tab} style={styles.tabItem} onPress={() => onChange(tab)}>
-            <View style={[styles.tabIconWrap, active && styles.tabIconWrapActive]}>
-              <Ionicons name={tabIcons[tab]} size={21} color={active ? colors.domaBlue : colors.inactive} />
-            </View>
-            <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{labels[tab]}</Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
-
-function Card({ children, style }: { children: React.ReactNode; style?: object }) {
-  return <View style={[styles.card, style]}>{children}</View>;
-}
-
-function SectionHeader({ title, action, onPress }: { title: string; action?: string; onPress?: () => void }) {
-  return (
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {action ? (
-        <Pressable onPress={onPress}>
-          <Text style={styles.sectionAction}>{action}</Text>
-        </Pressable>
-      ) : null}
-    </View>
-  );
-}
-
-function EventRow({
-  event,
-  participantsLabel,
-  index = 0,
-  grouped = false
-}: {
-  event: EventItem;
-  participantsLabel: string;
-  index?: number;
-  grouped?: boolean;
-}) {
-  const visual = eventVisuals[index % eventVisuals.length];
-  return (
-    <Pressable style={[styles.eventRow, grouped && styles.groupedRow]}>
-      <View style={[styles.rowAccent, { backgroundColor: visual.color }]} />
-      <View style={[styles.eventIconTile, { backgroundColor: visual.color }]}>
-        <Ionicons name={visual.icon} size={22} color="#FFFFFF" />
-      </View>
-      <Text style={styles.eventTimeText}>{event.time}</Text>
-      <View style={styles.rowGrow}>
-        <Text style={styles.rowTitle}>{event.title}</Text>
-        <Text style={styles.caption}>{participantsLabel}</Text>
-      </View>
-      <MiniAvatarGroup participants={event.participants} />
-      <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
-    </Pressable>
-  );
-}
-
-function CalendarEventRow({ event, participantsLabel, index = 0 }: { event: EventItem; participantsLabel: string; index?: number }) {
-  const visual = eventVisuals[index % eventVisuals.length];
-  return (
-    <Pressable style={styles.calendarEventRow}>
-      <View style={[styles.calendarTimeTile, { backgroundColor: visual.color }]}>
-        <Ionicons name={visual.icon} size={25} color="#FFFFFF" />
-        <Text style={styles.calendarTimeText}>{event.time}</Text>
-      </View>
-      <View style={styles.rowGrow}>
-        <Text style={styles.calendarEventTitle}>{event.title}</Text>
-        <View style={styles.inlineMeta}>
-          <MiniAvatarGroup participants={event.participants} small />
-          <Text style={styles.caption}>{participantsLabel}</Text>
-        </View>
-      </View>
-      <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
-    </Pressable>
-  );
-}
-
-function TaskRow({ task, assignee, onToggle, grouped = false }: { task: TaskItem; assignee: string; onToggle: () => void; grouped?: boolean }) {
-  return (
-    <Pressable style={[styles.taskRow, grouped && styles.groupedRow]}>
-      <View style={[styles.taskAccent, task.completed && styles.taskAccentDone]} />
-      <Pressable style={[styles.checkbox, task.completed && styles.checkboxDone]} onPress={onToggle}>
-        {task.completed && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
-      </Pressable>
-      <View style={styles.rowGrow}>
-        <Text style={[styles.rowTitle, task.completed && styles.completedText]}>{task.title}</Text>
-        <View style={styles.inlineMeta}>
-          <Ionicons name={task.reminder === "Не напоминать" ? "calendar-outline" : "notifications-outline"} size={15} color={task.completed ? colors.shoppingGreen : colors.taskOrange} />
-          <Text style={styles.caption}>{task.completed ? "Выполнено сегодня" : `${task.due} · ${assignee}`}</Text>
-        </View>
-      </View>
-      {task.assignee !== "shared" ? <Avatar person={task.assignee} size={28} /> : <Ionicons name="people-outline" size={22} color={colors.familySand} />}
-      <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
-    </Pressable>
-  );
-}
-
 function EmptyState({ title, description }: { title: string; description: string }) {
   return (
     <Card style={styles.emptyState}>
@@ -1567,117 +1293,6 @@ function EmptyState({ title, description }: { title: string; description: string
       <Text style={styles.captionCentered}>{description}</Text>
     </Card>
   );
-}
-
-function Avatar({ person, size = 32 }: { person: PersonId; size?: number }) {
-  return (
-    <Image
-      source={avatarSources[person]}
-      style={[styles.avatar, { width: size, height: size, borderRadius: size / 2 }]}
-      resizeMode="cover"
-    />
-  );
-}
-
-function AvatarStack({ small = false }: { small?: boolean }) {
-  const size = small ? 26 : 38;
-  return (
-    <View style={styles.avatarStack}>
-      <Avatar person="alex" size={size} />
-      <View style={styles.avatarOverlap}>
-        <Avatar person="maya" size={size} />
-      </View>
-    </View>
-  );
-}
-
-function MiniAvatarGroup({ participants, small = false }: { participants: PersonId[]; small?: boolean }) {
-  const size = small ? 26 : 30;
-  return (
-    <View style={styles.miniAvatarGroup}>
-      {participants.map((person, index) => (
-        <View key={person} style={index > 0 ? styles.miniAvatarOverlap : undefined}>
-          <Avatar person={person} size={size} />
-        </View>
-      ))}
-    </View>
-  );
-}
-
-function IconButton({ icon, onPress, badge = false }: { icon: IconName; onPress?: () => void; badge?: boolean }) {
-  return (
-    <Pressable style={styles.iconButton} onPress={onPress}>
-      <Ionicons name={icon} size={20} color={colors.domaBlue} />
-      {badge ? <View style={styles.iconBadge} /> : null}
-    </Pressable>
-  );
-}
-
-function PrimaryButton({ label, onPress, disabled = false, arrow = false }: { label: string; onPress: () => void; disabled?: boolean; arrow?: boolean }) {
-  return (
-    <Pressable style={[styles.primaryButton, disabled && styles.primaryButtonDisabled]} onPress={onPress} disabled={disabled}>
-      <Text style={[styles.primaryButtonText, disabled && styles.disabledText]}>{label}</Text>
-      {arrow ? <Ionicons name="arrow-forward" size={24} color="#FFFFFF" style={styles.primaryButtonArrow} /> : null}
-    </Pressable>
-  );
-}
-
-function SecondaryButton({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <Pressable style={styles.secondaryButton} onPress={onPress}>
-      <Text style={styles.secondaryButtonText}>{label}</Text>
-    </Pressable>
-  );
-}
-
-function Input({
-  label,
-  value,
-  onChangeText,
-  error,
-  compact,
-  autoFocus
-}: {
-  label: string;
-  value: string;
-  onChangeText: (value: string) => void;
-  error?: string;
-  compact?: boolean;
-  autoFocus?: boolean;
-}) {
-  return (
-    <View style={[styles.inputWrap, compact && styles.inputCompact]}>
-      <Text style={styles.fieldLabel}>{label}</Text>
-      <TextInput
-        style={[styles.input, error && styles.inputError]}
-        value={value}
-        onChangeText={onChangeText}
-        placeholderTextColor={colors.textTertiary}
-        autoFocus={autoFocus}
-      />
-      {error && <Text style={styles.formError}>{error}</Text>}
-    </View>
-  );
-}
-
-function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
-  return (
-    <Pressable style={[styles.chip, active && styles.chipActive]} onPress={onPress}>
-      <Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
-    </Pressable>
-  );
-}
-
-function Segment({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
-  return (
-    <Pressable style={[styles.segmentItem, active && styles.segmentItemActive]} onPress={onPress}>
-      <Text style={[styles.segmentText, active && styles.segmentTextActive]}>{label}</Text>
-    </Pressable>
-  );
-}
-
-function SheetTitle({ title }: { title: string }) {
-  return <Text style={styles.sheetTitle}>{title}</Text>;
 }
 
 function EventFormRow({
@@ -1708,20 +1323,6 @@ function EventFormRow({
       </View>
       {chevron ? <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} /> : null}
     </View>
-  );
-}
-
-function BottomSheet({ visible, onClose, children }: { visible: boolean; onClose: () => void; children: React.ReactNode }) {
-  return (
-    <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.modalRoot}>
-        <Pressable style={styles.modalBackdrop} onPress={onClose} />
-        <View style={styles.sheet}>
-          <View style={styles.sheetHandle} />
-          {children}
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
   );
 }
 
