@@ -6,6 +6,12 @@ This document defines privacy principles and minimum privacy requirements for Do
 
 Doma handles family-related data. Even if the app starts as a personal MVP, privacy must be considered from the beginning.
 
+For practical threat scenarios, mitigations, contributor checks, and backend security gates, see:
+
+```text
+/docs/privacy-threat-model.md
+```
+
 ## 2. Type of data Doma may process
 
 Doma may process:

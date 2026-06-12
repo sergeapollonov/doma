@@ -14,11 +14,11 @@ Completed: Milestone B — Component Foundation
 Completed: Milestone C — Localization Cleanup
 Completed: Milestone D — Local State
 Completed: Milestone E — Forms and Validation
-Partially complete: Milestone F — Privacy and Security Baseline
+Completed: Milestone F — Privacy and Security Baseline
 Not started: Milestone G — Backend Foundation
 ```
 
-Open follow-up work should focus on tests, accessibility, privacy threat modeling, and localization polish before backend features expand.
+Open follow-up work should focus on tests, accessibility, and localization polish before backend features expand.
 
 ## Open Source Goals
 
@@ -166,7 +166,7 @@ Exit criteria:
 
 ## Milestone F: Privacy and Security Baseline
 
-Status: partially complete; public policy files exist, but the privacy threat model issue remains open.
+Status: completed for the pre-backend public alpha baseline.
 
 Goal: prepare for backend work without leaking sensitive data.
 
@@ -185,6 +185,12 @@ Exit criteria:
 - `SECURITY.md` is current;
 - privacy review checklist exists;
 - backend milestones have explicit security gates.
+
+Current artifact:
+
+```text
+docs/privacy-threat-model.md
+```
 
 ## Milestone G: Backend Foundation
 
