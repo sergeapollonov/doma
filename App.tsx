@@ -34,35 +34,44 @@ import {
 } from "./src/components/ui";
 import { people } from "./src/data";
 import { copy } from "./src/i18n";
+import {
+  dueLabelToDateTime,
+  shoppingCategoryLabelToId,
+  shoppingCategoryName,
+  taskAssigneeToMemberId,
+  toShoppingItem,
+  toTaskItem
+} from "./src/mappers/appUiMappers";
 import { useLocalAppStore } from "./src/store/localAppStore";
 import { colors, spacing } from "./src/theme";
 import {
-  HouseholdTask,
   HouseholdTaskId,
-  ISODateString,
-  ISODateTimeString,
-  Language,
   PersonId,
-  ShoppingCategory,
   ShoppingCategoryId,
-  ShoppingItem,
   ShoppingItemId,
-  ShoppingListItem,
   TabKey,
   TaskItem
 } from "./src/types";
 import {
+  eventDateToDay,
+  eventDateToISODate,
+  formatCalendarSectionDate,
+  formatSelectedDate,
+  juneDate,
+  nowDateTime
+} from "./src/utils/appDates";
+import { createHouseholdTaskId, createShoppingItemId } from "./src/utils/localIds";
+import {
   eventFormSchema,
   familySetupFormSchema,
-  isFormValidationErrorCode,
   loginFormSchema,
   shoppingFormSchema,
   taskFormSchema
 } from "./src/validation/forms";
+import { fieldValidationMessage } from "./src/validation/messages";
 import type {
   EventFormInput,
   FamilySetupFormInput,
-  FormValidationErrorCode,
   LoginFormInput,
   ShoppingFormInput,
   TaskFormInput
@@ -80,11 +89,6 @@ const frequentVisuals: Record<string, { icon: IconName; tint: string }> = {
   Яйца: { icon: "ellipse-outline", tint: "rgba(215,185,139,0.18)" },
   Бананы: { icon: "leaf-outline", tint: "rgba(230,183,67,0.16)" },
   Кофе: { icon: "cafe-outline", tint: "rgba(143,102,61,0.14)" }
-};
-
-const taskAssigneeToMemberId: Record<PersonId, HouseholdTask["assigneeMemberId"]> = {
-  alex: "member-alex",
-  maya: "member-maya"
 };
 
 export default function App() {
@@ -148,8 +152,8 @@ export default function App() {
   );
   const selectedDateLabel = formatSelectedDate(selectedDate, text);
   const tasks = useMemo(
-    () => householdTasks.map((task) => toTaskItem(task, text, language)),
-    [householdTasks, language, text]
+    () => householdTasks.map((task) => toTaskItem(task, text)),
+    [householdTasks, text]
   );
   const shopping = useMemo(
     () => shoppingList.items.map((item) => toShoppingItem(item, shoppingList.categories, language, text)),
@@ -1036,149 +1040,6 @@ export default function App() {
   function selectCalendarDay(day: number) {
     storeSelectDate(juneDate(day));
   }
-}
-
-function nowDateTime(): ISODateTimeString {
-  return new Date().toISOString() as ISODateTimeString;
-}
-
-function juneDate(day: number): ISODateString {
-  return `2026-06-${String(day).padStart(2, "0")}` as ISODateString;
-}
-
-function eventDateToDay(dateLabel: string): number | null {
-  const match = dateLabel.match(/^(\d{1,2})\s/);
-
-  if (match === null) {
-    return null;
-  }
-
-  return Number(match[1]);
-}
-
-function eventDateToISODate(dateLabel: string): ISODateString | null {
-  const day = eventDateToDay(dateLabel);
-
-  if (day === null) {
-    return null;
-  }
-
-  return juneDate(day);
-}
-
-function formatSelectedDate(date: ISODateString, text: typeof copy.ru) {
-  const day = Number(date.slice(-2));
-
-  if (date === "2026-06-03") {
-    return text.formatTodayDate(day);
-  }
-
-  return formatCalendarSectionDate(date, text);
-}
-
-function formatCalendarSectionDate(date: ISODateString, text: typeof copy.ru) {
-  const day = Number(date.slice(-2));
-  return text.formatMonthDay(day);
-}
-
-function createHouseholdTaskId(): HouseholdTaskId {
-  return `task-${Date.now()}` as HouseholdTaskId;
-}
-
-function createShoppingItemId(title: string): ShoppingItemId {
-  return `shop-${Date.now()}-${title.toLowerCase().replace(/\s+/g, "-")}` as ShoppingItemId;
-}
-
-function dueLabelToDateTime(dueLabel: string, text: typeof copy.ru): ISODateTimeString | null {
-  if (dueLabel.trim() === text.noDue) {
-    return null;
-  }
-
-  if (dueLabel.trim() === text.dueJune5) {
-    return "2026-06-05T18:00:00+02:00";
-  }
-
-  return "2026-06-03T18:00:00+02:00";
-}
-
-function toTaskItem(task: HouseholdTask, text: typeof copy.ru, language: Language): TaskItem {
-  return {
-    id: task.id,
-    title: task.title,
-    assignee: memberIdToTaskAssignee(task.assigneeMemberId),
-    due: dueDateToLabel(task.dueAt, text),
-    reminder: task.reminderAt ? text.thirtyMin : text.noReminder,
-    completed: task.status === "completed"
-  };
-}
-
-function memberIdToTaskAssignee(memberId: HouseholdTask["assigneeMemberId"]): TaskItem["assignee"] {
-  if (memberId === "member-alex") {
-    return "alex";
-  }
-
-  if (memberId === "member-maya") {
-    return "maya";
-  }
-
-  return "shared";
-}
-
-function dueDateToLabel(dueAt: ISODateTimeString | null, text: typeof copy.ru) {
-  if (dueAt === null) {
-    return text.noDue;
-  }
-
-  const date = dueAt.slice(0, 10);
-
-  if (date === "2026-06-03") {
-    return text.taskToday;
-  }
-
-  if (date === "2026-06-05") {
-    return text.dueJune5;
-  }
-
-  return text.dueWeek;
-}
-
-function toShoppingItem(item: ShoppingListItem, categories: ShoppingCategory[], language: Language, text: typeof copy.ru): ShoppingItem {
-  return {
-    id: item.id,
-    title: item.title,
-    quantity: item.quantity ?? undefined,
-    categoryId: item.categoryId,
-    category: shoppingCategoryName(item.categoryId, categories, language, text),
-    purchased: item.status === "purchased"
-  };
-}
-
-function shoppingCategoryName(categoryId: ShoppingCategoryId | null, categories: ShoppingCategory[], language: Language, text: typeof copy.ru) {
-  const category = categories.find((item) => item.id === categoryId);
-  return category ? (language === "pl" ? category.namePl : category.nameRu) : text.categoryOther;
-}
-
-function shoppingCategoryLabelToId(categoryLabel: string, categories: ShoppingCategory[]) {
-  const normalizedLabel = categoryLabel.trim().toLowerCase();
-  const category = categories.find(
-    (item) => item.nameRu.toLowerCase() === normalizedLabel || item.namePl.toLowerCase() === normalizedLabel
-  );
-
-  return category?.id ?? "cat-other";
-}
-
-function fieldValidationMessage(error: { message?: unknown } | undefined, language: Language) {
-  const code = error?.message;
-
-  if (typeof code !== "string" || !isFormValidationErrorCode(code)) {
-    return undefined;
-  }
-
-  return validationMessage(code, language);
-}
-
-function validationMessage(code: FormValidationErrorCode, language: Language) {
-  return copy[language].validation[code];
 }
 
 function WelcomePreview({ text }: { text: typeof copy.ru }) {
