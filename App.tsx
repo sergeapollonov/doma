@@ -35,7 +35,7 @@ import {
 import { people } from "./src/data";
 import { copy } from "./src/i18n";
 import { useLocalAppStore } from "./src/store/localAppStore";
-import { colors, radius, spacing } from "./src/theme";
+import { colors, spacing } from "./src/theme";
 import {
   HouseholdTask,
   HouseholdTaskId,
@@ -1293,10 +1293,6 @@ function EventFormRow({
 }
 
 const styles = StyleSheet.create({
-  shell: {
-    flex: 1,
-    backgroundColor: colors.backgroundTop
-  },
   safe: {
     flex: 1
   },
@@ -1310,195 +1306,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 132,
     paddingTop: 0
-  },
-  header: {
-    paddingTop: 18,
-    marginBottom: 12
-  },
-  todayHeader: {
-    minHeight: 306,
-    marginHorizontal: -24,
-    paddingHorizontal: 24,
-    overflow: "hidden"
-  },
-  sunWash: {
-    position: "absolute",
-    right: -40,
-    top: 82,
-    width: 245,
-    height: 190,
-    borderRadius: 95,
-    backgroundColor: "rgba(255,255,255,0.54)",
-    shadowColor: colors.domaGold,
-    shadowOpacity: 0.14,
-    shadowRadius: 55,
-    shadowOffset: { width: -18, height: 22 }
-  },
-  phoneStatus: {
-    height: 28,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 28,
-    marginBottom: 24
-  },
-  statusTime: {
-    color: "#050505",
-    fontSize: 17,
-    fontWeight: "800"
-  },
-  statusIcons: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8
-  },
-  brandHeaderRow: {
-    minHeight: 60,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
-  },
-  logoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12
-  },
-  logoMark: {
-    width: 47,
-    height: 47,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  logoMarkLarge: {
-    width: 58,
-    height: 58
-  },
-  logoHeart: {
-    position: "absolute",
-    top: 17
-  },
-  logoText: {
-    color: colors.domaBlue,
-    fontSize: 44,
-    lineHeight: 50,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" }),
-    letterSpacing: 0
-  },
-  logoTextLarge: {
-    fontSize: 70,
-    lineHeight: 76
-  },
-  greetingBlock: {
-    marginTop: 30
-  },
-  greetingTitle: {
-    color: colors.domaBlue,
-    fontSize: 40,
-    lineHeight: 46,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" }),
-    letterSpacing: 0
-  },
-  greetingDate: {
-    marginTop: 10,
-    color: colors.textSecondary,
-    fontSize: 23,
-    lineHeight: 30,
-    fontWeight: "500"
-  },
-  innerHeaderBlock: {
-    marginTop: 42,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between"
-  },
-  innerScreenTitle: {
-    color: colors.domaBlue,
-    fontSize: 48,
-    lineHeight: 56,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" }),
-    letterSpacing: 0
-  },
-  taskHeaderAvatars: {
-    flexDirection: "row",
-    gap: 14,
-    alignItems: "center"
-  },
-  headerTitle: {
-    fontSize: 31,
-    lineHeight: 36,
-    fontWeight: "800",
-    color: colors.textPrimary,
-    letterSpacing: 0
-  },
-  headerSubtitle: {
-    marginTop: 3,
-    fontSize: 14,
-    color: colors.textSecondary
-  },
-  headerActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8
-  },
-  avatarButton: {
-    paddingHorizontal: 2,
-    paddingVertical: 4
-  },
-  iconButton: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.74)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.86)",
-    shadowColor: "#372614",
-    shadowOpacity: 0.12,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 8 }
-  },
-  todayHero: {
-    borderRadius: radius.xlarge,
-    padding: 18,
-    marginBottom: 12,
-    backgroundColor: colors.surfaceWarm,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.78)",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    shadowColor: "#372614",
-    shadowOpacity: 0.08,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 10 }
-  },
-  heroDate: {
-    color: colors.domaGold,
-    fontWeight: "700",
-    fontSize: 13
-  },
-  heroQuestion: {
-    marginTop: 5,
-    color: colors.textPrimary,
-    fontSize: 22,
-    lineHeight: 27,
-    fontWeight: "800"
-  },
-  card: {
-    backgroundColor: "rgba(255,255,255,0.74)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.88)",
-    borderRadius: 26,
-    padding: spacing.card,
-    marginBottom: 10,
-    shadowColor: "#372614",
-    shadowOpacity: 0.10,
-    shadowRadius: 28,
-    shadowOffset: { width: 0, height: 12 }
   },
   syncCard: {
     minHeight: 108,
@@ -1538,11 +1345,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
     minWidth: 0
-  },
-  syncLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10
   },
   syncTitle: {
     color: colors.domaBlue,
@@ -1587,122 +1389,14 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     textAlign: "center"
   },
-  familyPair: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    fontWeight: "700"
-  },
-  sectionHeader: {
-    marginTop: 20,
-    marginBottom: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
-  },
-  sectionTitle: {
-    color: colors.domaBlue,
-    fontSize: 27,
-    lineHeight: 32,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
-  sectionAction: {
-    color: "#C87F11",
-    fontSize: 17,
-    fontWeight: "500"
-  },
   groupCard: {
     padding: 0,
     overflow: "hidden",
     borderRadius: 25,
     marginBottom: 14
   },
-  eventRow: {
-    minHeight: 82,
-    borderRadius: 0,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    marginBottom: 0,
-    backgroundColor: "transparent",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 13,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(232,222,210,0.72)"
-  },
-  groupedRow: {
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(232,222,210,0.72)"
-  },
-  rowAccent: {
-    width: 4,
-    height: 54,
-    borderRadius: 4
-  },
-  eventIconTile: {
-    width: 56,
-    height: 56,
-    borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#372614",
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 }
-  },
-  eventTimeText: {
-    color: colors.domaBlue,
-    fontSize: 24,
-    fontWeight: "500",
-    minWidth: 66,
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
   rowGrow: {
     flex: 1
-  },
-  rowTitle: {
-    color: colors.domaBlue,
-    fontSize: 19,
-    lineHeight: 24,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
-  taskRow: {
-    minHeight: 84,
-    borderRadius: 0,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    marginBottom: 0,
-    backgroundColor: "transparent",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12
-  },
-  taskAccent: {
-    width: 4,
-    height: 51,
-    borderRadius: 4,
-    backgroundColor: colors.taskOrange
-  },
-  taskAccentDone: {
-    backgroundColor: colors.shoppingGreen
-  },
-  checkbox: {
-    width: 31,
-    height: 31,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: colors.taskOrange,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  checkboxDone: {
-    borderColor: colors.taskOrange,
-    backgroundColor: colors.taskOrange
-  },
-  completedText: {
-    color: colors.textTertiary,
-    textDecorationLine: "line-through"
   },
   shoppingSummary: {
     minHeight: 112,
@@ -1803,115 +1497,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "700"
   },
-  monthHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 18,
-    marginBottom: 22
-  },
-  monthTitle: {
-    color: colors.domaBlue,
-    fontSize: 32,
-    lineHeight: 38,
-    fontWeight: "600"
-  },
-  calendarCard: {
-    paddingHorizontal: 2,
-    paddingBottom: 16
-  },
-  weekRow: {
-    flexDirection: "row",
-    marginBottom: 10
-  },
-  weekDay: {
-    flex: 1,
-    textAlign: "center",
-    color: colors.textSecondary,
-    fontSize: 18,
-    fontWeight: "500"
-  },
-  calendarGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap"
-  },
-  dayCell: {
-    width: `${100 / 7}%`,
-    height: 62,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 25
-  },
-  dayCellSelected: {
-    backgroundColor: colors.domaBlue
-  },
-  dayCellToday: {
-    borderWidth: 1,
-    borderColor: colors.domaGold
-  },
-  dayText: {
-    color: colors.textPrimary,
-    fontSize: 25,
-    fontWeight: "500"
-  },
-  dayTextSelected: {
-    color: "#FFFFFF"
-  },
-  dotLine: {
-    height: 7,
-    marginTop: 3,
-    flexDirection: "row",
-    gap: 2
-  },
-  eventDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4
-  },
-  calendarEventRow: {
-    minHeight: 108,
-    borderRadius: 24,
-    padding: 12,
-    marginBottom: 12,
-    backgroundColor: "rgba(255,255,255,0.74)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.88)",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-    shadowColor: "#372614",
-    shadowOpacity: 0.08,
-    shadowRadius: 22,
-    shadowOffset: { width: 0, height: 10 }
-  },
-  calendarTimeTile: {
-    width: 86,
-    height: 86,
-    borderRadius: 19,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6
-  },
-  calendarTimeText: {
-    color: "#FFFFFF",
-    fontSize: 24,
-    lineHeight: 28,
-    fontWeight: "600",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
-  calendarEventTitle: {
-    color: colors.domaBlue,
-    fontSize: 25,
-    lineHeight: 31,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
-  inlineMeta: {
-    marginTop: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8
-  },
   chipRow: {
     flexDirection: "row",
     gap: 6,
@@ -1921,28 +1506,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.68)",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.86)"
-  },
-  chip: {
-    height: 39,
-    paddingHorizontal: 12,
-    borderRadius: 21,
-    borderWidth: 1,
-    borderColor: colors.strokeSoft,
-    backgroundColor: colors.surfaceWarm,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  chipActive: {
-    backgroundColor: colors.domaBlue,
-    borderColor: colors.domaBlue
-  },
-  chipText: {
-    color: colors.textSecondary,
-    fontSize: 15,
-    fontWeight: "500"
-  },
-  chipTextActive: {
-    color: "#FFFFFF"
   },
   addField: {
     height: 78,
@@ -1978,50 +1541,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "500",
     fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
-  frequentRow: {
-    gap: 8,
-    paddingBottom: 14
-  },
-  shoppingChip: {
-    height: 35,
-    paddingHorizontal: 14,
-    borderRadius: 17,
-    backgroundColor: "rgba(95,150,105,0.10)",
-    borderWidth: 1,
-    borderColor: "rgba(95,150,105,0.22)",
-    justifyContent: "center"
-  },
-  shoppingChipText: {
-    color: colors.shoppingGreen,
-    fontSize: 13,
-    fontWeight: "800"
-  },
-  shoppingRow: {
-    minHeight: 57,
-    paddingVertical: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(232,222,210,0.72)"
-  },
-  shoppingCheckbox: {
-    width: 23,
-    height: 23,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: colors.domaGold,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  shoppingCheckboxDone: {
-    backgroundColor: colors.shoppingGreen
-  },
-  shoppingItemTitle: {
-    color: colors.domaBlue,
-    fontSize: 19,
-    fontWeight: "600"
   },
   shoppingSectionTitle: {
     color: colors.domaBlue,
@@ -2059,48 +1578,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: 8
   },
-  shoppingCategoryCard: {
-    paddingHorizontal: 16,
-    paddingTop: 15,
-    paddingBottom: 4,
-    marginBottom: 13,
-    borderRadius: 24
-  },
-  shoppingCategoryHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    paddingBottom: 12
-  },
-  categoryIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  shoppingCategoryTitle: {
-    flex: 1,
-    color: colors.domaBlue,
-    fontSize: 24,
-    lineHeight: 29,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
-  quantityPill: {
-    minWidth: 48,
-    height: 32,
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(214,154,69,0.11)"
-  },
-  quantityText: {
-    color: colors.domaGold,
-    fontSize: 15,
-    fontWeight: "700"
-  },
   quickShoppingHelp: {
     minHeight: 92,
     borderRadius: 24,
@@ -2122,100 +1599,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     paddingVertical: 24
-  },
-  tabBar: {
-    position: "absolute",
-    left: 18,
-    right: 18,
-    bottom: 12,
-    height: 84,
-    borderRadius: 29,
-    backgroundColor: "rgba(255,255,255,0.94)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.74)",
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    shadowColor: "#372614",
-    shadowOpacity: 0.12,
-    shadowRadius: 30,
-    shadowOffset: { width: 0, height: 14 }
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8
-  },
-  tabIconWrap: {
-    width: 56,
-    height: 44,
-    borderRadius: 21,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  tabIconWrapActive: {
-    backgroundColor: "rgba(255,255,255,0.86)",
-    shadowColor: "#372614",
-    shadowOpacity: 0.10,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 }
-  },
-  tabLabel: {
-    color: colors.inactive,
-    fontSize: 14,
-    fontWeight: "500"
-  },
-  tabLabelActive: {
-    color: colors.domaBlue
-  },
-  fab: {
-    position: "absolute",
-    right: 34,
-    bottom: 144,
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: colors.domaGold,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: colors.domaGold,
-    shadowOpacity: 0.28,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 }
-  },
-  iconBadge: {
-    position: "absolute",
-    right: 13,
-    top: 13,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: colors.domaGold
-  },
-  avatar: {
-    borderWidth: 2,
-    borderColor: "#FFFFFF",
-    backgroundColor: colors.surfaceWarm
-  },
-  avatarText: {
-    color: "#FFFFFF",
-    fontWeight: "900"
-  },
-  avatarStack: {
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  avatarOverlap: {
-    marginLeft: -10
-  },
-  miniAvatarGroup: {
-    flexDirection: "row",
-    alignItems: "center",
-    minWidth: 34
-  },
-  miniAvatarOverlap: {
-    marginLeft: -12
   },
   newTaskCard: {
     minHeight: 98,
@@ -2244,39 +1627,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 7 }
-  },
-  modalRoot: {
-    flex: 1,
-    justifyContent: "flex-end"
-  },
-  modalBackdrop: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: "rgba(21,34,53,0.24)"
-  },
-  sheet: {
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    paddingHorizontal: spacing.screen,
-    paddingTop: 10,
-    paddingBottom: Platform.OS === "ios" ? 36 : 24,
-    backgroundColor: colors.warmBackground,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.74)"
-  },
-  sheetHandle: {
-    width: 42,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: colors.strokeSoft,
-    alignSelf: "center",
-    marginBottom: 18
-  },
-  sheetTitle: {
-    color: colors.textPrimary,
-    fontSize: 22,
-    lineHeight: 28,
-    fontWeight: "900",
-    marginBottom: 14
   },
   eventSheetBrand: {
     minHeight: 58,
@@ -2387,31 +1737,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "800"
   },
-  inputWrap: {
-    marginBottom: 14
-  },
-  inputCompact: {
-    flex: 1
-  },
   fieldLabel: {
     color: colors.textSecondary,
     fontSize: 12.5,
     fontWeight: "800",
     marginBottom: 7
-  },
-  input: {
-    height: 54,
-    borderRadius: 16,
-    backgroundColor: colors.surfacePrimary,
-    borderWidth: 1,
-    borderColor: colors.strokeLight,
-    paddingHorizontal: 14,
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "600"
-  },
-  inputError: {
-    borderColor: colors.dangerRed
   },
   formError: {
     color: colors.dangerRed,
@@ -2429,75 +1759,6 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 16,
     flexWrap: "wrap"
-  },
-  segmentItem: {
-    minHeight: 38,
-    paddingHorizontal: 13,
-    borderRadius: 17,
-    borderWidth: 1,
-    borderColor: colors.strokeSoft,
-    backgroundColor: colors.surfaceWarm,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  segmentItemActive: {
-    backgroundColor: colors.domaBlue,
-    borderColor: colors.domaBlue
-  },
-  segmentText: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    fontWeight: "800"
-  },
-  segmentTextActive: {
-    color: "#FFFFFF"
-  },
-  primaryButton: {
-    width: "100%",
-    height: 54,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.domaGold,
-    shadowColor: colors.domaGold,
-    shadowOpacity: 0.24,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 6 },
-    marginTop: 4,
-    position: "relative"
-  },
-  primaryButtonArrow: {
-    position: "absolute",
-    right: 24
-  },
-  primaryButtonDisabled: {
-    backgroundColor: "#E6DED4",
-    shadowOpacity: 0
-  },
-  primaryButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "900"
-  },
-  disabledText: {
-    color: colors.textTertiary
-  },
-  secondaryButton: {
-    minHeight: 48,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 8
-  },
-  secondaryButtonText: {
-    color: colors.domaBlue,
-    fontSize: 15,
-    fontWeight: "800"
-  },
-  onboarding: {
-    flex: 1,
-    padding: spacing.screen,
-    alignItems: "center",
-    justifyContent: "center"
   },
   welcomeScreen: {
     minHeight: Platform.OS === "web" ? 850 : undefined,
@@ -2716,79 +1977,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 24
   },
-  onboardingIcon: {
-    width: 134,
-    height: 134,
-    borderRadius: 34,
-    marginBottom: 24,
-    shadowColor: "#372614",
-    shadowOpacity: 0.18,
-    shadowRadius: 26,
-    shadowOffset: { width: 0, height: 14 }
-  },
-  brandOrb: {
-    width: 92,
-    height: 92,
-    borderRadius: 32,
-    backgroundColor: colors.domaBlue,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: colors.domaBlue,
-    shadowOpacity: 0.2,
-    shadowRadius: 28,
-    shadowOffset: { width: 0, height: 12 }
-  },
-  brandLetter: {
-    color: "#FFFFFF",
-    fontSize: 48,
-    fontWeight: "900"
-  },
-  wordmark: {
-    marginTop: 24,
-    color: colors.textPrimary,
-    fontSize: 42,
-    lineHeight: 48,
-    fontWeight: "900"
-  },
   wordmarkSmall: {
     color: colors.domaBlue,
     fontSize: 24,
     fontWeight: "900",
     marginBottom: 18
-  },
-  onboardingTitle: {
-    marginTop: 10,
-    color: colors.textPrimary,
-    fontSize: 25,
-    lineHeight: 31,
-    fontWeight: "900",
-    textAlign: "center"
-  },
-  onboardingText: {
-    marginTop: 12,
-    color: colors.textSecondary,
-    fontSize: 16,
-    lineHeight: 23,
-    textAlign: "center",
-    maxWidth: 330
-  },
-  dots: {
-    flexDirection: "row",
-    gap: 7,
-    marginVertical: 28
-  },
-  dot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: colors.strokeSoft
-  },
-  dotActive: {
-    width: 20,
-    backgroundColor: colors.domaGold
-  },
-  actionStack: {
-    width: "100%"
   },
   setupScreen: {
     padding: spacing.screen,
