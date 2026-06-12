@@ -55,7 +55,13 @@ Not implemented yet:
 
 ## Screenshots
 
-The repository includes design references used to guide implementation.
+The repository includes design references used to guide implementation. These images are not final product screenshots; they show the intended app flow, visual tone, and screen hierarchy for contributors.
+
+| Flow area | Key references | What they show |
+|---|---|---|
+| Onboarding and account setup | [Welcome](design-references/welcome.png), [Login](design-references/login.png), [Create family](design-references/create-family.png) | First-run entry points, calm onboarding tone, and family workspace creation direction. |
+| Daily planning | [Today](design-references/today.png), [Calendar](design-references/calendar.png), [New event](design-references/new-event.png) | The main planning surface, calendar rhythm, and event creation flow. |
+| Household coordination | [Tasks](design-references/tasks.png), [Shopping](design-references/shopping.png) | Shared chores, task completion, shopping categories, and lightweight household coordination. |
 
 | Welcome | Today | Calendar |
 |---|---|---|
@@ -64,6 +70,8 @@ The repository includes design references used to guide implementation.
 | Tasks | Shopping | New event |
 |---|---|---|
 | ![Tasks](design-references/tasks.png) | ![Shopping](design-references/shopping.png) | ![New event](design-references/new-event.png) |
+
+Do not add screenshots with real family data, personal accounts, private calendars, notification content, tokens, or local file paths. Use existing mock/demo data or sanitized design references only.
 
 ## Tech Stack
 
