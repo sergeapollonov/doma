@@ -133,6 +133,7 @@ Start here:
 - `docs/data-model.md` - planned data model;
 - `docs/testing.md` - local and CI verification workflow;
 - `docs/privacy-notes.md` - privacy principles;
+- `docs/privacy-threat-model.md` - practical privacy risks and backend security gates;
 - `docs/oss-roadmap.md` - public open-source roadmap.
 
 ## Open Source Roadmap

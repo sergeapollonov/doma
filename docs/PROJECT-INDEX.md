@@ -107,6 +107,7 @@ Read these after the main source-of-truth docs:
 /docs/analytics.md
 /docs/testing.md
 /docs/privacy-notes.md
+/docs/privacy-threat-model.md
 /docs/milestones.md
 /docs/definition-of-done.md
 /docs/adr/README.md
@@ -330,7 +331,8 @@ Current implementation status:
 ```text
 Completed in public alpha: Milestones 0-5.
 Next major implementation area: Milestone 6 — Supabase foundation.
-Still open as follow-up quality work: component tests, accessibility audit, privacy threat model, and Polish copy audit.
+Still open as follow-up quality work: component tests, accessibility audit, and Polish copy audit.
+Privacy threat model is documented and should be used as a security gate before backend-connected features.
 ```
 
 ## 13. First task for Codex

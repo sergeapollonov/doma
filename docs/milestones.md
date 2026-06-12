@@ -35,7 +35,8 @@ Notes:
 - Local state is intentionally non-persistent for now.
 - Forms use React Hook Form + Zod with localized validation messages.
 - Reusable UI components exist, but component-level UI tests remain a follow-up task.
-- Accessibility and privacy threat-model work remain open quality milestones.
+- Accessibility remains an open quality milestone.
+- Privacy threat modeling is documented in `docs/privacy-threat-model.md` and must gate backend-connected work.
 
 ## 3. Milestone 0 — Project understanding
 
@@ -263,6 +264,9 @@ Zod
 
 Add backend infrastructure, but keep feature migration controlled.
 
+Use `docs/privacy-threat-model.md` as the security gate for schema, RLS,
+invite handling, logging, and future sync decisions.
+
 ### Scope
 
 - Supabase client;
@@ -280,6 +284,14 @@ Add backend infrastructure, but keep feature migration controlled.
 
 - do not rewrite UI;
 - do not add features outside data model.
+
+### Security gates
+
+- no service role key in the app bundle or docs examples;
+- every shared table must have a family-scoped access rule;
+- Row Level Security must be documented before UI reads/writes are connected;
+- invite token handling must include expiry and revocation states;
+- logs, analytics, screenshots, and test fixtures must not contain private family data.
 
 ## 10. Milestone 7 — Auth and family flow
 

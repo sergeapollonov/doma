@@ -32,6 +32,8 @@ Do not include real family schedules, names, emails, medical details, school det
 
 Use the demo data in the repository.
 
+For the project privacy threat model, see `docs/privacy-threat-model.md`.
+
 ## Current Security Scope
 
 The project does not yet include production authentication, backend sync, push notifications, or native widgets. Security review will expand as those areas are implemented.
@@ -42,4 +44,5 @@ Current focus:
 - dependency safety;
 - privacy-safe mock data;
 - no secrets in source control;
-- safe documentation and issue examples.
+- safe documentation and issue examples;
+- privacy threat modeling before backend-connected features.
