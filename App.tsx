@@ -19,6 +19,15 @@ import { CalendarEventCard, CalendarMonth, EventCard } from "./src/components/ca
 import { Avatar, AvatarGroup, AvatarStack } from "./src/components/family";
 import { AppShell, BottomSheet, Header, TabBar } from "./src/components/layout";
 import { ShoppingCategorySection } from "./src/components/shopping";
+import {
+  EventFormSheet,
+  FamilySheet,
+  QuickAddSheet,
+  SettingsSheet,
+  ShoppingFormSheet,
+  TaskFormSheet,
+  type AppSheet
+} from "./src/components/sheets";
 import { TaskRow } from "./src/components/tasks";
 import {
   Card,
@@ -28,8 +37,6 @@ import {
   PrimaryButton,
   SecondaryButton,
   SectionHeader,
-  Segment,
-  SheetTitle,
   type IconName
 } from "./src/components/ui";
 import { people } from "./src/data";
@@ -79,7 +86,6 @@ import type {
 
 type Stage = "onboarding" | "login" | "family" | "invite" | "acceptInvite" | "app";
 type AuthIntent = "createFamily" | "acceptInvite";
-type Sheet = "quick" | "event" | "task" | "shopping" | "family" | "settings" | null;
 
 const appIconSource = require("./assets/app-icon.png");
 
@@ -113,7 +119,7 @@ export default function App() {
   const [authIntent, setAuthIntent] = useState<AuthIntent>("createFamily");
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [activeTab, setActiveTab] = useState<TabKey>("today");
-  const [sheet, setSheet] = useState<Sheet>(null);
+  const [sheet, setSheet] = useState<AppSheet>(null);
   const [taskFilter, setTaskFilter] = useState<"all" | "mine" | "maya" | "shared" | "done">("all");
   const loginForm = useForm<LoginFormInput>({
     defaultValues: { email: "alex@example.com" },
@@ -142,7 +148,6 @@ export default function App() {
   });
 
   const familyValues = familySetupForm.watch();
-  const eventValues = eventForm.watch();
   const familyName = familyValues.familyName;
   const userName = familyValues.userName;
   const selectedDay = Number(selectedDate.slice(-2));
@@ -542,12 +547,33 @@ export default function App() {
         </View>
       </SafeAreaView>
       <BottomSheet visible={sheet !== null} onClose={() => setSheet(null)}>
-        {sheet === "quick" && renderQuickAdd()}
-        {sheet === "event" && renderEventForm()}
-        {sheet === "task" && renderTaskForm()}
-        {sheet === "shopping" && renderShoppingForm()}
-        {sheet === "family" && renderFamilySheet()}
-        {sheet === "settings" && renderSettingsSheet()}
+        {sheet === "quick" && <QuickAddSheet text={text} onSelectSheet={setSheet} />}
+        {sheet === "event" && (
+          <EventFormSheet
+            form={eventForm}
+            language={language}
+            text={text}
+            isValid={eventIsValid}
+            onCancel={() => setSheet(null)}
+            onSubmit={addEvent}
+          />
+        )}
+        {sheet === "task" && (
+          <TaskFormSheet form={taskForm} language={language} text={text} isValid={taskIsValid} onSubmit={addTask} />
+        )}
+        {sheet === "shopping" && (
+          <ShoppingFormSheet
+            form={shoppingForm}
+            language={language}
+            text={text}
+            isValid={shoppingIsValid}
+            onSubmit={() => addShoppingItem()}
+          />
+        )}
+        {sheet === "family" && <FamilySheet text={text} userName={userName} onShareLink={() => setSheet(null)} />}
+        {sheet === "settings" && (
+          <SettingsSheet language={language} text={text} onChangeLanguage={storeSetLanguage} />
+        )}
       </BottomSheet>
     </AppShell>
   );
@@ -791,214 +817,6 @@ export default function App() {
     );
   }
 
-  function renderQuickAdd() {
-    const options: Array<{ label: string; icon: IconName; color: string; next: Sheet }> = [
-      { label: text.event, icon: "calendar-outline", color: colors.domaBlue, next: "event" },
-      { label: text.task, icon: "checkmark-circle-outline", color: colors.taskOrange, next: "task" },
-      { label: text.item, icon: "bag-outline", color: colors.shoppingGreen, next: "shopping" },
-      { label: text.reminder, icon: "notifications-outline", color: colors.familySand, next: "event" }
-    ];
-    return (
-      <View>
-        <SheetTitle title={text.quickAddTitle} />
-        {options.map((option) => (
-          <Pressable key={option.label} style={styles.sheetOption} onPress={() => setSheet(option.next)}>
-            <View style={[styles.sheetOptionIcon, { backgroundColor: `${option.color}18` }]}>
-              <Ionicons name={option.icon} size={22} color={option.color} />
-            </View>
-            <Text style={styles.sheetOptionText}>{option.label}</Text>
-            <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
-          </Pressable>
-        ))}
-      </View>
-    );
-  }
-
-  function renderEventForm() {
-    const eventErrorMessage =
-      fieldValidationMessage(eventForm.formState.errors.title, language) ??
-      fieldValidationMessage(eventForm.formState.errors.date, language) ??
-      fieldValidationMessage(eventForm.formState.errors.time, language) ??
-      fieldValidationMessage(eventForm.formState.errors.participants, language);
-
-    return (
-      <View>
-        <View style={styles.eventSheetBrand}>
-          <SecondaryButton label={text.cancel} onPress={() => setSheet(null)} />
-          <DomaLogo />
-          <View style={styles.eventSheetSpacer} />
-        </View>
-        <Text style={styles.eventSheetTitle}>{text.newEvent}</Text>
-        <Card style={styles.eventFormCard}>
-          <EventFormRow icon="pencil-outline" color={colors.domaGold} label={text.title}>
-            <Controller
-              control={eventForm.control}
-              name="title"
-              render={({ field: { value, onBlur, onChange } }) => (
-                <TextInput
-                  style={styles.eventFormValueInput}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  placeholder={text.eventTitlePlaceholder}
-                  placeholderTextColor={colors.domaBlue}
-                  autoFocus
-                />
-              )}
-            />
-          </EventFormRow>
-          <EventFormRow icon="calendar-outline" color={colors.domaBlue} label={text.date} value={eventValues.date} chevron />
-          <EventFormRow icon="time-outline" color={colors.taskOrange} label={text.time} value={eventValues.time} chevron />
-          <EventFormRow icon="people-outline" color={colors.domaBlue} label={text.participants} chevron>
-            <View style={styles.eventParticipantsValue}>
-              <AvatarGroup participants={eventValues.participants === "both" ? ["alex", "maya"] : ["alex"]} small />
-              <Text style={styles.eventFormValue}>{eventValues.participants === "both" ? text.both : people.alex.name}</Text>
-            </View>
-          </EventFormRow>
-          <EventFormRow icon="notifications-outline" color={colors.domaGold} label={text.reminder} value={text.thirtyMin} chevron />
-          <EventFormRow icon="repeat-outline" color={colors.domaBlue} label={text.repeat} value={text.noRepeat} chevron last />
-        </Card>
-        {eventErrorMessage !== null && <Text style={styles.formError}>{eventErrorMessage}</Text>}
-        <Card style={styles.eventCommentCard}>
-          <EventFormRow icon="chatbubble-outline" color={colors.domaBlue} label={text.comment} value={text.addComment} last />
-        </Card>
-        <PrimaryButton label={text.save} onPress={addEvent} disabled={!eventIsValid} />
-      </View>
-    );
-  }
-
-  function renderTaskForm() {
-    const taskTitleError = fieldValidationMessage(taskForm.formState.errors.title, language);
-    const taskAssigneeError = fieldValidationMessage(taskForm.formState.errors.assignee, language);
-    const taskDueError = fieldValidationMessage(taskForm.formState.errors.due, language);
-
-    return (
-      <View>
-        <SheetTitle title={text.newTask} />
-        <Controller
-          control={taskForm.control}
-          name="title"
-          render={({ field: { value, onChange } }) => (
-            <Input label={text.title} value={value} onChangeText={onChange} error={taskTitleError} autoFocus />
-          )}
-        />
-        <Text style={styles.fieldLabel}>{text.assignee}</Text>
-        <Controller
-          control={taskForm.control}
-          name="assignee"
-          render={({ field: { value, onChange } }) => (
-            <View style={styles.segment}>
-              <Segment label={people.alex.name} active={value === "alex"} onPress={() => onChange("alex")} />
-              <Segment label={people.maya.name} active={value === "maya"} onPress={() => onChange("maya")} />
-              <Segment label={text.shared} active={value === "shared"} onPress={() => onChange("shared")} />
-            </View>
-          )}
-        />
-        {taskAssigneeError ? <Text style={styles.formError}>{taskAssigneeError}</Text> : null}
-        <Controller
-          control={taskForm.control}
-          name="due"
-          render={({ field: { value, onChange } }) => (
-            <Input label={text.due} value={value} onChangeText={onChange} error={taskDueError} />
-          )}
-        />
-        <PrimaryButton label={text.save} onPress={addTask} disabled={!taskIsValid} />
-      </View>
-    );
-  }
-
-  function renderShoppingForm() {
-    const shoppingTitleError = fieldValidationMessage(shoppingForm.formState.errors.title, language);
-    const shoppingQuantityError = fieldValidationMessage(shoppingForm.formState.errors.quantity, language);
-    const shoppingCategoryError = fieldValidationMessage(shoppingForm.formState.errors.category, language);
-
-    return (
-      <View>
-        <SheetTitle title={text.newShopping} />
-        <Controller
-          control={shoppingForm.control}
-          name="title"
-          render={({ field: { value, onChange } }) => (
-            <Input label={text.title} value={value} onChangeText={onChange} error={shoppingTitleError} autoFocus />
-          )}
-        />
-        <View style={styles.formRow}>
-          <Controller
-            control={shoppingForm.control}
-            name="quantity"
-            render={({ field: { value, onChange } }) => (
-              <Input
-                compact
-                label={text.quantity}
-                value={value}
-                onChangeText={onChange}
-                error={shoppingQuantityError}
-              />
-            )}
-          />
-          <Controller
-            control={shoppingForm.control}
-            name="category"
-            render={({ field: { value, onChange } }) => (
-              <Input
-                compact
-                label={text.category}
-                value={value}
-                onChangeText={onChange}
-                error={shoppingCategoryError}
-              />
-            )}
-          />
-        </View>
-        <PrimaryButton label={text.add} onPress={() => addShoppingItem()} disabled={!shoppingIsValid} />
-      </View>
-    );
-  }
-
-  function renderFamilySheet() {
-    return (
-      <View>
-        <SheetTitle title={text.family} />
-        <Card style={styles.memberCard}>
-          <Avatar person="alex" size={44} />
-          <View style={styles.rowGrow}>
-            <Text style={styles.cardTitle}>{userName}</Text>
-            <Text style={styles.caption}>{text.ownerDevice}</Text>
-          </View>
-        </Card>
-        <Card style={styles.memberCard}>
-          <Avatar person="maya" size={44} />
-          <View style={styles.rowGrow}>
-            <Text style={styles.cardTitle}>{people.maya.name}</Text>
-            <Text style={styles.caption}>{text.connectedDevice}</Text>
-          </View>
-          <Ionicons name="checkmark-circle" size={20} color={colors.shoppingGreen} />
-        </Card>
-        <SecondaryButton label={text.shareLink} onPress={() => setSheet(null)} />
-      </View>
-    );
-  }
-
-  function renderSettingsSheet() {
-    return (
-      <View>
-        <SheetTitle title={text.settings} />
-        <Text style={styles.fieldLabel}>{text.language}</Text>
-        <View style={styles.segment}>
-          <Segment label={text.languageRussian} active={language === "ru"} onPress={() => storeSetLanguage("ru")} />
-          <Segment label={text.languagePolish} active={language === "pl"} onPress={() => storeSetLanguage("pl")} />
-        </View>
-        <Card style={styles.offlineCard}>
-          <Ionicons name="cloud-offline-outline" size={22} color={colors.domaBlue} />
-          <View style={styles.rowGrow}>
-            <Text style={styles.cardTitle}>{text.offline}</Text>
-            <Text style={styles.caption}>{text.offlineHint}</Text>
-          </View>
-        </Card>
-      </View>
-    );
-  }
-
   function toggleTask(id: string) {
     const task = householdTasks.find((item) => item.id === id);
 
@@ -1119,37 +937,6 @@ function EmptyState({ title, description }: { title: string; description: string
       <Text style={styles.cardTitle}>{title}</Text>
       <Text style={styles.captionCentered}>{description}</Text>
     </Card>
-  );
-}
-
-function EventFormRow({
-  icon,
-  color,
-  label,
-  value,
-  chevron = false,
-  last = false,
-  children
-}: {
-  icon: IconName;
-  color: string;
-  label: string;
-  value?: string;
-  chevron?: boolean;
-  last?: boolean;
-  children?: React.ReactNode;
-}) {
-  return (
-    <View style={[styles.eventFormRow, last && styles.eventFormRowLast]}>
-      <View style={styles.eventFormIcon}>
-        <Ionicons name={icon} size={22} color={color} />
-      </View>
-      <Text style={styles.eventFormLabel}>{label}</Text>
-      <View style={styles.eventFormValueWrap}>
-        {children ?? <Text style={styles.eventFormValue}>{value}</Text>}
-      </View>
-      {chevron ? <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} /> : null}
-    </View>
   );
 }
 
@@ -1489,137 +1276,11 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 7 }
   },
-  eventSheetBrand: {
-    minHeight: 58,
-    marginBottom: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
-  },
-  eventSheetSpacer: {
-    width: 76
-  },
-  eventSheetTitle: {
-    color: colors.domaBlue,
-    fontSize: 48,
-    lineHeight: 56,
-    fontWeight: "500",
-    marginBottom: 20,
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
-  eventFormCard: {
-    padding: 0,
-    overflow: "hidden",
-    borderRadius: 28,
-    marginBottom: 14
-  },
-  eventFormRow: {
-    minHeight: 76,
-    paddingHorizontal: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(232,222,210,0.72)"
-  },
-  eventFormRowLast: {
-    borderBottomWidth: 0
-  },
-  eventFormIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.82)",
-    borderWidth: 1,
-    borderColor: "rgba(232,222,210,0.72)"
-  },
-  eventFormLabel: {
-    flex: 1,
-    color: colors.domaBlue,
-    fontSize: 22,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
-  eventFormValueWrap: {
-    maxWidth: "47%",
-    alignItems: "flex-end"
-  },
-  eventFormValue: {
-    color: colors.domaBlue,
-    fontSize: 19,
-    lineHeight: 24,
-    fontWeight: "600",
-    textAlign: "right"
-  },
-  eventFormValueInput: {
-    minWidth: 92,
-    color: colors.domaBlue,
-    fontSize: 21,
-    lineHeight: 26,
-    fontWeight: "600",
-    textAlign: "right",
-    paddingVertical: 0
-  },
-  eventParticipantsValue: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8
-  },
-  eventCommentCard: {
-    padding: 0,
-    overflow: "hidden",
-    borderRadius: 24,
-    marginBottom: 18
-  },
-  sheetOption: {
-    minHeight: 62,
-    borderRadius: 18,
-    backgroundColor: colors.surfacePrimary,
-    borderWidth: 1,
-    borderColor: colors.strokeLight,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    padding: 12,
-    marginBottom: 10
-  },
-  sheetOptionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  sheetOptionText: {
-    flex: 1,
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "800"
-  },
   fieldLabel: {
     color: colors.textSecondary,
     fontSize: 12.5,
     fontWeight: "800",
     marginBottom: 7
-  },
-  formError: {
-    color: colors.dangerRed,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: "700",
-    marginTop: 7
-  },
-  formRow: {
-    flexDirection: "row",
-    gap: 10
-  },
-  segment: {
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 16,
-    flexWrap: "wrap"
   },
   welcomeScreen: {
     minHeight: Platform.OS === "web" ? 850 : undefined,
@@ -2026,15 +1687,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12
   },
-  memberCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12
-  },
-  offlineCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    backgroundColor: colors.surfaceWarm
-  }
 });
