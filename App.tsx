@@ -98,7 +98,6 @@ export default function App() {
   const text = copy[language] as typeof copy.ru;
   const [stage, setStage] = useState<Stage>("onboarding");
   const [authIntent, setAuthIntent] = useState<AuthIntent>("createFamily");
-  const [onboardingStep, setOnboardingStep] = useState(0);
   const [activeTab, setActiveTab] = useState<TabKey>("today");
   const [sheet, setSheet] = useState<AppSheet>(null);
   const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
@@ -170,14 +169,6 @@ export default function App() {
     void loginForm.trigger();
     void familySetupForm.trigger();
   }, [familySetupForm, loginForm]);
-
-  function completeOnboarding() {
-    if (onboardingStep < 2) {
-      setOnboardingStep((step) => step + 1);
-      return;
-    }
-    setStage("family");
-  }
 
   function openLogin(intent: AuthIntent) {
     setAuthIntent(intent);
