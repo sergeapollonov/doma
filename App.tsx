@@ -15,10 +15,8 @@ import {
   View
 } from "react-native";
 
-import { CalendarEventCard, CalendarMonth, EventCard } from "./src/components/calendar";
 import { Avatar, AvatarGroup, AvatarStack } from "./src/components/family";
 import { AppShell, BottomSheet, Header, TabBar } from "./src/components/layout";
-import { ShoppingCategorySection } from "./src/components/shopping";
 import {
   EventFormSheet,
   FamilySheet,
@@ -28,16 +26,12 @@ import {
   TaskFormSheet,
   type AppSheet
 } from "./src/components/sheets";
-import { TaskRow } from "./src/components/tasks";
 import {
   Card,
-  Chip,
   DomaLogo,
   Input,
   PrimaryButton,
-  SecondaryButton,
-  SectionHeader,
-  type IconName
+  SecondaryButton
 } from "./src/components/ui";
 import { people } from "./src/data";
 import { copy } from "./src/i18n";
@@ -54,11 +48,17 @@ import { colors, spacing } from "./src/theme";
 import {
   HouseholdTaskId,
   PersonId,
-  ShoppingCategoryId,
   ShoppingItemId,
   TabKey,
   TaskItem
 } from "./src/types";
+import {
+  CalendarScreen,
+  ShoppingScreen,
+  TasksScreen,
+  TodayScreen,
+  type TaskFilter
+} from "./src/screens/tabs";
 import {
   eventDateToDay,
   eventDateToISODate,
@@ -89,14 +89,6 @@ type AuthIntent = "createFamily" | "acceptInvite";
 
 const appIconSource = require("./assets/app-icon.png");
 
-const frequentVisuals: Record<string, { icon: IconName; tint: string }> = {
-  Молоко: { icon: "water-outline", tint: "rgba(176,210,226,0.45)" },
-  Хлеб: { icon: "restaurant-outline", tint: "rgba(214,154,69,0.15)" },
-  Яйца: { icon: "ellipse-outline", tint: "rgba(215,185,139,0.18)" },
-  Бананы: { icon: "leaf-outline", tint: "rgba(230,183,67,0.16)" },
-  Кофе: { icon: "cafe-outline", tint: "rgba(143,102,61,0.14)" }
-};
-
 export default function App() {
   const language = useLocalAppStore((state) => state.language);
   const familyId = useLocalAppStore((state) => state.familyId);
@@ -120,7 +112,7 @@ export default function App() {
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [activeTab, setActiveTab] = useState<TabKey>("today");
   const [sheet, setSheet] = useState<AppSheet>(null);
-  const [taskFilter, setTaskFilter] = useState<"all" | "mine" | "maya" | "shared" | "done">("all");
+  const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
   const loginForm = useForm<LoginFormInput>({
     defaultValues: { email: "alex@example.com" },
     mode: "onChange",
@@ -155,7 +147,12 @@ export default function App() {
     () => events.filter((event) => eventDateToISODate(event.date) === selectedDate),
     [events, selectedDate]
   );
+  const eventDays = useMemo(
+    () => new Set(events.map((event) => eventDateToDay(event.date)).filter((day): day is number => day !== null)),
+    [events]
+  );
   const selectedDateLabel = formatSelectedDate(selectedDate, text);
+  const selectedDateSectionTitle = formatCalendarSectionDate(selectedDate, text);
   const tasks = useMemo(
     () => householdTasks.map((task) => toTaskItem(task, text)),
     [householdTasks, text]
@@ -538,10 +535,59 @@ export default function App() {
               onSettings={() => setSheet("settings")}
               onAdd={() => setSheet("quick")}
             />
-            {activeTab === "today" && renderToday()}
-            {activeTab === "calendar" && renderCalendar()}
-            {activeTab === "tasks" && renderTasks()}
-            {activeTab === "shopping" && renderShopping()}
+            {activeTab === "today" && (
+              <TodayScreen
+                text={text}
+                selectedEvents={selectedEvents}
+                activeTasks={activeTasks}
+                pendingShopping={pendingShopping}
+                purchasedCount={purchasedCount}
+                participantsLabel={participantsLabel}
+                assigneeLabel={assigneeLabel}
+                onOpenQuickAdd={() => setSheet("quick")}
+                onOpenCalendar={() => setActiveTab("calendar")}
+                onOpenTasks={() => setActiveTab("tasks")}
+                onOpenShopping={() => setActiveTab("shopping")}
+                onToggleTask={toggleTask}
+              />
+            )}
+            {activeTab === "calendar" && (
+              <CalendarScreen
+                text={text}
+                selectedDateTitle={selectedDateSectionTitle}
+                selectedDay={selectedDay}
+                selectedEvents={selectedEvents}
+                eventDays={eventDays}
+                participantsLabel={participantsLabel}
+                onSelectDay={selectCalendarDay}
+                onAddEvent={() => setSheet("event")}
+              />
+            )}
+            {activeTab === "tasks" && (
+              <TasksScreen
+                text={text}
+                tasks={tasks}
+                filter={taskFilter}
+                filteredTasks={filteredTasks}
+                assigneeLabel={assigneeLabel}
+                onChangeFilter={setTaskFilter}
+                onOpenTaskSheet={() => setSheet("task")}
+                onToggleTask={toggleTask}
+              />
+            )}
+            {activeTab === "shopping" && (
+              <ShoppingScreen
+                text={text}
+                shopping={shopping}
+                categories={shoppingList.categories}
+                language={language}
+                frequentShopping={frequentShopping}
+                categoryName={shoppingCategoryName}
+                onOpenShoppingSheet={() => setSheet("shopping")}
+                onAddFrequentItem={addShoppingItem}
+                onToggleShoppingItem={toggleShopping}
+              />
+            )}
           </ScrollView>
           <TabBar activeTab={activeTab} onChange={setActiveTab} labels={text.tabs} />
         </View>
@@ -577,245 +623,6 @@ export default function App() {
       </BottomSheet>
     </AppShell>
   );
-
-  function renderToday() {
-    const remainingShopping = Math.max(pendingShopping.length - 3, 0);
-    const shoppingCaption =
-      remainingShopping > 0
-        ? text.shoppingSummaryMore(remainingShopping, purchasedCount)
-        : text.shoppingSummaryBought(purchasedCount);
-
-    return (
-      <View>
-        <Card style={styles.syncCard}>
-          <View style={styles.syncPeople}>
-            <View style={styles.syncPerson}>
-              <Avatar person="alex" size={58} />
-              <Text style={styles.syncName}>{people.alex.name}</Text>
-            </View>
-            <View style={styles.syncPerson}>
-              <Avatar person="maya" size={58} />
-              <Text style={styles.syncName}>{people.maya.name}</Text>
-            </View>
-          </View>
-          <View style={styles.syncDivider} />
-          <View style={styles.syncState}>
-            <View style={styles.syncCheck}>
-              <Ionicons name="checkmark" size={28} color="#FFFFFF" />
-            </View>
-            <View>
-              <Text style={styles.syncTitle}>{text.synced}</Text>
-              <Text style={styles.caption}>{text.syncedAgo}</Text>
-            </View>
-          </View>
-        </Card>
-        <Pressable style={styles.inlineFab} onPress={() => setSheet("quick")} accessibilityRole="button" accessibilityLabel={text.add}>
-          <Ionicons name="add" size={32} color="#FFFFFF" />
-        </Pressable>
-
-        <SectionHeader title={text.upcoming} action={text.seeAll} onPress={() => setActiveTab("calendar")} />
-        <Card style={styles.groupCard}>
-          {selectedEvents.length > 0 ? (
-            selectedEvents.slice(0, 3).map((event, index) => (
-              <EventCard key={event.id} event={event} participantsLabel={participantsLabel(event.participants)} index={index} grouped />
-            ))
-          ) : (
-            <Text style={styles.caption}>{text.emptyToday}</Text>
-          )}
-        </Card>
-
-        <SectionHeader title={text.tasks} action={text.seeAll} onPress={() => setActiveTab("tasks")} />
-        <Card style={styles.groupCard}>
-          {activeTasks.slice(0, 2).map((task) => (
-            <TaskRow
-              key={task.id}
-              task={task}
-              assignee={assigneeLabel(task.assignee)}
-              completedLabel={text.completedToday}
-              noReminderLabel={text.noReminder}
-              onToggle={() => toggleTask(task.id)}
-              grouped
-            />
-          ))}
-        </Card>
-
-        <SectionHeader title={text.shopping} action={text.seeAll} onPress={() => setActiveTab("shopping")} />
-        <Pressable style={styles.shoppingSummary} onPress={() => setActiveTab("shopping")}>
-          <View style={styles.shoppingIcon}>
-            <Ionicons name="bag-handle-outline" size={34} color={colors.shoppingGreen} />
-          </View>
-          <View style={styles.shoppingSummaryText}>
-            <Text style={styles.shoppingSummaryTitle}>{pendingShopping.slice(0, 3).map((item) => item.title.toLowerCase()).join(", ")}</Text>
-            <Text style={styles.shoppingSummaryCaption}>{shoppingCaption}</Text>
-          </View>
-          <View style={styles.shoppingCount}>
-            <Text style={styles.shoppingCountText}>{pendingShopping.length}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
-        </Pressable>
-
-        <Card style={styles.widgetPreview}>
-          <View style={styles.widgetHeader}>
-            <Text style={styles.widgetBrand}>Doma</Text>
-            <Text style={styles.caption}>{text.tabs.today}</Text>
-          </View>
-          {selectedEvents.slice(0, 3).map((event) => (
-            <View key={`widget-${event.id}`} style={styles.widgetRow}>
-              <Text style={styles.widgetTime}>{event.time}</Text>
-              <Text style={styles.widgetTitle}>{event.title}</Text>
-            </View>
-          ))}
-          <Text style={styles.widgetFooter}>{text.widgetLine}</Text>
-        </Card>
-      </View>
-    );
-  }
-
-  function renderCalendar() {
-    const days = Array.from({ length: 30 }, (_, index) => index + 1);
-    const weekDays = text.weekDays;
-    const eventDays = new Set(events.map((event) => eventDateToDay(event.date)).filter((day) => day !== null));
-    return (
-      <View>
-        <CalendarMonth
-          title={text.monthJune2026}
-          days={days}
-          weekDays={weekDays}
-          selectedDay={selectedDay}
-          todayDay={3}
-          eventDays={eventDays}
-          onSelectDay={selectCalendarDay}
-        />
-        <SectionHeader title={formatCalendarSectionDate(selectedDate, text)} action={text.add} onPress={() => setSheet("event")} />
-        {selectedEvents.length > 0 ? (
-          selectedEvents.map((event, index) => <CalendarEventCard key={`cal-${event.id}`} event={event} participantsLabel={participantsLabel(event.participants)} index={index} />)
-        ) : (
-          <EmptyState title={text.emptyToday} description={text.emptyTodayHint} />
-        )}
-      </View>
-    );
-  }
-
-  function renderTasks() {
-    const todayLabel = text.taskToday;
-    const todayTasks = tasks.filter((task) => !task.completed && task.due === todayLabel);
-    const weekTasks = tasks.filter((task) => !task.completed && task.due !== todayLabel && task.due !== text.noDue);
-    const noDueTasks = tasks.filter((task) => !task.completed && task.due === text.noDue);
-    const doneTasks = tasks.filter((task) => task.completed);
-    const groups = [
-      { title: text.taskToday, items: todayTasks },
-      { title: text.taskWeek, items: weekTasks },
-      { title: text.taskNoDue, items: noDueTasks },
-      { title: text.done, items: doneTasks }
-    ].filter((group) => group.items.length > 0);
-
-    return (
-      <View>
-        <View style={styles.chipRow}>
-          <Chip label={text.all} active={taskFilter === "all"} onPress={() => setTaskFilter("all")} />
-          <Chip label={text.mine} active={taskFilter === "mine"} onPress={() => setTaskFilter("mine")} />
-          <Chip label={text.taskMaya} active={taskFilter === "maya"} onPress={() => setTaskFilter("maya")} />
-          <Chip label={text.shared} active={taskFilter === "shared"} onPress={() => setTaskFilter("shared")} />
-          <Chip label={text.done} active={taskFilter === "done"} onPress={() => setTaskFilter("done")} />
-        </View>
-        {taskFilter === "all" ? (
-          groups.map((group) => (
-            <View key={group.title}>
-              <SectionHeader title={group.title} action={`${group.items.length}`} />
-              <Card style={styles.groupCard}>
-                {group.items.map((task) => (
-                  <TaskRow
-                    key={`tasks-${task.id}`}
-                    task={task}
-                    assignee={assigneeLabel(task.assignee)}
-                    completedLabel={text.completedToday}
-                    noReminderLabel={text.noReminder}
-                    onToggle={() => toggleTask(task.id)}
-                    grouped
-                  />
-                ))}
-              </Card>
-            </View>
-          ))
-        ) : (
-          <Card style={styles.groupCard}>
-            {filteredTasks.map((task) => (
-              <TaskRow
-                key={`tasks-${task.id}`}
-                task={task}
-                assignee={assigneeLabel(task.assignee)}
-                completedLabel={text.completedToday}
-                noReminderLabel={text.noReminder}
-                onToggle={() => toggleTask(task.id)}
-                grouped
-              />
-            ))}
-          </Card>
-        )}
-        <Pressable style={styles.newTaskCard} onPress={() => setSheet("task")}>
-          <View style={styles.newTaskIcon}>
-            <Ionicons name="add" size={34} color={colors.domaGold} />
-          </View>
-          <View style={styles.rowGrow}>
-            <Text style={styles.cardTitle}>{text.newTask}</Text>
-            <Text style={styles.caption}>{text.newTaskHint}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
-        </Pressable>
-      </View>
-    );
-  }
-
-  function renderShopping() {
-    const sortedShopping = [...shopping].sort((a, b) => Number(a.purchased) - Number(b.purchased));
-    const categoryOrder: ShoppingCategoryId[] = ["cat-dairy", "cat-fruit-veg", "cat-home", "cat-meat-fish", "cat-other"];
-    const groupedShopping = categoryOrder
-      .map((categoryId) => ({
-        categoryId,
-        category: shoppingCategoryName(categoryId, shoppingList.categories, language, text),
-        items: sortedShopping.filter((item) => item.categoryId === categoryId)
-      }))
-      .filter((group) => group.items.length > 0);
-    return (
-      <View>
-        <Pressable style={styles.addField} onPress={() => setSheet("shopping")}>
-          <View style={styles.addFieldIcon}>
-            <Ionicons name="add" size={26} color={colors.domaGold} />
-          </View>
-          <Text style={styles.addFieldText}>{text.shoppingAddItem}</Text>
-        </Pressable>
-        <Card style={styles.frequentCard}>
-          <Text style={styles.shoppingSectionTitle}>{text.shoppingFrequent}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.frequentTiles}>
-            {frequentShopping.map((item) => {
-              const visual = frequentVisuals[item] ?? frequentVisuals["Молоко"];
-              return (
-                <Pressable key={item} style={styles.frequentTile} onPress={() => addShoppingItem(item)}>
-                  <View style={[styles.frequentImage, { backgroundColor: visual.tint }]}>
-                    <Ionicons name={visual.icon} size={34} color={colors.domaBlue} />
-                  </View>
-                  <Text style={styles.frequentLabel}>{item}</Text>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-        </Card>
-        {groupedShopping.map((group) => (
-          <ShoppingCategorySection key={group.categoryId} categoryId={group.categoryId} category={group.category} items={group.items} onToggleItem={toggleShopping} />
-        ))}
-        <Pressable style={styles.quickShoppingHelp} onPress={() => setSheet("shopping")}>
-          <View style={styles.previewBasket}>
-            <Ionicons name="basket-outline" size={34} color={colors.domaGold} />
-          </View>
-          <View style={styles.rowGrow}>
-            <Text style={styles.cardTitle}>{text.shoppingQuickTitle}</Text>
-            <Text style={styles.caption}>{text.shoppingQuickHint}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
-        </Pressable>
-      </View>
-    );
-  }
 
   function toggleTask(id: string) {
     const task = householdTasks.find((item) => item.id === id);
@@ -930,16 +737,6 @@ function WelcomePreview({ text }: { text: typeof copy.ru }) {
   );
 }
 
-function EmptyState({ title, description }: { title: string; description: string }) {
-  return (
-    <Card style={styles.emptyState}>
-      <Ionicons name="sparkles-outline" size={24} color={colors.domaGold} />
-      <Text style={styles.cardTitle}>{title}</Text>
-      <Text style={styles.captionCentered}>{description}</Text>
-    </Card>
-  );
-}
-
 const styles = StyleSheet.create({
   safe: {
     flex: 1
@@ -955,326 +752,18 @@ const styles = StyleSheet.create({
     paddingBottom: 132,
     paddingTop: 0
   },
-  syncCard: {
-    minHeight: 108,
-    marginTop: -44,
-    marginBottom: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 16,
-    backgroundColor: "rgba(255,255,255,0.66)",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderRadius: 27
-  },
-  syncPeople: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 11
-  },
-  syncPerson: {
-    alignItems: "center",
-    gap: 7
-  },
-  syncName: {
-    color: colors.domaBlue,
-    fontSize: 13,
-    fontWeight: "600"
-  },
-  syncDivider: {
-    width: 1,
-    height: 76,
-    backgroundColor: "rgba(232,222,210,0.95)",
-    marginHorizontal: 7
-  },
-  syncState: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    minWidth: 0
-  },
-  syncTitle: {
-    color: colors.domaBlue,
-    fontSize: 14,
-    lineHeight: 18,
-    fontWeight: "700"
-  },
-  syncCheck: {
-    width: 39,
-    height: 39,
-    borderRadius: 20,
-    backgroundColor: colors.shoppingGreen,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  inlineFab: {
-    alignSelf: "flex-end",
-    width: 66,
-    height: 66,
-    borderRadius: 33,
-    marginTop: -8,
-    marginBottom: 0,
-    marginRight: 4,
-    backgroundColor: colors.domaGold,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.78)",
-    shadowColor: colors.domaGold,
-    shadowOpacity: 0.24,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 }
-  },
   caption: {
     color: colors.textSecondary,
     fontSize: 12.5,
     lineHeight: 17
   },
-  captionCentered: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-    textAlign: "center"
-  },
-  groupCard: {
-    padding: 0,
-    overflow: "hidden",
-    borderRadius: 25,
-    marginBottom: 14
-  },
   rowGrow: {
-    flex: 1
-  },
-  shoppingSummary: {
-    minHeight: 112,
-    borderRadius: 26,
-    padding: 18,
-    marginBottom: 18,
-    backgroundColor: "rgba(255,255,255,0.74)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.88)",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-    shadowColor: "#372614",
-    shadowOpacity: 0.09,
-    shadowRadius: 28,
-    shadowOffset: { width: 0, height: 12 }
-  },
-  shoppingIcon: {
-    width: 78,
-    height: 78,
-    borderRadius: 39,
-    backgroundColor: "rgba(95,150,105,0.10)",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.86)"
-  },
-  shoppingSummaryText: {
     flex: 1
   },
   cardTitle: {
     color: colors.textPrimary,
     fontSize: 16,
     fontWeight: "800"
-  },
-  shoppingSummaryTitle: {
-    color: colors.domaBlue,
-    fontSize: 24,
-    lineHeight: 30,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
-  shoppingSummaryCaption: {
-    marginTop: 4,
-    color: colors.shoppingGreen,
-    fontSize: 17,
-    fontWeight: "600"
-  },
-  shoppingCount: {
-    width: 53,
-    height: 53,
-    borderRadius: 27,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(95,150,105,0.11)"
-  },
-  shoppingCountText: {
-    color: colors.shoppingGreen,
-    fontSize: 25,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
-  widgetPreview: {
-    marginTop: 12,
-    backgroundColor: "rgba(255,255,255,0.72)"
-  },
-  widgetHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10
-  },
-  widgetBrand: {
-    color: colors.domaBlue,
-    fontSize: 18,
-    fontWeight: "900"
-  },
-  widgetRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    paddingVertical: 3
-  },
-  widgetTime: {
-    width: 45,
-    color: colors.domaGold,
-    fontWeight: "800",
-    fontSize: 13
-  },
-  widgetTitle: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontWeight: "700"
-  },
-  widgetFooter: {
-    marginTop: 10,
-    color: colors.textSecondary,
-    fontSize: 13,
-    fontWeight: "700"
-  },
-  chipRow: {
-    flexDirection: "row",
-    gap: 6,
-    marginBottom: 24,
-    padding: 5,
-    borderRadius: 24,
-    backgroundColor: "rgba(255,255,255,0.68)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.86)"
-  },
-  addField: {
-    height: 78,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.84)",
-    backgroundColor: "rgba(255,255,255,0.72)",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-    paddingHorizontal: 0,
-    marginBottom: 14,
-    shadowColor: "#372614",
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 9 }
-  },
-  addFieldIcon: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
-    marginLeft: -2,
-    backgroundColor: "rgba(255,255,255,0.88)",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#372614",
-    shadowOpacity: 0.10,
-    shadowRadius: 15,
-    shadowOffset: { width: 0, height: 8 }
-  },
-  addFieldText: {
-    color: colors.domaBlue,
-    fontSize: 24,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
-  shoppingSectionTitle: {
-    color: colors.domaBlue,
-    fontSize: 25,
-    lineHeight: 31,
-    fontWeight: "500",
-    marginBottom: 15,
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
-  },
-  frequentCard: {
-    padding: 16,
-    borderRadius: 25,
-    marginBottom: 14
-  },
-  frequentTiles: {
-    gap: 10,
-    paddingRight: 4
-  },
-  frequentTile: {
-    width: 68,
-    minHeight: 104,
-    alignItems: "center",
-    justifyContent: "space-between"
-  },
-  frequentImage: {
-    width: 66,
-    height: 66,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  frequentLabel: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontWeight: "600",
-    marginTop: 8
-  },
-  quickShoppingHelp: {
-    minHeight: 92,
-    borderRadius: 24,
-    padding: 14,
-    marginTop: 4,
-    marginBottom: 12,
-    backgroundColor: "rgba(255,255,255,0.72)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.88)",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    shadowColor: "#372614",
-    shadowOpacity: 0.08,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 10 }
-  },
-  emptyState: {
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: 24
-  },
-  newTaskCard: {
-    minHeight: 98,
-    borderRadius: 24,
-    padding: 16,
-    marginTop: 8,
-    backgroundColor: "rgba(255,255,255,0.74)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.88)",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 15,
-    shadowColor: "#372614",
-    shadowOpacity: 0.09,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 10 }
-  },
-  newTaskIcon: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: "rgba(255,255,255,0.88)",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#372614",
-    shadowOpacity: 0.12,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 7 }
   },
   fieldLabel: {
     color: colors.textSecondary,
