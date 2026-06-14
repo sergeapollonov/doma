@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
     borderTopWidth: 1,
-    borderTopColor: "rgba(232,222,210,0.72)"
+    borderTopColor: colors.divider
   },
   shoppingCheckbox: {
     width: 23,

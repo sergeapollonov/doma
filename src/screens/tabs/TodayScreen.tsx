@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { EventCard } from "../../components/calendar";
 import { Avatar } from "../../components/family";
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 14,
     paddingVertical: 16,
-    backgroundColor: "rgba(255,255,255,0.66)",
+    backgroundColor: colors.glassSurface,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   syncDivider: {
     width: 1,
     height: 76,
-    backgroundColor: "rgba(232,222,210,0.95)",
+    backgroundColor: colors.divider,
     marginHorizontal: 7
   },
   syncState: {
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.78)",
+    borderColor: colors.glass.borderMedium,
     shadowColor: colors.domaGold,
     shadowOpacity: 0.24,
     shadowRadius: 18,
@@ -220,9 +220,9 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     padding: 18,
     marginBottom: 18,
-    backgroundColor: "rgba(255,255,255,0.74)",
+    backgroundColor: colors.glass.medium,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.88)",
+    borderColor: colors.glass.borderHeavy,
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.86)"
+    borderColor: colors.glass.borderHeavy
   },
   shoppingSummaryText: {
     flex: 1
@@ -248,8 +248,7 @@ const styles = StyleSheet.create({
     color: colors.domaBlue,
     fontSize: 24,
     lineHeight: 30,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    fontWeight: "500"
   },
   shoppingSummaryCaption: {
     marginTop: 4,
@@ -268,12 +267,11 @@ const styles = StyleSheet.create({
   shoppingCountText: {
     color: colors.shoppingGreen,
     fontSize: 25,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    fontWeight: "500"
   },
   widgetPreview: {
     marginTop: 12,
-    backgroundColor: "rgba(255,255,255,0.72)"
+    backgroundColor: colors.glass.medium
   },
   widgetHeader: {
     flexDirection: "row",

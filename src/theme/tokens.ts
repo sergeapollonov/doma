@@ -17,6 +17,16 @@ export const colors = {
   surfacePrimary: '#FFFFFF',
   surfaceWarm: '#FFFBF5',
   glassSurface: 'rgba(255, 255, 255, 0.68)',
+  
+  glass: {
+    light: 'rgba(255, 255, 255, 0.54)',
+    medium: 'rgba(255, 255, 255, 0.74)',
+    heavy: 'rgba(255, 255, 255, 0.86)',
+    solid: 'rgba(255, 255, 255, 0.94)',
+    borderLight: 'rgba(255, 255, 255, 0.6)',
+    borderMedium: 'rgba(255, 255, 255, 0.74)',
+    borderHeavy: 'rgba(255, 255, 255, 0.88)',
+  },
 
   // Text
   textPrimary: '#152235',
@@ -26,6 +36,7 @@ export const colors = {
   // Strokes / dividers
   strokeSoft: '#E8DED2',
   strokeLight: '#F1E8DD',
+  divider: 'rgba(232, 222, 210, 0.72)',
 
   // Brand / accents
   domaBlue: '#163A5F',

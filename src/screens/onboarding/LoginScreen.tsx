@@ -6,7 +6,7 @@ import { Controller, type UseFormReturn } from "react-hook-form";
 
 import { AppShell } from "../../components/layout";
 import { Card, DomaLogo, PrimaryButton } from "../../components/ui";
-import { colors, spacing } from "../../theme";
+import { colors, spacing, typography } from "../../theme";
 import type { Language } from "../../types";
 import type { LoginFormInput } from "../../validation/forms";
 import { fieldValidationMessage } from "../../validation/messages";
@@ -124,9 +124,9 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.72)",
+    backgroundColor: colors.glass.medium,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.86)"
+    borderColor: colors.glass.borderHeavy
   },
   authBackSpacer: {
     width: 48
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     fontSize: 45,
     lineHeight: 53,
     fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" }),
+    fontFamily: typography.fontFamily.brand,
     marginBottom: 14
   },
   authSubtitle: {
@@ -194,9 +194,9 @@ const styles = StyleSheet.create({
   socialButton: {
     height: 54,
     borderRadius: 17,
-    backgroundColor: "rgba(255,255,255,0.66)",
+    backgroundColor: colors.glass.light,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.86)",
+    borderColor: colors.glass.borderHeavy,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

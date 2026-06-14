@@ -47,9 +47,9 @@ const styles = StyleSheet.create({
     bottom: spacing.md,
     height: sizes.tabBarHeight,
     borderRadius: 29,
-    backgroundColor: "rgba(255,255,255,0.94)",
+    backgroundColor: colors.glass.solid,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.74)",
+    borderColor: colors.glass.borderMedium,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   tabIconWrapActive: {
-    backgroundColor: "rgba(255,255,255,0.86)",
+    backgroundColor: colors.glass.heavy,
     shadowColor: "#372614",
     shadowOpacity: 0.1,
     shadowRadius: 18,

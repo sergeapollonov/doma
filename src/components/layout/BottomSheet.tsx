@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === "ios" ? 36 : 24,
     backgroundColor: colors.warmBackground,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.74)"
+    borderColor: colors.glass.borderMedium
   },
   sheetHandle: {
     width: 42,

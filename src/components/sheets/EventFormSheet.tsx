@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Platform, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import { Controller, type UseFormReturn } from "react-hook-form";
 
 import { people } from "../../data";
-import { colors } from "../../theme";
+import { colors, typography } from "../../theme";
 import type { Language } from "../../types";
 import type { copy } from "../../i18n";
 import type { EventFormInput } from "../../validation/forms";
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     lineHeight: 56,
     fontWeight: "500",
     marginBottom: 20,
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    fontFamily: typography.fontFamily.brand
   },
   eventFormCard: {
     padding: 0,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 14,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(232,222,210,0.72)"
+    borderBottomColor: colors.divider
   },
   eventFormRowLast: {
     borderBottomWidth: 0
@@ -149,16 +149,15 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.82)",
+    backgroundColor: colors.glass.heavy,
     borderWidth: 1,
-    borderColor: "rgba(232,222,210,0.72)"
+    borderColor: colors.divider
   },
   eventFormLabel: {
     flex: 1,
     color: colors.domaBlue,
     fontSize: 22,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    fontWeight: "500"
   },
   eventFormValueWrap: {
     maxWidth: "47%",

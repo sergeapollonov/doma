@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors } from "../../theme";
 import type { TaskItem } from "../../types";
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   groupedRow: {
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(232,222,210,0.72)"
+    borderBottomColor: colors.divider
   },
   taskAccent: {
     width: 4,
@@ -84,8 +84,7 @@ const styles = StyleSheet.create({
     color: colors.domaBlue,
     fontSize: 19,
     lineHeight: 24,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    fontWeight: "500"
   },
   completedText: {
     color: colors.textTertiary,

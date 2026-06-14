@@ -6,7 +6,7 @@ import { Image, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text,
 import { Avatar, AvatarGroup } from "../../components/family";
 import { AppShell } from "../../components/layout";
 import { DomaLogo, PrimaryButton } from "../../components/ui";
-import { colors } from "../../theme";
+import { colors, typography } from "../../theme";
 import type { copy } from "../../i18n";
 
 const appIconSource = require("../../../assets/app-icon.png");
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     width: 185,
     height: 245,
     borderRadius: 92,
-    backgroundColor: "rgba(255,255,255,0.52)"
+    backgroundColor: colors.glass.light
   },
   welcomePlant: {
     position: "absolute",
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
     marginTop: 18,
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    fontFamily: typography.fontFamily.brand
   },
   welcomeText: {
     color: colors.textSecondary,
@@ -225,9 +225,9 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     padding: 14,
     gap: 12,
-    backgroundColor: "rgba(255,255,255,0.56)",
+    backgroundColor: colors.glass.light,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.86)",
+    borderColor: colors.glass.borderHeavy,
     shadowColor: "#372614",
     shadowOpacity: 0.05,
     shadowRadius: 36,
@@ -237,9 +237,9 @@ const styles = StyleSheet.create({
   previewCard: {
     borderRadius: 24,
     padding: 15,
-    backgroundColor: "rgba(255,255,255,0.74)",
+    backgroundColor: colors.glass.medium,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.82)"
+    borderColor: colors.glass.borderHeavy
   },
   previewRowHeader: {
     flexDirection: "row",
@@ -257,8 +257,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.textPrimary,
     fontSize: 23,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    fontWeight: "500"
   },
   previewPill: {
     borderRadius: 15,
@@ -274,7 +273,7 @@ const styles = StyleSheet.create({
   previewLine: {
     height: 1,
     marginVertical: 11,
-    backgroundColor: "rgba(232,222,210,0.72)"
+    backgroundColor: colors.divider
   },
   previewItemRow: {
     minHeight: 54,
