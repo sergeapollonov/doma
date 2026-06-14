@@ -1,5 +1,5 @@
 import React from "react";
-import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } from "react-native";
+import { KeyboardAvoidingView, Modal, Pressable, StyleSheet, View } from "react-native";
 
 import { colors, spacing } from "../../theme";
 
@@ -12,7 +12,7 @@ type BottomSheetProps = {
 export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
   return (
     <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.modalRoot}>
+      <KeyboardAvoidingView behavior="padding" style={styles.modalRoot}>
         <Pressable style={styles.modalBackdrop} onPress={onClose} />
         <View style={styles.sheet}>
           <View style={styles.sheetHandle} />
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 28,
     paddingHorizontal: spacing.screen,
     paddingTop: 10,
-    paddingBottom: Platform.OS === "ios" ? 36 : 24,
+    paddingBottom: 36,
     backgroundColor: colors.warmBackground,
     borderWidth: 1,
     borderColor: colors.glass.borderMedium

@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { StatusBar } from "expo-status-bar";
+import { NavigationContainer, createNavigationContainerRef } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -76,8 +78,25 @@ import type {
 } from "./src/validation/forms";
 import { sizes, spacing } from "./src/theme/tokens";
 
-type Stage = "onboarding" | "login" | "family" | "invite" | "acceptInvite" | "app";
 type AuthIntent = "createFamily" | "acceptInvite";
+
+type RootStackParamList = {
+  Onboarding: undefined;
+  Login: undefined;
+  Family: undefined;
+  Invite: undefined;
+  AcceptInvite: undefined;
+  MainApp: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const navigationRef = createNavigationContainerRef<RootStackParamList>();
+
+function navigate(name: keyof RootStackParamList) {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate(name);
+  }
+}
 
 const TAB_BAR_OFFSET = sizes.tabBarHeight + spacing.md + spacing.xxxl;
 
@@ -99,7 +118,6 @@ export default function App() {
   const storePurchaseShoppingItem = useLocalAppStore((state) => state.purchaseShoppingItem);
   const storeUnpurchaseShoppingItem = useLocalAppStore((state) => state.unpurchaseShoppingItem);
   const text = copy[language] as typeof copy.ru;
-  const [stage, setStage] = useState<Stage>("onboarding");
   const [authIntent, setAuthIntent] = useState<AuthIntent>("createFamily");
   const [activeTab, setActiveTab] = useState<TabKey>("today");
   const [sheet, setSheet] = useState<AppSheet>(null);
@@ -177,18 +195,18 @@ export default function App() {
     setAuthIntent(intent);
     loginForm.reset({ email: intent === "createFamily" ? "alex@example.com" : "maya@example.com" });
     void loginForm.trigger("email");
-    setStage("login");
+    navigate("Login");
   }
 
   function continueLogin() {
     void loginForm.handleSubmit(() => {
-      setStage(authIntent === "createFamily" ? "family" : "acceptInvite");
+      navigate(authIntent === "createFamily" ? "Family" : "AcceptInvite");
     })();
   }
 
   function continueFamilySetup() {
     void familySetupForm.handleSubmit(() => {
-      setStage("invite");
+      navigate("Invite");
     })();
   }
 
@@ -285,172 +303,178 @@ export default function App() {
     return true;
   });
 
-  if (stage === "onboarding") {
-    return (
-      <OnboardingScreen
-        text={text}
-        onCreateFamily={() => openLogin("createFamily")}
-        onAcceptInvite={() => openLogin("acceptInvite")}
-      />
-    );
-  }
-
-  if (stage === "login") {
-    const isInvite = authIntent === "acceptInvite";
-
-    return (
-      <LoginScreen
-        form={loginForm}
-        language={language}
-        text={text}
-        isInvite={isInvite}
-        isValid={loginIsValid}
-        onBack={() => setStage("onboarding")}
-        onContinue={continueLogin}
-      />
-    );
-  }
-
-  if (stage === "family") {
-    return (
-      <FamilySetupScreen
-        form={familySetupForm}
-        language={language}
-        text={text}
-        isValid={familySetupIsValid}
-        onContinue={continueFamilySetup}
-      />
-    );
-  }
-
-  if (stage === "invite") {
-    return (
-      <InviteScreen text={text} onShareLink={() => setStage("app")} onLater={() => setStage("app")} />
-    );
-  }
-
-  if (stage === "acceptInvite") {
-    return (
-      <AcceptInviteScreen
-        text={text}
-        familyName={familyName}
-        onJoin={() => setStage("app")}
-        onSwitchAccount={() => openLogin("acceptInvite")}
-      />
-    );
-  }
-
   return (
-    <AppShell>
-      <StatusBar style="dark" />
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.app}>
-          <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-            <Header
-              tab={activeTab}
-              greetingTitle={text.todayGreeting}
-              title={activeTab === "today" ? text.brand : text.tabs[activeTab]}
-              todayDateLabel={selectedDateLabel}
-              subtitle={
-                activeTab === "tasks"
-                  ? text.tasksSubtitle
-                  : activeTab === "shopping"
-                    ? text.shoppingSubtitle
-                    : activeTab === "calendar"
-                      ? text.calendarSubtitle
-                      : text.morning
-              }
-              onFamily={() => setSheet("family")}
-              onSettings={() => setSheet("settings")}
-              onAdd={() => setSheet("quick")}
+    <NavigationContainer ref={navigationRef}>
+      <Stack.Navigator screenOptions={{ headerShown: false, animation: "slide_from_right" }}>
+        <Stack.Screen name="Onboarding">
+          {() => (
+            <OnboardingScreen
+              text={text}
+              onCreateFamily={() => openLogin("createFamily")}
+              onAcceptInvite={() => openLogin("acceptInvite")}
             />
-            {activeTab === "today" && (
-              <TodayScreen
-                text={text}
-                selectedEvents={selectedEvents}
-                activeTasks={activeTasks}
-                pendingShopping={pendingShopping}
-                purchasedCount={purchasedCount}
-                participantsLabel={participantsLabel}
-                assigneeLabel={assigneeLabel}
-                onOpenQuickAdd={() => setSheet("quick")}
-                onOpenCalendar={() => setActiveTab("calendar")}
-                onOpenTasks={() => setActiveTab("tasks")}
-                onOpenShopping={() => setActiveTab("shopping")}
-                onToggleTask={toggleTask}
-              />
-            )}
-            {activeTab === "calendar" && (
-              <CalendarScreen
-                text={text}
-                selectedDateTitle={selectedDateSectionTitle}
-                selectedDay={selectedDay}
-                selectedEvents={selectedEvents}
-                eventDays={eventDays}
-                participantsLabel={participantsLabel}
-                onSelectDay={selectCalendarDay}
-                onAddEvent={() => setSheet("event")}
-              />
-            )}
-            {activeTab === "tasks" && (
-              <TasksScreen
-                text={text}
-                tasks={tasks}
-                filter={taskFilter}
-                filteredTasks={filteredTasks}
-                assigneeLabel={assigneeLabel}
-                onChangeFilter={setTaskFilter}
-                onOpenTaskSheet={() => setSheet("task")}
-                onToggleTask={toggleTask}
-              />
-            )}
-            {activeTab === "shopping" && (
-              <ShoppingScreen
-                text={text}
-                shopping={shopping}
-                categories={shoppingList.categories}
-                language={language}
-                frequentShopping={frequentShopping}
-                categoryName={shoppingCategoryName}
-                onOpenShoppingSheet={() => setSheet("shopping")}
-                onAddFrequentItem={addShoppingItem}
-                onToggleShoppingItem={toggleShopping}
-              />
-            )}
-          </ScrollView>
-          <TabBar activeTab={activeTab} onChange={setActiveTab} labels={text.tabs} />
-        </View>
-      </SafeAreaView>
-      <BottomSheet visible={sheet !== null} onClose={() => setSheet(null)}>
-        {sheet === "quick" && <QuickAddSheet text={text} onSelectSheet={setSheet} />}
-        {sheet === "event" && (
-          <EventFormSheet
-            form={eventForm}
-            language={language}
-            text={text}
-            isValid={eventIsValid}
-            onCancel={() => setSheet(null)}
-            onSubmit={addEvent}
-          />
-        )}
-        {sheet === "task" && (
-          <TaskFormSheet form={taskForm} language={language} text={text} isValid={taskIsValid} onSubmit={addTask} />
-        )}
-        {sheet === "shopping" && (
-          <ShoppingFormSheet
-            form={shoppingForm}
-            language={language}
-            text={text}
-            isValid={shoppingIsValid}
-            onSubmit={() => addShoppingItem()}
-          />
-        )}
-        {sheet === "family" && <FamilySheet text={text} userName={userName} onShareLink={() => setSheet(null)} />}
-        {sheet === "settings" && (
-          <SettingsSheet language={language} text={text} onChangeLanguage={storeSetLanguage} />
-        )}
-      </BottomSheet>
-    </AppShell>
+          )}
+        </Stack.Screen>
+
+        <Stack.Screen name="Login">
+          {() => (
+            <LoginScreen
+              form={loginForm}
+              language={language}
+              text={text}
+              isInvite={authIntent === "acceptInvite"}
+              isValid={loginIsValid}
+              onBack={() => navigate("Onboarding")}
+              onContinue={continueLogin}
+            />
+          )}
+        </Stack.Screen>
+
+        <Stack.Screen name="Family">
+          {() => (
+            <FamilySetupScreen
+              form={familySetupForm}
+              language={language}
+              text={text}
+              isValid={familySetupIsValid}
+              onContinue={continueFamilySetup}
+            />
+          )}
+        </Stack.Screen>
+
+        <Stack.Screen name="Invite">
+          {() => (
+            <InviteScreen text={text} onShareLink={() => navigate("MainApp")} onLater={() => navigate("MainApp")} />
+          )}
+        </Stack.Screen>
+
+        <Stack.Screen name="AcceptInvite">
+          {() => (
+            <AcceptInviteScreen
+              text={text}
+              familyName={familyName}
+              onJoin={() => navigate("MainApp")}
+              onSwitchAccount={() => openLogin("acceptInvite")}
+            />
+          )}
+        </Stack.Screen>
+
+        <Stack.Screen name="MainApp">
+          {() => (
+            <AppShell>
+              <StatusBar style="dark" />
+              <SafeAreaView style={styles.safe}>
+                <View style={styles.app}>
+                  <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                    <Header
+                      tab={activeTab}
+                      greetingTitle={text.todayGreeting}
+                      title={activeTab === "today" ? text.brand : text.tabs[activeTab]}
+                      todayDateLabel={selectedDateLabel}
+                      subtitle={
+                        activeTab === "tasks"
+                          ? text.tasksSubtitle
+                          : activeTab === "shopping"
+                            ? text.shoppingSubtitle
+                            : activeTab === "calendar"
+                              ? text.calendarSubtitle
+                              : text.morning
+                      }
+                      onFamily={() => setSheet("family")}
+                      onSettings={() => setSheet("settings")}
+                      onAdd={() => setSheet("quick")}
+                    />
+                    {activeTab === "today" && (
+                      <TodayScreen
+                        text={text}
+                        selectedEvents={selectedEvents}
+                        activeTasks={activeTasks}
+                        pendingShopping={pendingShopping}
+                        purchasedCount={purchasedCount}
+                        participantsLabel={participantsLabel}
+                        assigneeLabel={assigneeLabel}
+                        onOpenQuickAdd={() => setSheet("quick")}
+                        onOpenCalendar={() => setActiveTab("calendar")}
+                        onOpenTasks={() => setActiveTab("tasks")}
+                        onOpenShopping={() => setActiveTab("shopping")}
+                        onToggleTask={toggleTask}
+                      />
+                    )}
+                    {activeTab === "calendar" && (
+                      <CalendarScreen
+                        text={text}
+                        selectedDateTitle={selectedDateSectionTitle}
+                        selectedDay={selectedDay}
+                        selectedEvents={selectedEvents}
+                        eventDays={eventDays}
+                        participantsLabel={participantsLabel}
+                        onSelectDay={selectCalendarDay}
+                        onAddEvent={() => setSheet("event")}
+                      />
+                    )}
+                    {activeTab === "tasks" && (
+                      <TasksScreen
+                        text={text}
+                        tasks={tasks}
+                        filter={taskFilter}
+                        filteredTasks={filteredTasks}
+                        assigneeLabel={assigneeLabel}
+                        onChangeFilter={setTaskFilter}
+                        onOpenTaskSheet={() => setSheet("task")}
+                        onToggleTask={toggleTask}
+                      />
+                    )}
+                    {activeTab === "shopping" && (
+                      <ShoppingScreen
+                        text={text}
+                        shopping={shopping}
+                        categories={shoppingList.categories}
+                        language={language}
+                        frequentShopping={frequentShopping}
+                        categoryName={shoppingCategoryName}
+                        onOpenShoppingSheet={() => setSheet("shopping")}
+                        onAddFrequentItem={addShoppingItem}
+                        onToggleShoppingItem={toggleShopping}
+                      />
+                    )}
+                  </ScrollView>
+                  <TabBar activeTab={activeTab} onChange={setActiveTab} labels={text.tabs} />
+                </View>
+              </SafeAreaView>
+              <BottomSheet visible={sheet !== null} onClose={() => setSheet(null)}>
+                {sheet === "quick" && <QuickAddSheet text={text} onSelectSheet={setSheet} />}
+                {sheet === "event" && (
+                  <EventFormSheet
+                    form={eventForm}
+                    language={language}
+                    text={text}
+                    isValid={eventIsValid}
+                    onCancel={() => setSheet(null)}
+                    onSubmit={addEvent}
+                  />
+                )}
+                {sheet === "task" && (
+                  <TaskFormSheet form={taskForm} language={language} text={text} isValid={taskIsValid} onSubmit={addTask} />
+                )}
+                {sheet === "shopping" && (
+                  <ShoppingFormSheet
+                    form={shoppingForm}
+                    language={language}
+                    text={text}
+                    isValid={shoppingIsValid}
+                    onSubmit={() => addShoppingItem()}
+                  />
+                )}
+                {sheet === "family" && <FamilySheet text={text} userName={userName} onShareLink={() => setSheet(null)} />}
+                {sheet === "settings" && (
+                  <SettingsSheet language={language} text={text} onChangeLanguage={storeSetLanguage} />
+                )}
+              </BottomSheet>
+            </AppShell>
+          )}
+        </Stack.Screen>
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 
   function toggleTask(id: string) {
