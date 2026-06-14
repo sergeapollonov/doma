@@ -16,7 +16,6 @@ export const colors = {
   backgroundBottom: '#F3E8DA',
   surfacePrimary: '#FFFFFF',
   surfaceWarm: '#FFFBF5',
-  glassSurface: 'rgba(255, 255, 255, 0.68)',
   
   glass: {
     light: 'rgba(255, 255, 255, 0.54)',
@@ -55,11 +54,6 @@ export const colors = {
   transparent: 'transparent',
 } as const;
 
-export const gradients = {
-  warmBackground: ['#FFF8EE', '#F7F1E8', '#F3E8DA'],
-  goldCta: ['#E5B76C', '#D69A45'],
-  blueActive: ['#1D4A76', '#163A5F'],
-} as const;
 
 export const spacing = {
   none: 0,
@@ -102,81 +96,8 @@ export const typography = {
     uiAndroid: 'Roboto',
     brand: 'Playfair Display',
   },
-
-  largeTitle: {
-    fontSize: 34,
-    lineHeight: 40,
-    fontWeight: '700',
-  },
-
-  screenTitle: {
-    fontSize: 28,
-    lineHeight: 34,
-    fontWeight: '700',
-  },
-
-  sectionTitle: {
-    fontSize: 18,
-    lineHeight: 24,
-    fontWeight: '600',
-  },
-
-  body: {
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: '400',
-  },
-
-  bodyMedium: {
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: '500',
-  },
-
-  caption: {
-    fontSize: 13,
-    lineHeight: 16,
-    fontWeight: '400',
-  },
-
-  button: {
-    fontSize: 16,
-    lineHeight: 20,
-    fontWeight: '600',
-  },
-
-  tabLabel: {
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '500',
-  },
 } as const;
 
-export const shadows = {
-  softCard: {
-    shadowColor: 'rgba(55, 38, 20, 0.08)',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 1,
-    shadowRadius: 24,
-    elevation: 3,
-  },
-
-  glass: {
-    shadowColor: 'rgba(55, 38, 20, 0.10)',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 1,
-    shadowRadius: 36,
-    elevation: 4,
-  },
-
-  button: {
-    shadowColor: 'rgba(214, 154, 69, 0.24)',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 1,
-    shadowRadius: 16,
-    elevation: 3,
-  },
-} as const;
 
 export const sizes = {
   minTouchTarget: 44,
@@ -221,11 +142,9 @@ export const zIndex = {
 
 export const domaTokens = {
   colors,
-  gradients,
   spacing,
   radius,
   typography,
-  shadows,
   sizes,
   opacity,
   zIndex,

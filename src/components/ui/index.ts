@@ -4,6 +4,7 @@ export { Card } from "./Card";
 export { Chip, Segment } from "./Chip";
 export { IconButton } from "./IconButton";
 export { Input } from "./Input";
+export { EmptyState } from "./EmptyState";
 export { SectionHeader } from "./SectionHeader";
 export { SheetTitle } from "./SheetTitle";
 export type { IconName } from "./types";

@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { EventCard } from "../../components/calendar";
 import { Avatar } from "../../components/family";
 import { TaskRow } from "../../components/tasks";
-import { Card, SectionHeader } from "../../components/ui";
+import { Card, SectionHeader, EmptyState } from "../../components/ui";
 import { people } from "../../data";
 import { colors } from "../../theme";
 import type { EventItem, TaskItem } from "../../types";
@@ -81,7 +81,7 @@ export function TodayScreen({
             <EventCard key={event.id} event={event} participantsLabel={participantsLabel(event.participants)} index={index} grouped />
           ))
         ) : (
-          <Text style={styles.caption}>{text.emptyToday}</Text>
+          <EmptyState title={text.emptyToday} style={{ paddingVertical: 16 }} />
         )}
       </Card>
 
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 14,
     paddingVertical: 16,
-    backgroundColor: colors.glassSurface,
+    backgroundColor: colors.glass.medium,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
