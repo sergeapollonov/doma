@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../../theme";
+import { colors, sizes, spacing } from "../../theme";
 import type { TabKey } from "../../types";
 import type { IconName } from "../ui";
 
@@ -44,8 +44,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 18,
     right: 18,
-    bottom: 12,
-    height: 84,
+    bottom: spacing.md,
+    height: sizes.tabBarHeight,
     borderRadius: 29,
     backgroundColor: "rgba(255,255,255,0.94)",
     borderWidth: 1,

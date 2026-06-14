@@ -170,7 +170,7 @@ export const shadows = {
 export const sizes = {
   minTouchTarget: 44,
 
-  tabBarHeight: 80,
+  tabBarHeight: 84,
   headerHeight: 64,
 
   listRowMinHeight: 52,

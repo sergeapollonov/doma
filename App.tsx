@@ -74,9 +74,12 @@ import type {
   ShoppingFormInput,
   TaskFormInput
 } from "./src/validation/forms";
+import { sizes, spacing } from "./src/theme/tokens";
 
 type Stage = "onboarding" | "login" | "family" | "invite" | "acceptInvite" | "app";
 type AuthIntent = "createFamily" | "acceptInvite";
+
+const TAB_BAR_OFFSET = sizes.tabBarHeight + spacing.md + spacing.xxxl;
 
 export default function App() {
   const language = useLocalAppStore((state) => state.language);
@@ -505,7 +508,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 24,
-    paddingBottom: 132,
+    paddingBottom: TAB_BAR_OFFSET,
     paddingTop: 0
   }
 });
