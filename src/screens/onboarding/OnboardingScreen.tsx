@@ -205,8 +205,8 @@ const styles = StyleSheet.create({
   },
   welcomeTitle: {
     color: colors.textPrimary,
-    fontSize: 31,
-    lineHeight: 38,
+    fontSize: 34,
+    lineHeight: 42,
     fontWeight: "500",
     textAlign: "center",
     marginTop: 18,
@@ -229,9 +229,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.86)",
     shadowColor: "#372614",
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.05,
     shadowRadius: 36,
-    shadowOffset: { width: 0, height: 16 }
+    shadowOffset: { width: 0, height: 16 },
+    opacity: 0.85
   },
   previewCard: {
     borderRadius: 24,
@@ -331,17 +332,17 @@ const styles = StyleSheet.create({
     marginTop: 34
   },
   inviteOutlineButton: {
-    height: 76,
-    borderRadius: 24,
+    height: 54,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
     borderColor: colors.domaGold,
-    backgroundColor: "rgba(255,255,255,0.42)"
+    backgroundColor: "transparent"
   },
   inviteOutlineText: {
     color: colors.domaGold,
-    fontSize: 21,
+    fontSize: 16,
     fontWeight: "700"
   },
   legalText: {
