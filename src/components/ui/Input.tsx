@@ -22,14 +22,16 @@ export function Input({ label, value, onChangeText, error, compact, autoFocus }:
         placeholderTextColor={colors.textTertiary}
         autoFocus={autoFocus}
       />
-      {error && <Text style={styles.formError}>{error}</Text>}
+      <View style={styles.errorContainer}>
+        {error ? <Text style={styles.formError}>{error}</Text> : null}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   inputWrap: {
-    marginBottom: 14
+    // marginBottom is handled by errorContainer
   },
   inputCompact: {
     flex: 1
@@ -54,11 +56,16 @@ const styles = StyleSheet.create({
   inputError: {
     borderColor: colors.dangerRed
   },
+  errorContainer: {
+    minHeight: 24,
+    justifyContent: "flex-start",
+    marginBottom: 4
+  },
   formError: {
     color: colors.dangerRed,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: "700",
-    marginTop: 7
+    marginTop: 8
   }
 });

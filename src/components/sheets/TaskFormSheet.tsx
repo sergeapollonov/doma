@@ -45,7 +45,9 @@ export function TaskFormSheet({ form, language, text, isValid, onSubmit }: TaskF
           </View>
         )}
       />
-      {taskAssigneeError ? <Text style={styles.formError}>{taskAssigneeError}</Text> : null}
+      <View style={styles.errorContainer}>
+        {taskAssigneeError ? <Text style={styles.formError}>{taskAssigneeError}</Text> : null}
+      </View>
       <Controller
         control={form.control}
         name="due"
@@ -65,12 +67,17 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     marginBottom: 7
   },
+  errorContainer: {
+    minHeight: 24,
+    justifyContent: "flex-start",
+    marginBottom: 4
+  },
   formError: {
     color: colors.dangerRed,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: "700",
-    marginTop: 7
+    marginTop: 8
   },
   segment: {
     flexDirection: "row",
