@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../../theme";
+import { colors, typography } from "../../theme";
 import type { TabKey } from "../../types";
 import { Avatar } from "../family";
 import { DomaLogo, IconButton } from "../ui";
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     width: 245,
     height: 190,
     borderRadius: 95,
-    backgroundColor: "rgba(255,255,255,0.54)",
+    backgroundColor: colors.glass.light,
     shadowColor: colors.domaGold,
     shadowOpacity: 0.14,
     shadowRadius: 55,
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     lineHeight: 46,
     fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" }),
+    fontFamily: typography.fontFamily.brand,
     letterSpacing: 0
   },
   greetingDate: {
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     fontSize: 48,
     lineHeight: 56,
     fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" }),
+    fontFamily: typography.fontFamily.brand,
     letterSpacing: 0
   },
   taskHeaderAvatars: {

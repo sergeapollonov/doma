@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { ShoppingCategorySection } from "../../components/shopping";
 import { Card, type IconName } from "../../components/ui";
@@ -101,8 +101,8 @@ const styles = StyleSheet.create({
     height: 78,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.84)",
-    backgroundColor: "rgba(255,255,255,0.72)",
+    borderColor: colors.glass.borderHeavy,
+    backgroundColor: colors.glass.medium,
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     height: 62,
     borderRadius: 31,
     marginLeft: -2,
-    backgroundColor: "rgba(255,255,255,0.88)",
+    backgroundColor: colors.glass.heavy,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#372614",
@@ -129,16 +129,14 @@ const styles = StyleSheet.create({
   addFieldText: {
     color: colors.domaBlue,
     fontSize: 24,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    fontWeight: "500"
   },
   shoppingSectionTitle: {
     color: colors.domaBlue,
     fontSize: 25,
     lineHeight: 31,
     fontWeight: "500",
-    marginBottom: 15,
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    marginBottom: 15
   },
   frequentCard: {
     padding: 16,
@@ -174,9 +172,9 @@ const styles = StyleSheet.create({
     padding: 14,
     marginTop: 4,
     marginBottom: 12,
-    backgroundColor: "rgba(255,255,255,0.72)",
+    backgroundColor: colors.glass.medium,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.88)",
+    borderColor: colors.glass.borderHeavy,
     flexDirection: "row",
     alignItems: "center",
     gap: 14,

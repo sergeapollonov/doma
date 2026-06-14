@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors } from "../../theme";
 import type { EventItem } from "../../types";
@@ -73,11 +73,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 13,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(232,222,210,0.72)"
+    borderBottomColor: colors.divider
   },
   groupedRow: {
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(232,222,210,0.72)"
+    borderBottomColor: colors.divider
   },
   rowAccent: {
     width: 4,
@@ -99,8 +99,7 @@ const styles = StyleSheet.create({
     color: colors.domaBlue,
     fontSize: 24,
     fontWeight: "500",
-    minWidth: 66,
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    minWidth: 66
   },
   rowGrow: {
     flex: 1
@@ -109,8 +108,7 @@ const styles = StyleSheet.create({
     color: colors.domaBlue,
     fontSize: 19,
     lineHeight: 24,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    fontWeight: "500"
   },
   caption: {
     color: colors.textSecondary,
@@ -122,9 +120,9 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 12,
     marginBottom: 12,
-    backgroundColor: "rgba(255,255,255,0.74)",
+    backgroundColor: colors.glass.medium,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.88)",
+    borderColor: colors.glass.borderHeavy,
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
@@ -145,15 +143,13 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 24,
     lineHeight: 28,
-    fontWeight: "600",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    fontWeight: "600"
   },
   calendarEventTitle: {
     color: colors.domaBlue,
     fontSize: 25,
     lineHeight: 31,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    fontWeight: "500"
   },
   inlineMeta: {
     marginTop: 7,

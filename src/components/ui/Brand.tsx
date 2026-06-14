@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../../theme";
+import { colors, typography } from "../../theme";
 
 type DomaLogoProps = {
   large?: boolean;
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     fontSize: 44,
     lineHeight: 50,
     fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" }),
+    fontFamily: typography.fontFamily.brand,
     letterSpacing: 0
   },
   logoTextLarge: {

@@ -14,9 +14,9 @@ export function Card({ children, style }: CardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "rgba(255,255,255,0.74)",
+    backgroundColor: colors.glass.medium,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.88)",
+    borderColor: colors.glass.borderHeavy,
     borderRadius: 26,
     padding: spacing.card,
     marginBottom: 10,

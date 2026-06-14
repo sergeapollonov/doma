@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { colors } from "../../theme";
 import type { ShoppingCategoryId, ShoppingItem } from "../../types";
@@ -66,8 +66,6 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.domaBlue,
     fontSize: 24,
-    lineHeight: 29,
-    fontWeight: "500",
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif", default: "Georgia" })
+    fontWeight: "500"
   }
 });
