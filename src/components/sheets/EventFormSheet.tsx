@@ -66,7 +66,9 @@ export function EventFormSheet({ form, language, text, isValid, onCancel, onSubm
         <EventFormRow icon="notifications-outline" color={colors.domaGold} label={text.reminder} value={text.thirtyMin} chevron />
         <EventFormRow icon="repeat-outline" color={colors.domaBlue} label={text.repeat} value={text.noRepeat} chevron last />
       </Card>
-      {eventErrorMessage !== null && <Text style={styles.formError}>{eventErrorMessage}</Text>}
+      <View style={styles.errorContainer}>
+        {eventErrorMessage !== null ? <Text style={styles.formError}>{eventErrorMessage}</Text> : null}
+      </View>
       <Card style={styles.eventCommentCard}>
         <EventFormRow icon="chatbubble-outline" color={colors.domaBlue} label={text.comment} value={text.addComment} last />
       </Card>
@@ -160,7 +162,8 @@ const styles = StyleSheet.create({
   },
   eventFormValueWrap: {
     maxWidth: "47%",
-    alignItems: "flex-end"
+    alignItems: "flex-end",
+    flexShrink: 1
   },
   eventFormValue: {
     color: colors.domaBlue,
@@ -189,11 +192,17 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginBottom: 18
   },
+  errorContainer: {
+    minHeight: 24,
+    justifyContent: "flex-start",
+    marginBottom: 4,
+    paddingHorizontal: 8
+  },
   formError: {
     color: colors.dangerRed,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: "700",
-    marginTop: 7
+    marginTop: 8
   }
 });

@@ -58,11 +58,13 @@ export function LoginScreen({ form, language, text, isInvite, isValid, onBack, o
                 />
               )}
             />
-            {loginEmailError ? (
-              <Text style={styles.validationText}>{loginEmailError}</Text>
-            ) : (
-              <Text style={styles.authHelp}>{text.authEmailHelp}</Text>
-            )}
+            <View style={styles.authErrorContainer}>
+              {loginEmailError ? (
+                <Text style={styles.validationText}>{loginEmailError}</Text>
+              ) : (
+                <Text style={styles.authHelp}>{text.authEmailHelp}</Text>
+              )}
+            </View>
           </Card>
 
           <PrimaryButton label={text.authContinue} onPress={onContinue} disabled={!isValid} arrow />
@@ -161,6 +163,10 @@ const styles = StyleSheet.create({
   },
   authInputError: {
     borderColor: colors.dangerRed
+  },
+  authErrorContainer: {
+    minHeight: 28,
+    justifyContent: "flex-start"
   },
   validationText: {
     color: colors.dangerRed,

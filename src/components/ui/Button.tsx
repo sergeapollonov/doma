@@ -52,7 +52,8 @@ const styles = StyleSheet.create({
   },
   primaryButtonDisabled: {
     backgroundColor: "#E6DED4",
-    shadowOpacity: 0
+    shadowOpacity: 0,
+    opacity: 0.7
   },
   primaryButtonText: {
     color: colors.white,
