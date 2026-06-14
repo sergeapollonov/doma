@@ -3,7 +3,7 @@ import React from "react";
 import { StyleSheet, Text } from "react-native";
 
 import { CalendarEventCard, CalendarMonth } from "../../components/calendar";
-import { Card, SectionHeader } from "../../components/ui";
+import { Card, SectionHeader, EmptyState } from "../../components/ui";
 import { colors } from "../../theme";
 import type { EventItem } from "../../types";
 import type { copy } from "../../i18n";
@@ -53,32 +53,3 @@ export function CalendarScreen({
     </>
   );
 }
-
-function EmptyState({ title, description }: { title: string; description: string }) {
-  return (
-    <Card style={styles.emptyState}>
-      <Ionicons name="sparkles-outline" size={24} color={colors.domaGold} />
-      <Text style={styles.cardTitle}>{title}</Text>
-      <Text style={styles.captionCentered}>{description}</Text>
-    </Card>
-  );
-}
-
-const styles = StyleSheet.create({
-  cardTitle: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "800"
-  },
-  captionCentered: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-    textAlign: "center"
-  },
-  emptyState: {
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: 24
-  }
-});
