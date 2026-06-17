@@ -6,16 +6,16 @@ import { EventCard } from "../../components/calendar";
 import { Avatar } from "../../components/family";
 import { TaskRow } from "../../components/tasks";
 import { Card, SectionHeader, EmptyState } from "../../components/ui";
-import { people } from "../../data";
-import { colors } from "../../theme";
-import type { EventItem, TaskItem } from "../../types";
+import { colors, typography } from "../../theme";
+import type { EventItem, TaskItem, ShoppingItem } from "../../types";
 import type { copy } from "../../i18n";
+import { getTodayBriefing, getFamilyPulse } from "../../mappers/appUiMappers";
 
 type TodayScreenProps = {
   text: typeof copy.ru;
   selectedEvents: EventItem[];
   activeTasks: TaskItem[];
-  pendingShopping: Array<{ title: string }>;
+  pendingShopping: ShoppingItem[];
   purchasedCount: number;
   participantsLabel: (participants: EventItem["participants"]) => string;
   assigneeLabel: (assignee: TaskItem["assignee"]) => string;
@@ -31,7 +31,6 @@ export function TodayScreen({
   selectedEvents,
   activeTasks,
   pendingShopping,
-  purchasedCount,
   participantsLabel,
   assigneeLabel,
   onOpenQuickAdd,
@@ -40,39 +39,33 @@ export function TodayScreen({
   onOpenShopping,
   onToggleTask
 }: TodayScreenProps) {
-  const remainingShopping = Math.max(pendingShopping.length - 3, 0);
-  const shoppingCaption =
-    remainingShopping > 0
-      ? text.shoppingSummaryMore(remainingShopping, purchasedCount)
-      : text.shoppingSummaryBought(purchasedCount);
+  const todayIso = "2026-06-03"; 
+  
+  const briefing = getTodayBriefing(selectedEvents, activeTasks, pendingShopping, todayIso);
+  const pulse = getFamilyPulse(activeTasks, selectedEvents, todayIso);
+  
+  const focusTasks = activeTasks.slice(0, 3);
+  const topShopping = pendingShopping.slice(0, 3);
 
   return (
-    <View>
-      <Card style={styles.syncCard}>
-        <View style={styles.syncPeople}>
-          <View style={styles.syncPerson}>
-            <Avatar person="alex" size={58} />
-            <Text style={styles.syncName}>{people.alex.name}</Text>
-          </View>
-          <View style={styles.syncPerson}>
-            <Avatar person="maya" size={58} />
-            <Text style={styles.syncName}>{people.maya.name}</Text>
-          </View>
+    <View style={styles.container}>
+      <View style={styles.sunWash} />
+
+      <View style={styles.headerRow}>
+        <View style={styles.greetingBlock}>
+          <Text style={styles.greetingTitle}>{text.morning} ☀️</Text>
+          <Text style={styles.greetingDate}>{text.todayDate}</Text>
+          <Text style={styles.briefingSubtitle}>
+            {text.briefingSubtitle(briefing.eventsCount, briefing.tasksCount, briefing.shoppingCount)}
+          </Text>
         </View>
-        <View style={styles.syncDivider} />
-        <View style={styles.syncState}>
-          <View style={styles.syncCheck}>
-            <Ionicons name="checkmark" size={28} color="#FFFFFF" />
+        <View style={styles.headerAvatars}>
+          <View style={styles.avatarOverlap}>
+            <Avatar person="alex" size={44} />
           </View>
-          <View>
-            <Text style={styles.syncTitle}>{text.synced}</Text>
-            <Text style={styles.caption}>{text.syncedAgo}</Text>
-          </View>
+          <Avatar person="maya" size={44} />
         </View>
-      </Card>
-      <Pressable style={styles.inlineFab} onPress={onOpenQuickAdd} accessibilityRole="button" accessibilityLabel={text.add}>
-        <Ionicons name="add" size={32} color="#FFFFFF" />
-      </Pressable>
+      </View>
 
       <SectionHeader title={text.upcoming} action={text.seeAll} onPress={onOpenCalendar} />
       <Card style={styles.groupCard}>
@@ -81,230 +74,239 @@ export function TodayScreen({
             <EventCard key={event.id} event={event} participantsLabel={participantsLabel(event.participants)} index={index} grouped />
           ))
         ) : (
-          <EmptyState title={text.emptyToday} style={{ paddingVertical: 16 }} />
+          <EmptyState title={text.todayFree} style={{ paddingVertical: 16 }} />
         )}
       </Card>
 
-      <SectionHeader title={text.tasks} action={text.seeAll} onPress={onOpenTasks} />
+      <SectionHeader title={text.tasksForToday} action={text.seeAll} onPress={onOpenTasks} />
       <Card style={styles.groupCard}>
-        {activeTasks.slice(0, 2).map((task) => (
-          <TaskRow
-            key={task.id}
-            task={task}
-            assignee={assigneeLabel(task.assignee)}
-            completedLabel={text.completedToday}
-            noReminderLabel={text.noReminder}
-            onToggle={() => onToggleTask(task.id)}
-            grouped
-          />
-        ))}
+        {focusTasks.length > 0 ? (
+          focusTasks.map((task) => (
+            <TaskRow
+              key={task.id}
+              task={task}
+              assignee={assigneeLabel(task.assignee)}
+              completedLabel={text.completedToday}
+              noReminderLabel={text.noReminder}
+              onToggle={() => onToggleTask(task.id)}
+              grouped
+            />
+          ))
+        ) : (
+          <EmptyState title={text.allDone} style={{ paddingVertical: 16 }} />
+        )}
       </Card>
 
-      <SectionHeader title={text.shopping} action={text.seeAll} onPress={onOpenShopping} />
-      <Pressable style={styles.shoppingSummary} onPress={onOpenShopping}>
-        <View style={styles.shoppingIcon}>
-          <Ionicons name="bag-handle-outline" size={34} color={colors.shoppingGreen} />
-        </View>
-        <View style={styles.shoppingSummaryText}>
-          <Text style={styles.shoppingSummaryTitle}>{pendingShopping.slice(0, 3).map((item) => item.title.toLowerCase()).join(", ")}</Text>
-          <Text style={styles.shoppingSummaryCaption}>{shoppingCaption}</Text>
-        </View>
-        <View style={styles.shoppingCount}>
-          <Text style={styles.shoppingCountText}>{pendingShopping.length}</Text>
-        </View>
-        <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
-      </Pressable>
+      <SectionHeader title={text.needToBuy} action={text.seeAll} onPress={onOpenShopping} />
+      <Card style={styles.shoppingCard}>
+        {topShopping.length > 0 ? (
+          topShopping.map((item, index) => (
+            <Pressable key={item.id} style={[styles.shoppingRow, index > 0 && styles.shoppingRowBorder]} onPress={onOpenShopping}>
+              <View style={styles.shoppingDot} />
+              <Text style={styles.shoppingTitle}>{item.title}</Text>
+            </Pressable>
+          ))
+        ) : (
+          <EmptyState title={text.fridgeFull} style={{ paddingVertical: 16 }} />
+        )}
+      </Card>
 
-      <Card style={styles.widgetPreview}>
-        <View style={styles.widgetHeader}>
-          <Text style={styles.widgetBrand}>Doma</Text>
-          <Text style={styles.caption}>{text.tabs.today}</Text>
+      <Card style={styles.pulseCard}>
+        <View style={styles.pulseIconWrap}>
+          <Ionicons name="people" size={24} color={colors.white} />
         </View>
-        {selectedEvents.slice(0, 3).map((event) => (
-          <View key={`widget-${event.id}`} style={styles.widgetRow}>
-            <Text style={styles.widgetTime}>{event.time}</Text>
-            <Text style={styles.widgetTitle}>{event.title}</Text>
+        <View style={styles.pulseContent}>
+          <View style={styles.pulseHeader}>
+            <Text style={styles.pulseTitle}>{text.familyPulse}</Text>
+            <View style={styles.pulseBadge}>
+              <View style={styles.pulseDot} />
+              <Text style={styles.pulseBadgeText}>{text.todaysProgress}</Text>
+            </View>
           </View>
-        ))}
-        <Text style={styles.widgetFooter}>{text.widgetLine}</Text>
+          <View style={styles.pulseBar}>
+            <View style={[styles.pulseFill, { width: "40%" }]} />
+          </View>
+          <Text style={styles.pulseText}>{text.tasksDone(pulse.tasksDoneToday)}, {text.eventsAhead(pulse.eventsAhead)}</Text>
+        </View>
       </Card>
+
+      <Pressable style={styles.fab} onPress={onOpenQuickAdd} accessibilityRole="button" accessibilityLabel={text.add}>
+        <Ionicons name="add" size={32} color={colors.white} />
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  syncCard: {
-    minHeight: 108,
-    marginTop: -44,
-    marginBottom: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 16,
-    backgroundColor: colors.glass.medium,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderRadius: 27
+  container: {
+    paddingTop: 40,
+    paddingBottom: 80
   },
-  syncPeople: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 11
-  },
-  syncPerson: {
-    alignItems: "center",
-    gap: 7
-  },
-  syncName: {
-    color: colors.domaBlue,
-    fontSize: 13,
-    fontWeight: "600"
-  },
-  syncDivider: {
-    width: 1,
-    height: 76,
-    backgroundColor: colors.divider,
-    marginHorizontal: 7
-  },
-  syncState: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    minWidth: 0
-  },
-  syncTitle: {
-    color: colors.domaBlue,
-    fontSize: 14,
-    lineHeight: 18,
-    fontWeight: "700"
-  },
-  syncCheck: {
-    width: 39,
-    height: 39,
-    borderRadius: 20,
-    backgroundColor: colors.shoppingGreen,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  inlineFab: {
-    alignSelf: "flex-end",
-    width: 66,
-    height: 66,
-    borderRadius: 33,
-    marginTop: -8,
-    marginBottom: 0,
-    marginRight: 4,
-    backgroundColor: colors.domaGold,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.glass.borderMedium,
+  sunWash: {
+    position: "absolute",
+    right: -40,
+    top: 0,
+    width: 245,
+    height: 190,
+    borderRadius: 95,
+    backgroundColor: colors.glass.light,
     shadowColor: colors.domaGold,
-    shadowOpacity: 0.24,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 }
+    shadowOpacity: 0.14,
+    shadowRadius: 55,
+    shadowOffset: { width: -18, height: 22 },
+    zIndex: -1
   },
-  caption: {
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 32
+  },
+  greetingBlock: {
+    flex: 1
+  },
+  greetingTitle: {
+    color: colors.domaBlue,
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: "700",
+    fontFamily: typography.fontFamily.brand,
+    letterSpacing: 0
+  },
+  greetingDate: {
+    marginTop: 6,
+    color: colors.textPrimary,
+    fontSize: 16,
+    fontWeight: "500"
+  },
+  briefingSubtitle: {
+    marginTop: 4,
     color: colors.textSecondary,
-    fontSize: 12.5,
-    lineHeight: 17
+    fontSize: 14
+  },
+  headerAvatars: {
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  avatarOverlap: {
+    marginRight: -12,
+    zIndex: 1,
+    borderWidth: 2,
+    borderColor: colors.surfaceWarm,
+    borderRadius: 24
   },
   groupCard: {
     padding: 0,
     overflow: "hidden",
-    borderRadius: 25,
-    marginBottom: 14
+    borderRadius: 20,
+    marginBottom: 24
   },
-  shoppingSummary: {
-    minHeight: 112,
-    borderRadius: 26,
-    padding: 18,
-    marginBottom: 18,
-    backgroundColor: colors.glass.medium,
-    borderWidth: 1,
-    borderColor: colors.glass.borderHeavy,
+  shoppingCard: {
+    paddingHorizontal: 0,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginBottom: 24
+  },
+  shoppingRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
-    shadowColor: "#372614",
-    shadowOpacity: 0.09,
-    shadowRadius: 28,
-    shadowOffset: { width: 0, height: 12 }
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12
   },
-  shoppingIcon: {
-    width: 78,
-    height: 78,
-    borderRadius: 39,
-    backgroundColor: "rgba(95,150,105,0.10)",
+  shoppingRowBorder: {
+    borderTopWidth: 1,
+    borderTopColor: colors.strokeLight
+  },
+  shoppingDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.domaGold
+  },
+  shoppingTitle: {
+    fontSize: 16,
+    color: colors.textPrimary,
+    fontWeight: "500"
+  },
+  pulseCard: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.glass.borderHeavy
+    backgroundColor: colors.familySand,
+    borderRadius: 20,
+    padding: 16,
+    gap: 16,
+    marginTop: 8
   },
-  shoppingSummaryText: {
+  pulseIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.25)",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  pulseContent: {
     flex: 1
   },
-  shoppingSummaryTitle: {
-    color: colors.domaBlue,
-    fontSize: 24,
-    lineHeight: 30,
-    fontWeight: "500"
-  },
-  shoppingSummaryCaption: {
-    marginTop: 4,
-    color: colors.shoppingGreen,
-    fontSize: 17,
-    fontWeight: "600"
-  },
-  shoppingCount: {
-    width: 53,
-    height: 53,
-    borderRadius: 27,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(95,150,105,0.11)"
-  },
-  shoppingCountText: {
-    color: colors.shoppingGreen,
-    fontSize: 25,
-    fontWeight: "500"
-  },
-  widgetPreview: {
-    marginTop: 12,
-    backgroundColor: colors.glass.medium
-  },
-  widgetHeader: {
+  pulseHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10
+    marginBottom: 8
   },
-  widgetBrand: {
-    color: colors.domaBlue,
-    fontSize: 18,
-    fontWeight: "900"
+  pulseTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: colors.textPrimary
   },
-  widgetRow: {
+  pulseBadge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    paddingVertical: 3
+    gap: 4
   },
-  widgetTime: {
-    width: 45,
-    color: colors.domaGold,
-    fontWeight: "800",
-    fontSize: 13
+  pulseDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.domaGold
   },
-  widgetTitle: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontWeight: "700"
-  },
-  widgetFooter: {
-    marginTop: 10,
+  pulseBadgeText: {
+    fontSize: 12,
     color: colors.textSecondary,
+    fontWeight: "500"
+  },
+  pulseBar: {
+    height: 4,
+    backgroundColor: "rgba(255,255,255,0.4)",
+    borderRadius: 2,
+    marginBottom: 8,
+    overflow: "hidden"
+  },
+  pulseFill: {
+    height: "100%",
+    backgroundColor: colors.white,
+    borderRadius: 2
+  },
+  pulseText: {
     fontSize: 13,
-    fontWeight: "700"
+    color: colors.textPrimary,
+    fontWeight: "500"
+  },
+  fab: {
+    position: "absolute",
+    bottom: -16,
+    right: 0,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.domaGold,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: colors.domaGold,
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 }
   }
 });
+

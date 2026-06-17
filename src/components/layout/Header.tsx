@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, typography } from "../../theme";
 import type { TabKey } from "../../types";
 import { Avatar } from "../family";
-import { DomaLogo, IconButton } from "../ui";
+import { IconButton } from "../ui";
 
 type HeaderProps = {
   tab: TabKey;
@@ -18,10 +18,14 @@ type HeaderProps = {
   onAdd: () => void;
 };
 
-export function Header({ tab, greetingTitle, title, todayDateLabel, subtitle, onFamily, onSettings, onAdd }: HeaderProps) {
+export function Header({ tab, title, subtitle, onFamily, onAdd }: HeaderProps) {
+  // Экран Today имеет свой собственный кастомный заголовок (Family Briefing Header)
+  if (tab === "today") {
+    return null;
+  }
+
   return (
-    <View style={[styles.header, tab === "today" && styles.todayHeader]}>
-      {tab === "today" && <View style={styles.sunWash} />}
+    <View style={styles.header}>
       <View style={styles.phoneStatus}>
         <Text style={styles.statusTime}>9:41</Text>
         <View style={styles.statusIcons}>
@@ -30,35 +34,26 @@ export function Header({ tab, greetingTitle, title, todayDateLabel, subtitle, on
           <Ionicons name="battery-full" size={23} color="#050505" />
         </View>
       </View>
+      
       <View style={styles.brandHeaderRow}>
-        <DomaLogo />
+        <View style={{ flex: 1 }} />
         <View style={styles.headerActions}>
-          {tab === "today" ? (
-            <IconButton icon="notifications-outline" onPress={onSettings} badge />
-          ) : (
-            <IconButton icon="add" onPress={onAdd} />
-          )}
+          <IconButton icon="add" onPress={onAdd} />
         </View>
       </View>
-      {tab === "today" ? (
-        <View style={styles.greetingBlock}>
-          <Text style={styles.greetingTitle}>{greetingTitle}</Text>
-          <Text style={styles.greetingDate}>{todayDateLabel}</Text>
+      
+      <View style={styles.innerHeaderBlock}>
+        <View>
+          <Text style={styles.innerScreenTitle}>{title}</Text>
+          <Text style={styles.headerSubtitle}>{subtitle}</Text>
         </View>
-      ) : (
-        <View style={styles.innerHeaderBlock}>
-          <View>
-            <Text style={styles.innerScreenTitle}>{title}</Text>
-            <Text style={styles.headerSubtitle}>{subtitle}</Text>
-          </View>
-          {tab === "tasks" || tab === "shopping" ? (
-            <Pressable onPress={onFamily} style={styles.taskHeaderAvatars}>
-              <Avatar person="alex" size={58} />
-              <Avatar person="maya" size={58} />
-            </Pressable>
-          ) : null}
-        </View>
-      )}
+        {tab === "tasks" || tab === "shopping" ? (
+          <Pressable onPress={onFamily} style={styles.taskHeaderAvatars}>
+            <Avatar person="alex" size={58} />
+            <Avatar person="maya" size={58} />
+          </Pressable>
+        ) : null}
+      </View>
     </View>
   );
 }
@@ -67,25 +62,6 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 18,
     marginBottom: 12
-  },
-  todayHeader: {
-    minHeight: 306,
-    marginHorizontal: -24,
-    paddingHorizontal: 24,
-    overflow: "hidden"
-  },
-  sunWash: {
-    position: "absolute",
-    right: -40,
-    top: 82,
-    width: 245,
-    height: 190,
-    borderRadius: 95,
-    backgroundColor: colors.glass.light,
-    shadowColor: colors.domaGold,
-    shadowOpacity: 0.14,
-    shadowRadius: 55,
-    shadowOffset: { width: -18, height: 22 }
   },
   phoneStatus: {
     height: 28,
@@ -110,24 +86,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between"
-  },
-  greetingBlock: {
-    marginTop: 30
-  },
-  greetingTitle: {
-    color: colors.domaBlue,
-    fontSize: 40,
-    lineHeight: 46,
-    fontWeight: "500",
-    fontFamily: typography.fontFamily.brand,
-    letterSpacing: 0
-  },
-  greetingDate: {
-    marginTop: 10,
-    color: colors.textSecondary,
-    fontSize: 23,
-    lineHeight: 30,
-    fontWeight: "500"
   },
   innerHeaderBlock: {
     marginTop: 42,

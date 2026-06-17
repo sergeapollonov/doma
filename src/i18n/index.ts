@@ -121,6 +121,17 @@ type DomaCopy = {
     itemCount: string;
   };
   tabs: Record<TabKey, string>;
+  // Новые ключи для Today Screen
+  tasksForToday: string;
+  needToBuy: string;
+  familyPulse: string;
+  todaysProgress: string;
+  tasksDone: (count: number) => string;
+  eventsAhead: (count: number) => string;
+  todayFree: string;
+  allDone: string;
+  fridgeFull: string;
+  briefingSubtitle: (events: number, tasks: number, shopping: number) => string;
 };
 
 export const copy = {
@@ -262,7 +273,17 @@ export const copy = {
       calendar: "Календарь",
       tasks: "Дела",
       shopping: "Покупки"
-    }
+    },
+    tasksForToday: "Дела",
+    needToBuy: "Покупки",
+    familyPulse: "Семья сегодня",
+    todaysProgress: "Прогресс дня",
+    tasksDone: (count) => `${count} дел выполнено`,
+    eventsAhead: (count) => `${count} события впереди`,
+    todayFree: "Сегодня свободный день 🍃",
+    allDone: "Все дела сделаны",
+    fridgeFull: "Холодильник полон",
+    briefingSubtitle: (e, t, s) => `${e} события, ${t} задач, ${s} покупок`
   },
   pl: {
     brand: "Doma",
@@ -402,6 +423,16 @@ export const copy = {
       calendar: "Kalendarz",
       tasks: "Sprawy",
       shopping: "Zakupy"
-    }
+    },
+    tasksForToday: "Sprawy",
+    needToBuy: "Zakupy",
+    familyPulse: "Rodzina dzisiaj",
+    todaysProgress: "Postęp dnia",
+    tasksDone: (count) => `${count} spraw zrobione`,
+    eventsAhead: (count) => `${count} wydarzenia przed nami`,
+    todayFree: "Dzisiaj wolny dzień 🍃",
+    allDone: "Wszystkie sprawy załatwione",
+    fridgeFull: "Lodówka jest pełna",
+    briefingSubtitle: (e, t, s) => `${e} wydarzenia, ${t} spraw, ${s} zakupów`
   }
 } satisfies Record<Language, DomaCopy>;
