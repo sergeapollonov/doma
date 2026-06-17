@@ -8,7 +8,8 @@ import type {
   ShoppingCategoryId,
   ShoppingItem,
   ShoppingListItem,
-  TaskItem
+  TaskItem,
+  EventItem
 } from "../types";
 
 export type TaskMapperCopy = {
@@ -115,4 +116,30 @@ export function shoppingCategoryLabelToId(categoryLabel: string, categories: Sho
   );
 
   return category?.id ?? "cat-other";
+}
+
+export function getNextEvent(events: EventItem[], todayIso: string): EventItem | null {
+  // Находим события на сегодня
+  const todayEvents = events.filter(e => e.date.startsWith(todayIso));
+  if (todayEvents.length === 0) return null;
+  // В реальном приложении здесь будет сортировка по времени и фильтрация прошедших
+  // Пока возвращаем первое ближайшее
+  return todayEvents[0];
+}
+
+export function getTodayBriefing(events: EventItem[], tasks: TaskItem[], shopping: ShoppingItem[], todayIso: string) {
+  // Поскольку в TodayScreen уже передаются отфильтрованные массивы на сегодняшний день,
+  // мы можем просто взять их length.
+  return { 
+    eventsCount: events.length, 
+    tasksCount: tasks.length, 
+    shoppingCount: shopping.length 
+  };
+}
+
+export function getFamilyPulse(tasks: TaskItem[], events: EventItem[], todayIso: string) {
+  const tasksDoneToday = tasks.filter(t => t.completed).length; // В реальном приложении фильтруем по completedAt
+  const eventsAhead = events.filter(e => e.date.startsWith(todayIso)).length; // Кол-во событий сегодня
+  
+  return { tasksDoneToday, eventsAhead };
 }
