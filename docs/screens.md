@@ -305,76 +305,97 @@ Active tab:
 
 ### Purpose
 
-Monthly overview and selected day plan.
+The central family planning hub. Unlike traditional calendars, it displays the entire family plan for the selected day: events, tasks, shopping, and conflicts.
+
+### Design Principles
+
+- **Family First:** Always show participants (avatars/names).
+- **Event Priority:** 🟣 Events (Highest) -> 🟠 Tasks (Medium) -> 🟢 Shopping (Lowest).
+- **One-Day Focus:** Primary attention is on the selected day.
 
 ### Header
 
-```text
-Doma
-Календарь
-+
-```
-
-### Month navigation
+Height: 88px
 
 ```text
-<  Июнь 2026  >
+< Calendar          June 2026        🔍  +
 ```
 
-### Calendar grid
+### Family Filter
 
-Week starts on Monday.
-
-Selected day:
+Sticky horizontal pill-shaped chips to toggle data display.
 
 ```text
-3
+[👨‍👩‍👧 Family]  [👦 Sergey]  [👩 Olya]
 ```
 
-Selected day style:
-
-- Doma Blue circular background;
-- white text.
-
-Event dots:
-
-- blue: events;
-- orange: tasks;
-- green: shopping;
-- sand: family.
-
-### Selected day list
-
-Header:
+### Types Filter
 
 ```text
-3 июня, среда
+[Все]  [🟣 События]  [🟠 Задачи]  [🟢 Покупки]
 ```
 
-Example cards:
+### Month Strip
+
+Horizontal scrolling days strip with activity indicators. Selected day is highlighted.
 
 ```text
-09:00
-Врач
-Алексей и Мая
-
-14:30
-Забрать посылку
-Алексей
-
-19:00
-Ужин с родителями
-Алексей и Мая
+Пн   Вт   Ср   Чт   Пт   Сб   Вс
+8    9    10  [11]  12   13   14
+🟣   🟠   🟢   🟣🟠
 ```
 
-Each card includes:
+### Day Summary Card
 
-- colored time block;
-- icon;
-- title;
-- avatars;
-- participants;
-- chevron.
+Displays a quick overview of the workload for the selected day and current weather.
+
+```text
+Четверг, 12 июня                    ☀️ 23°
+🟣 2 события   🟠 4 задачи   🟢 3 покупки
+```
+
+### Events Timeline (Purple)
+
+Vertical timeline. Events sorted by start time.
+- Past events: Faded / reduced opacity.
+- Current event: Highlighted with `NOW` badge.
+- Conflict detection: `⚠ Schedule Conflict` warning badge if events overlap.
+
+```text
+09:30 | 🟣 Детский врач
+      |    Поликлиника №4
+      |    [Сергей] [Оля]
+```
+
+### Tasks Section (Orange)
+
+Household tasks related to the selected day.
+- Checkboxes.
+- Assignee avatars.
+- Completed: Checked, crossed out, moved to bottom.
+- Overdue: Red text emphasis.
+
+```text
+[ ] Купить подарок (Оля)        10:00
+[ ] Оплатить интернет (Сергей)  12:00
+```
+
+### Shopping Section (Green)
+
+Horizontal scroll of shopping items relevant to the selected day.
+
+```text
+[ ] Молоко (1 л)   [ ] Хлеб (1 шт)   [ ещё 14 ]
+```
+
+### Weekly Overview
+
+Positioned at the bottom of the screen to provide context for the upcoming workload.
+
+```text
+Неделя: 8 – 14 июня
+🟣 8 событий   🟠 12 задач   🟢 17 покупок
+```
 
 ### Bottom tab
 
@@ -383,6 +404,7 @@ Active tab:
 ```text
 Календарь
 ```
+
 
 ## 8. Event Details
 

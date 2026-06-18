@@ -1,12 +1,20 @@
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
+import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 
-import { CalendarEventCard, CalendarMonth } from "../../components/calendar";
-import { Card, SectionHeader, EmptyState } from "../../components/ui";
 import { colors } from "../../theme";
 import type { EventItem } from "../../types";
 import type { copy } from "../../i18n";
+
+import { FilterPanel } from "./components/FilterPanel";
+import { WeekStrip } from "./components/WeekStrip";
+import { DaySummaryCard } from "./components/DaySummaryCard";
+import { SectionHeader } from "./components/SectionHeader";
+import { EventsTimeline } from "./components/EventsTimeline";
+import { TasksSection } from "./components/TasksSection";
+import { ShoppingSection } from "./components/ShoppingSection";
+import { WeeklyOverviewCard } from "./components/WeeklyOverviewCard";
+import { mockCalendarEvents, mockCalendarTasks, mockCalendarShopping } from "../../utils/calendarMocks";
 
 type CalendarScreenProps = {
   text: typeof copy.ru;
@@ -29,27 +37,83 @@ export function CalendarScreen({
   onSelectDay,
   onAddEvent
 }: CalendarScreenProps) {
-  const days = Array.from({ length: 30 }, (_, index) => index + 1);
+  const scrollY = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
 
   return (
-    <>
-      <CalendarMonth
-        title={text.monthJune2026}
-        days={days}
-        weekDays={text.weekDays}
-        selectedDay={selectedDay}
-        todayDay={3}
-        eventDays={eventDays}
-        onSelectDay={onSelectDay}
-      />
-      <SectionHeader title={selectedDateTitle} action={text.add} onPress={onAddEvent} />
-      {selectedEvents.length > 0 ? (
-        selectedEvents.map((event, index) => (
-          <CalendarEventCard key={`cal-${event.id}`} event={event} participantsLabel={participantsLabel(event.participants)} index={index} />
-        ))
-      ) : (
-        <EmptyState title={text.emptyToday} description={text.emptyTodayHint} />
-      )}
-    </>
+    <Animated.ScrollView
+      style={styles.container}
+      onScroll={scrollHandler}
+      scrollEventThrottle={16}
+      stickyHeaderIndices={[1]} // Индекс элемента, который будет липким
+      contentContainerStyle={styles.scrollContent}
+    >
+      {/* 0. Схлопывающийся Header */}
+      <View style={styles.headerPlaceHolder}>
+        <Text style={styles.headerTitle}>{text.monthJune2026}</Text>
+      </View>
+
+      {/* 1. Sticky Panel (FilterPanel + WeekStrip) */}
+      <View style={styles.stickyContainer}>
+        <FilterPanel activeUserFilter="family" activeTypeFilter="all" />
+        <WeekStrip selectedDate={12} />
+      </View>
+
+      {/* 2. Main Content (DaySummary, Timeline, Tasks, Shopping) */}
+      <View style={styles.mainContent}>
+        <DaySummaryCard />
+        
+        <SectionHeader title="События" colorTheme="purple" />
+        <EventsTimeline events={mockCalendarEvents} />
+
+        <SectionHeader title="Задачи на день" actionLabel="4 задачи" colorTheme="orange" />
+        <TasksSection tasks={mockCalendarTasks} />
+
+        <SectionHeader title="Покупки на сегодня" actionLabel="3 из 17" colorTheme="green" />
+        <ShoppingSection items={mockCalendarShopping} />
+
+        {/* 3. Weekly Overview */}
+        <WeeklyOverviewCard />
+      </View>
+    </Animated.ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.warmBackground, // F7F1E8
+  },
+  scrollContent: {
+    paddingBottom: 120, // Чтобы не перекрывалось таб-баром
+  },
+  headerPlaceHolder: {
+    height: 88,
+    justifyContent: "flex-end",
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    backgroundColor: colors.warmBackground,
+  },
+  headerTitle: {
+    fontSize: 34,
+    fontWeight: "700",
+    color: colors.textPrimary,
+    fontFamily: "Playfair Display",
+  },
+  stickyContainer: {
+    backgroundColor: colors.warmBackground, // Важно для перекрытия контента под ним
+    paddingTop: 12,
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.strokeSoft,
+  },
+  mainContent: {
+    paddingHorizontal: 20,
+    paddingTop: 24,
+  },
+});
