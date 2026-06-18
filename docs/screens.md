@@ -309,7 +309,9 @@ The central family planning hub. Unlike traditional calendars, it displays the e
 
 ### Design Principles
 
-- **Family First:** Always show participants (avatars/names).
+- **Unified Card Layout:** All major sections (Summary, Events, Tasks, Shopping, Weekly) are displayed inside unified white card containers with consistent rounded corners, shadows, and internal headers.
+- **Unified Typography:** Consistent font sizes and weights across all lists (14px bold for primary titles, 11px for secondary details like time/location/quantity) for maximum vertical efficiency.
+- **Family First:** Always show participants using colored pill-shaped chips with avatars and names (purple for events, orange for tasks).
 - **Event Priority:** 🟣 Events (Highest) -> 🟠 Tasks (Medium) -> 🟢 Shopping (Lowest).
 - **One-Day Focus:** Primary attention is on the selected day.
 
@@ -347,54 +349,63 @@ Horizontal scrolling days strip with activity indicators. Selected day is highli
 
 ### Day Summary Card
 
-Displays a quick overview of the workload for the selected day and current weather.
+Displays a quick overview of the workload for the selected day and current weather. Compact layout with synchronized typography.
 
 ```text
 Четверг, 12 июня                    ☀️ 23°
-🟣 2 события   🟠 4 задачи   🟢 3 покупки
+[🟣 2] события   [🟠 4] задачи   [🟢 3] покупки
 ```
 
 ### Events Timeline (Purple)
 
-Vertical timeline. Events sorted by start time.
+Vertical timeline embedded inside a unified card with an internal "СОБЫТИЯ" header.
+- Participants: Pill-shaped purple chip with avatars and names.
 - Past events: Faded / reduced opacity.
 - Current event: Highlighted with `NOW` badge.
-- Conflict detection: `⚠ Schedule Conflict` warning badge if events overlap.
+- Conflict detection: Pill-shaped `Конфликт расписания` warning badge aligned below participants.
+- Expandable: "Показать весь день" bottom action.
 
 ```text
 09:30 | 🟣 Детский врач
       |    Поликлиника №4
-      |    [Сергей] [Оля]
+      |    [👨‍👩‍👧 Алексей, Мая]
+      |    [Конфликт расписания]
 ```
 
 ### Tasks Section (Orange)
 
-Household tasks related to the selected day.
+Household tasks related to the selected day, embedded in a unified card with an internal "ЗАДАЧИ НА ДЕНЬ" header.
 - Checkboxes.
-- Assignee avatars.
+- Assignee avatars: Pill-shaped orange chip.
 - Completed: Checked, crossed out, moved to bottom.
-- Overdue: Red text emphasis.
+- Overdue: `Просрочено •` red text emphasis before the title.
+- Expandable: "Показать все задачи" bottom action.
 
 ```text
-[ ] Купить подарок (Оля)        10:00
-[ ] Оплатить интернет (Сергей)  12:00
+[ ] Купить подарок     10:00
+    [👩 Мая]
+[ ] Оплатить интернет  12:00
+    [👦 Алексей]
 ```
 
 ### Shopping Section (Green)
 
-Horizontal scroll of shopping items relevant to the selected day.
+Horizontal scroll of individual shopping item cards embedded inside a unified card.
+- Header includes "ПОКУПКИ НА СЕГОДНЯ" and completion status (e.g., "3 из 17").
+- Card layout: Checkbox, Emoji Icon, Column with Title and Quantity.
+- Expandable: "Показать все покупки" bottom action.
 
 ```text
-[ ] Молоко (1 л)   [ ] Хлеб (1 шт)   [ ещё 14 ]
+[ ] 🥛 Молоко (1 л)   [ ] 🍞 Хлеб (1 шт)   [ ещё 14 ]
 ```
 
 ### Weekly Overview
 
-Positioned at the bottom of the screen to provide context for the upcoming workload.
+Positioned at the bottom of the screen to provide context for the upcoming workload. Compact layout matching the Day Summary Card.
 
 ```text
 Неделя: 8 – 14 июня
-🟣 8 событий   🟠 12 задач   🟢 17 покупок
+[🟣 8] событий   [🟠 12] задач   [🟢 17] покупок
 ```
 
 ### Bottom tab
