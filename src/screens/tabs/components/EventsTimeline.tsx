@@ -49,7 +49,7 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
               <View style={styles.eventContent}>
                 
                 <View style={[styles.iconWrapper, isActive && styles.iconWrapperActive]}>
-                  <Ionicons name={iconName} size={24} color={isActive ? colors.white : '#8C77F6'} />
+                  <Ionicons name={iconName} size={24} color={colors.white} />
                 </View>
 
                 <View style={styles.details}>
@@ -58,27 +58,29 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
                     <Text style={styles.location}>{event.location}</Text>
                   )}
                   
-                  {/* Участники в фиолетовом чипсе */}
-                  <View style={styles.participantsChip}>
-                    <View style={styles.avatarsRow}>
-                      {event.participants.map((p, idx) => (
-                        <View key={p.id} style={{ marginLeft: idx > 0 ? -8 : 0, zIndex: 10 - idx }}>
-                          <Avatar person={p.id as any} size={20} />
-                        </View>
-                      ))}
+                  {/* Беджи: Участники и Конфликт (в одну строку) */}
+                  <View style={styles.chipsRow}>
+                    {/* Участники в фиолетовом чипсе */}
+                    <View style={styles.participantsChip}>
+                      <View style={styles.avatarsRow}>
+                        {event.participants.map((p, idx) => (
+                          <View key={p.id} style={{ marginLeft: idx > 0 ? -8 : 0, zIndex: 10 - idx }}>
+                            <Avatar person={p.id as any} size={20} />
+                          </View>
+                        ))}
+                      </View>
+                      <Text style={styles.participantsText}>
+                        {event.participants.map(p => p.name).join(', ')}
+                      </Text>
                     </View>
-                    <Text style={styles.participantsText}>
-                      {event.participants.map(p => p.name).join(', ')}
-                    </Text>
-                  </View>
 
-                  {/* Алерт конфликта (теперь под именами) */}
-                  {hasConflict && (
-                    <View style={styles.conflictBadge}>
-                      <Ionicons name="warning" size={12} color={colors.dangerRed} />
-                      <Text style={styles.conflictText}>Конфликт расписания</Text>
-                    </View>
-                  )}
+                    {/* Алерт конфликта */}
+                    {hasConflict && (
+                      <View style={styles.conflictBadge}>
+                        <Text style={styles.conflictText}>Конфликт расписания</Text>
+                      </View>
+                    )}
+                  </View>
                 </View>
 
                 {/* Время и стрелочка справа */}
@@ -215,6 +217,12 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: 6,
   },
+  chipsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
   participantsChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -222,7 +230,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: radius.pill,
-    alignSelf: 'flex-start',
   },
   avatarsRow: {
     flexDirection: 'row',
@@ -234,20 +241,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   conflictBadge: {
-    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(216, 92, 74, 0.1)', 
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    alignSelf: 'flex-start',
-    marginTop: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
   },
   conflictText: {
     fontSize: 11,
     color: colors.dangerRed,
     fontWeight: '600',
-    marginLeft: 4,
   },
   cardRight: {
     marginLeft: 8,
