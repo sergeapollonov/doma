@@ -9,8 +9,16 @@ type EventsTimelineProps = {
   events: CalendarEvent[];
 };
 
+function getEventIcon(title: string): keyof typeof Ionicons.glyphMap {
+  const t = title.toLowerCase();
+  if (t.includes('врач') || t.includes('поликлиника')) return 'medical-outline';
+  if (t.includes('посылк')) return 'cube-outline';
+  if (t.includes('плаван') || t.includes('бассейн')) return 'water-outline';
+  if (t.includes('школ')) return 'school-outline';
+  return 'calendar-outline';
+}
+
 export function EventsTimeline({ events }: EventsTimelineProps) {
-  // Хук просчитает наложения (isConflict = true)
   const processedEvents = useCalendarConflicts(events);
 
   return (
@@ -19,21 +27,20 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
         const isPast = event.status === 'completed' || event.status === 'cancelled';
         const isActive = event.status === 'active';
         const hasConflict = event.isConflict;
+        const iconName = getEventIcon(event.title);
 
         return (
           <View key={event.id} style={[styles.eventRow, isPast && styles.eventPast]}>
             {/* Timeline (Время и линия) */}
             <View style={styles.timeColumn}>
               <Text style={[styles.timeText, isActive && styles.timeActive]}>{event.timeStart}</Text>
-              {/* Кружок на таймлайне */}
               <View style={[styles.timelineDot, isActive && styles.timelineDotActive]} />
-              {/* Линия до следующего (если не последний) */}
               {index < processedEvents.length - 1 && <View style={styles.timelineLine} />}
             </View>
 
             {/* Карточка события */}
             <View style={styles.cardContainer}>
-              {/* Алерт конфликта если есть */}
+              {/* Алерт конфликта */}
               {hasConflict && (
                 <View style={styles.conflictBadge}>
                   <Ionicons name="warning" size={12} color={colors.dangerRed} />
@@ -42,10 +49,11 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
               )}
 
               <View style={[styles.card, isActive && styles.cardActive]}>
-                <View style={styles.cardLeft}>
-                  {/* Иконка */}
+                
+                <View style={styles.cardMain}>
+                  {/* Иконка слева */}
                   <View style={[styles.iconWrapper, isActive && styles.iconWrapperActive]}>
-                    <Ionicons name="calendar-outline" size={20} color={isActive ? colors.white : colors.domaBlue} />
+                    <Ionicons name={iconName} size={24} color={isActive ? colors.white : '#8C77F6'} />
                   </View>
                   
                   <View style={styles.details}>
@@ -66,7 +74,7 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
                   </View>
                 </View>
 
-                {/* Время справа и NOW бейдж */}
+                {/* Время справа вверху */}
                 <View style={styles.cardRight}>
                   {isActive ? (
                     <View style={styles.nowBadge}>
@@ -75,8 +83,9 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
                   ) : (
                     <Text style={styles.durationText}>{event.timeStart} – {event.timeEnd}</Text>
                   )}
-                  <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} style={{ marginTop: 4 }} />
+                  <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} style={{ marginLeft: 8 }} />
                 </View>
+                
               </View>
             </View>
           </View>
@@ -92,11 +101,11 @@ const styles = StyleSheet.create({
   },
   eventRow: {
     flexDirection: 'row',
-    marginBottom: spacing.sm,
-    minHeight: 80,
+    marginBottom: spacing.md,
+    minHeight: 100,
   },
   eventPast: {
-    opacity: 0.5,
+    opacity: 0.6,
   },
   timeColumn: {
     width: 50,
@@ -106,7 +115,7 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 12,
     color: colors.textSecondary,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   timeActive: {
     color: colors.domaBlue,
@@ -116,45 +125,49 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.strokeSoft,
+    backgroundColor: '#8C77F6', // Фиолетовая точка как на макете
     zIndex: 2,
   },
   timelineDotActive: {
     backgroundColor: colors.domaBlue,
+    transform: [{ scale: 1.2 }],
   },
   timelineLine: {
-    width: 2,
+    width: 1,
     flex: 1,
-    backgroundColor: colors.strokeLight,
-    marginTop: 4,
+    backgroundColor: colors.strokeSoft,
+    marginTop: 6,
   },
   cardContainer: {
     flex: 1,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.sm,
   },
   card: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: spacing.md,
     backgroundColor: colors.surfacePrimary,
-    borderRadius: radius.large,
-    // В референсе у событий почти нет фона, они просто лежат на поверхности,
-    // Но мы сделаем легкий фон, если это не активное событие.
+    borderRadius: radius.xl, // Крупное скругление (20px)
+    shadowColor: colors.domaBlue,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.strokeLight,
   },
   cardActive: {
-    backgroundColor: 'rgba(29, 74, 118, 0.05)', // Очень легкий фиолетовый/синий оттенок
-    borderWidth: 1,
+    backgroundColor: 'rgba(29, 74, 118, 0.03)',
     borderColor: 'rgba(29, 74, 118, 0.1)',
   },
-  cardLeft: {
+  cardMain: {
     flexDirection: 'row',
     flex: 1,
   },
   iconWrapper: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.small,
-    backgroundColor: 'rgba(29, 74, 118, 0.1)',
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: 'rgba(140, 119, 246, 0.1)', // Светло-фиолетовый фон для иконки
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -167,13 +180,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   textPast: {
-    textDecorationLine: 'line-through',
+    color: colors.textSecondary,
   },
   location: {
     fontSize: 13,
@@ -193,15 +206,18 @@ const styles = StyleSheet.create({
   },
   participantsText: {
     fontSize: 12,
-    color: colors.domaBlue, // Фиолетовый акцент для участников в событиях
+    color: '#8C77F6', // Фиолетовый
     marginLeft: 6,
+    fontWeight: '500',
   },
   cardRight: {
-    alignItems: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'flex-start', // Выравнивание по верху
   },
   durationText: {
     fontSize: 12,
     color: colors.textSecondary,
+    marginTop: 2, // Чтобы выровнять с заголовком
   },
   nowBadge: {
     backgroundColor: colors.domaBlue,
@@ -218,7 +234,7 @@ const styles = StyleSheet.create({
   conflictBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(216, 92, 74, 0.1)', // Light Red
+    backgroundColor: 'rgba(216, 92, 74, 0.1)', 
     paddingHorizontal: spacing.sm,
     paddingVertical: 4,
     borderRadius: radius.small,

@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { colors, radius, spacing } from '../../../theme';
 import { useWeather } from '../hooks/useWeather';
+import { Ionicons } from '@expo/vector-icons';
 
 export function DaySummaryCard() {
   const { weather } = useWeather();
@@ -16,30 +17,56 @@ export function DaySummaryCard() {
             <Text style={styles.weatherText}>
               {weather ? (weather.condition === 'sunny' ? '☀️' : '☁️') : '...'} {weather?.temp ?? '--'}°
             </Text>
+            <Ionicons name="chevron-down" size={12} color={colors.textSecondary} style={{ marginLeft: 4 }} />
           </View>
         </View>
 
         {/* Счетчики */}
         <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <View style={[styles.statDot, { backgroundColor: colors.domaBlue }]} />
-            <Text style={styles.statText}>
-              <Text style={styles.statNumber}>2</Text> события
-            </Text>
-          </View>
-          
-          <View style={styles.statItem}>
-            <View style={[styles.statDot, { backgroundColor: colors.taskOrange }]} />
-            <Text style={styles.statText}>
-              <Text style={styles.statNumber}>4</Text> задачи
-            </Text>
+          {/* События */}
+          <View style={styles.statColumn}>
+            <View style={[styles.iconBox, { backgroundColor: 'rgba(140, 119, 246, 0.1)' }]}>
+              <Ionicons name="calendar-outline" size={24} color="#8C77F6" />
+            </View>
+            <View style={styles.statInfo}>
+              <Text style={styles.statNumber}>2</Text>
+              <View>
+                <Text style={styles.statLabelMain}>события</Text>
+                <Text style={styles.statLabelSub}>запланировано</Text>
+              </View>
+            </View>
           </View>
 
-          <View style={styles.statItem}>
-            <View style={[styles.statDot, { backgroundColor: colors.shoppingGreen }]} />
-            <Text style={styles.statText}>
-              <Text style={styles.statNumber}>3</Text> покупки
-            </Text>
+          <View style={styles.divider} />
+          
+          {/* Задачи */}
+          <View style={styles.statColumn}>
+            <View style={[styles.iconBox, { backgroundColor: 'rgba(239, 138, 31, 0.1)' }]}>
+              <Ionicons name="checkmark-circle-outline" size={24} color={colors.taskOrange} />
+            </View>
+            <View style={styles.statInfo}>
+              <Text style={styles.statNumber}>4</Text>
+              <View>
+                <Text style={styles.statLabelMain}>задачи</Text>
+                <Text style={styles.statLabelSub}>на сегодня</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.divider} />
+
+          {/* Покупки */}
+          <View style={styles.statColumn}>
+            <View style={[styles.iconBox, { backgroundColor: 'rgba(95, 150, 105, 0.1)' }]}>
+              <Ionicons name="cart-outline" size={24} color={colors.shoppingGreen} />
+            </View>
+            <View style={styles.statInfo}>
+              <Text style={styles.statNumber}>3</Text>
+              <View>
+                <Text style={styles.statLabelMain}>покупки</Text>
+                <Text style={styles.statLabelSub}>нужно купить</Text>
+              </View>
+            </View>
           </View>
         </View>
       </View>
@@ -69,7 +96,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
   },
   title: {
     fontSize: 18,
@@ -77,10 +104,12 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   weatherBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.surfaceWarm,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: radius.small,
+    borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: colors.strokeSoft,
   },
@@ -92,26 +121,46 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: colors.warmBackground,
-    padding: spacing.md,
-    borderRadius: radius.md,
+    alignItems: 'center',
   },
-  statItem: {
+  statColumn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+  iconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  statInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  statDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 6,
-  },
-  statText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
   statNumber: {
+    fontSize: 28,
     fontWeight: '700',
     color: colors.textPrimary,
+    marginRight: 6,
+  },
+  statLabelMain: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    lineHeight: 14,
+  },
+  statLabelSub: {
+    fontSize: 10,
+    color: colors.textTertiary,
+    lineHeight: 12,
+  },
+  divider: {
+    width: 1,
+    height: 44,
+    backgroundColor: colors.strokeLight,
   }
 });
