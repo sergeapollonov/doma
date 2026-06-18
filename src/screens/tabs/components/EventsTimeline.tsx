@@ -69,7 +69,7 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
                           </View>
                         ))}
                       </View>
-                      <Text style={styles.participantsText} numberOfLines={1} ellipsizeMode="tail">
+                      <Text style={styles.participantsText} numberOfLines={1}>
                         {event.participants.map(p => p.name).join(', ')}
                       </Text>
                     </View>
@@ -77,7 +77,7 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
                     {/* Алерт конфликта */}
                     {hasConflict && (
                       <View style={styles.conflictBadge}>
-                        <Text style={styles.conflictText}>Конфликт расписания</Text>
+                        <Text style={styles.conflictText} numberOfLines={1}>Конфликт расписания</Text>
                       </View>
                     )}
                   </View>
@@ -220,16 +220,16 @@ const styles = StyleSheet.create({
   chipsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
   participantsChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(140, 119, 246, 0.08)', // Светлая фиолетовая подложка
+    backgroundColor: 'rgba(140, 119, 246, 0.08)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: radius.pill,
     flexShrink: 1,
+    marginRight: 8, // Вместо gap в chipsRow
   },
   avatarsRow: {
     flexDirection: 'row',
@@ -239,16 +239,16 @@ const styles = StyleSheet.create({
     color: '#8C77F6',
     marginLeft: 6,
     fontWeight: '600',
-    flexShrink: 1,
+    flexShrink: 1, // Позволяет тексту усекаться
   },
   conflictBadge: {
-    justifyContent: 'center',
+    flexDirection: 'row', // Это не даст тексту переноситься на 2 строки
     alignItems: 'center',
     backgroundColor: 'rgba(216, 92, 74, 0.1)', 
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: radius.pill,
-    flexShrink: 0,
+    flexShrink: 0, // Запрещает сжатие плашки
   },
   conflictText: {
     fontSize: 11,
