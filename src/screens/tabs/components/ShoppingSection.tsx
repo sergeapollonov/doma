@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { colors, radius, spacing } from '../../../theme';
 import { CalendarShoppingItem } from '../../../types/calendar';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,27 +10,29 @@ type ShoppingSectionProps = {
 
 export function ShoppingSection({ items }: ShoppingSectionProps) {
   return (
-    <View style={styles.container}>
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+    <View style={styles.outerContainer}>
+      <Text style={styles.headerTitle}>ПОКУПКИ НА СЕГОДНЯ</Text>
+
+      <View style={styles.itemsList}>
         {items.map((item) => {
           const isPurchased = item.status === 'purchased';
 
-          // Скрываем купленные из активного скролла (как вариант) или показываем тусклыми
-          if (isPurchased) return null; 
-
+          // Покажем все элементы для наглядности списка
           return (
-            <TouchableOpacity key={item.id} style={styles.card}>
+            <TouchableOpacity key={item.id} style={[styles.itemRow, isPurchased && styles.itemPurchased]}>
+              {/* Checkbox */}
+              <View style={[styles.checkbox, isPurchased && styles.checkboxPurchased]}>
+                {isPurchased && <Ionicons name="checkmark" size={14} color={colors.white} />}
+              </View>
+
+              {/* Иконка */}
               <Text style={styles.icon}>{item.iconUrl}</Text>
               
+              {/* Details */}
               <View style={styles.details}>
-                <View style={styles.titleRow}>
-                  <View style={styles.checkbox} />
-                  <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
-                </View>
+                <Text style={[styles.title, isPurchased && styles.titlePurchased]} numberOfLines={1}>
+                  {item.title}
+                </Text>
                 {item.quantity && (
                   <Text style={styles.quantity}>{item.quantity}</Text>
                 )}
@@ -38,92 +40,95 @@ export function ShoppingSection({ items }: ShoppingSectionProps) {
             </TouchableOpacity>
           );
         })}
+      </View>
 
-        {/* Карточка "Ещё N товаров" */}
-        <TouchableOpacity style={styles.moreCard}>
-          <View style={styles.moreIconWrapper}>
-            <Ionicons name="ellipsis-horizontal" size={16} color={colors.textSecondary} />
-          </View>
-          <View style={styles.details}>
-            <Text style={styles.title}>ещё 14</Text>
-            <Text style={styles.quantity}>товаров</Text>
-          </View>
-        </TouchableOpacity>
-      </ScrollView>
+      <TouchableOpacity style={styles.showAllButton}>
+        <Text style={styles.showAllText}>Показать все покупки (17)</Text>
+        <Ionicons name="chevron-down" size={16} color={colors.shoppingGreen} style={{ marginLeft: 4, marginTop: 2 }} />
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    // Выходим за пределы паддинга родителя для горизонтального скролла от края до края
-    marginHorizontal: -spacing.xl, 
+  outerContainer: {
+    backgroundColor: colors.surfacePrimary,
+    borderRadius: radius.xxl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
+    shadowColor: colors.domaBlue,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.strokeLight,
   },
-  scrollContent: {
-    paddingHorizontal: spacing.xl,
-    gap: spacing.md,
-    paddingBottom: spacing.sm,
+  headerTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.shoppingGreen,
+    letterSpacing: 0.5,
+    marginBottom: spacing.md,
+    textTransform: 'uppercase',
   },
-  card: {
+  itemsList: {
+    paddingLeft: 4,
+  },
+  itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surfaceWarm,
-    padding: spacing.md,
-    borderRadius: radius.large,
-    borderWidth: 1,
-    borderColor: colors.strokeSoft,
-    minWidth: 140,
-    height: 60,
+    marginBottom: spacing.sm, // Как в задачах
   },
-  moreCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    padding: spacing.md,
-    borderRadius: radius.large,
-    borderWidth: 1,
-    borderColor: colors.strokeSoft,
-    borderStyle: 'dashed',
-    minWidth: 120,
-    height: 60,
+  itemPurchased: {
+    opacity: 0.5,
   },
-  icon: {
-    fontSize: 24,
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1,
+    borderColor: colors.shoppingGreen,
     marginRight: spacing.sm,
-  },
-  moreIconWrapper: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.strokeSoft,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  checkboxPurchased: {
+    backgroundColor: colors.shoppingGreen,
+  },
+  icon: {
+    fontSize: 22,
     marginRight: spacing.sm,
   },
   details: {
     flex: 1,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  checkbox: {
-    width: 12,
-    height: 12,
-    borderRadius: 3,
-    borderWidth: 1,
-    borderColor: colors.shoppingGreen,
-    marginRight: 6,
+    justifyContent: 'center',
   },
   title: {
     fontSize: 14,
-    fontWeight: '600',
     color: colors.textPrimary,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  titlePurchased: {
+    textDecorationLine: 'line-through',
+    color: colors.textSecondary,
   },
   quantity: {
-    fontSize: 12,
+    fontSize: 11,
     color: colors.textSecondary,
-    marginLeft: 18, // Выравнивание под текстом (12 checkbox + 6 margin)
+  },
+  showAllButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 0,
+    paddingVertical: spacing.sm,
+  },
+  showAllText: {
+    color: colors.shoppingGreen,
+    fontWeight: '600',
+    fontSize: 14,
   }
 });

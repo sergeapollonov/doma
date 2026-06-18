@@ -87,7 +87,6 @@ export function CalendarScreen({
 
         <TasksSection tasks={mockCalendarTasks} />
 
-        <SectionHeader title="Покупки на сегодня" actionLabel="3 из 17" colorTheme="green" />
         <ShoppingSection items={mockCalendarShopping} />
 
         {/* 3. Weekly Overview */}
