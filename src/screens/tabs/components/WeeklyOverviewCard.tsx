@@ -9,7 +9,7 @@ export function WeeklyOverviewCard() {
       
       <View style={styles.statsRow}>
         <View style={styles.statItem}>
-          <Text style={[styles.statNumber, { color: colors.domaBlue }]}>8</Text>
+          <Text style={[styles.statNumber, { color: '#8C77F6' }]}>8</Text>
           <Text style={styles.statLabel}>событий</Text>
         </View>
         
@@ -35,8 +35,10 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.surfacePrimary,
     borderRadius: radius.xlarge,
-    padding: spacing.xl,
-    marginTop: spacing.xxl,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.md,
+    marginBottom: spacing.md,
     borderWidth: 1,
     borderColor: colors.strokeSoft,
     alignItems: 'center',
@@ -46,10 +48,10 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.sm,
   },
   statsRow: {
     flexDirection: 'row',
@@ -61,18 +63,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statNumber: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '700',
     marginBottom: 2,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: colors.textSecondary,
     fontWeight: '500',
   },
   divider: {
     width: 1,
-    height: 30,
+    height: 24,
     backgroundColor: colors.strokeLight,
   }
 });
