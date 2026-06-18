@@ -85,7 +85,6 @@ export function CalendarScreen({
         
         <EventsTimeline events={mockCalendarEvents} />
 
-        <SectionHeader title="Задачи на день" actionLabel="4 задачи" colorTheme="orange" />
         <TasksSection tasks={mockCalendarTasks} />
 
         <SectionHeader title="Покупки на сегодня" actionLabel="3 из 17" colorTheme="green" />

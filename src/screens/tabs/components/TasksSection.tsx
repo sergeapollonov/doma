@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { colors, radius, spacing } from '../../../theme';
 import { CalendarTask } from '../../../types/calendar';
 import { Ionicons } from '@expo/vector-icons';
+import { Avatar } from '../../../components/family';
 
 type TasksSectionProps = {
   tasks: CalendarTask[];
@@ -10,50 +11,84 @@ type TasksSectionProps = {
 
 export function TasksSection({ tasks }: TasksSectionProps) {
   return (
-    <View style={styles.container}>
-      {tasks.map((task) => {
-        const isCompleted = task.status === 'completed';
-        const isOverdue = task.status === 'overdue';
+    <View style={styles.outerContainer}>
+      <Text style={styles.headerTitle}>ЗАДАЧИ НА ДЕНЬ</Text>
 
-        return (
-          <TouchableOpacity key={task.id} style={[styles.taskRow, isCompleted && styles.taskCompleted]}>
-            {/* Checkbox */}
-            <View style={[styles.checkbox, isCompleted && styles.checkboxCompleted]}>
-              {isCompleted && <Ionicons name="checkmark" size={14} color={colors.white} />}
-            </View>
+      <View style={styles.tasksList}>
+        {tasks.map((task) => {
+          const isCompleted = task.status === 'completed';
+          const isOverdue = task.status === 'overdue';
 
-            {/* Title */}
-            <Text style={[styles.title, isCompleted && styles.titleCompleted, isOverdue && styles.titleOverdue]}>
-              {isOverdue && <Text style={{ color: colors.dangerRed }}>Overdue </Text>}
-              {task.title}
-            </Text>
+          return (
+            <TouchableOpacity key={task.id} style={[styles.taskRow, isCompleted && styles.taskCompleted]}>
+              {/* Checkbox */}
+              <View style={[styles.checkbox, isCompleted && styles.checkboxCompleted]}>
+                {isCompleted && <Ionicons name="checkmark" size={14} color={colors.white} />}
+              </View>
 
-            {/* Assignee / Time */}
-            <View style={styles.rightInfo}>
-              {task.assignee && (
-                <View style={styles.assigneeBadge}>
-                  <Text style={styles.assigneeText}>{task.assignee.name}</Text>
+              {/* Title & Details */}
+              <View style={styles.contentContainer}>
+                <Text style={[styles.title, isCompleted && styles.titleCompleted, isOverdue && styles.titleOverdue]} numberOfLines={2}>
+                  {isOverdue && <Text style={{ color: colors.dangerRed }}>Просрочено • </Text>}
+                  {task.title}
+                </Text>
+
+                <View style={styles.detailsRow}>
+                  {task.assignee && (
+                    <View style={styles.participantsChip}>
+                      <Avatar person={task.assignee.id as any} size={20} />
+                      <Text style={styles.participantsText} numberOfLines={1}>{task.assignee.name}</Text>
+                    </View>
+                  )}
+
+                  {task.dueTime && (
+                    <Text style={styles.timeText}>{task.dueTime}</Text>
+                  )}
                 </View>
-              )}
-              {task.dueTime && (
-                <Text style={styles.timeText}>{task.dueTime}</Text>
-              )}
-            </View>
-          </TouchableOpacity>
-        );
-      })}
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      <TouchableOpacity style={styles.showAllButton}>
+        <Text style={styles.showAllText}>Показать все задачи ({tasks.length})</Text>
+        <Ionicons name="chevron-down" size={16} color={colors.taskOrange} style={{ marginLeft: 4, marginTop: 2 }} />
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: spacing.sm,
+  outerContainer: {
+    backgroundColor: colors.surfacePrimary,
+    borderRadius: radius.xxl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
+    shadowColor: colors.domaBlue,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.strokeLight,
+  },
+  headerTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.taskOrange,
+    letterSpacing: 0.5,
+    marginBottom: spacing.md,
+    textTransform: 'uppercase',
+  },
+  tasksList: {
+    paddingLeft: 4,
   },
   taskRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
+    alignItems: 'flex-start',
+    marginBottom: spacing.md,
   },
   taskCompleted: {
     opacity: 0.5,
@@ -67,43 +102,65 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 2, // Выравнивание с первой строкой текста
   },
   checkboxCompleted: {
     backgroundColor: colors.taskOrange,
   },
-  title: {
+  contentContainer: {
     flex: 1,
+    justifyContent: 'center',
+  },
+  title: {
     fontSize: 15,
     color: colors.textPrimary,
+    fontWeight: '500',
+    lineHeight: 20,
+    marginBottom: 6,
   },
   titleCompleted: {
     textDecorationLine: 'line-through',
     color: colors.textSecondary,
   },
   titleOverdue: {
-    // В референсе красный текст для "Overdue", но мы добавили приставку.
-    // Можно просто сделать шрифт жирнее
+    // Специфические стили для просроченной задачи, если нужно
   },
-  rightInfo: {
+  detailsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    justifyContent: 'space-between',
   },
-  assigneeBadge: {
-    backgroundColor: 'rgba(239, 138, 31, 0.1)',
+  participantsChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(239, 138, 31, 0.08)', // Светлая оранжевая подложка
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 4,
     borderRadius: radius.pill,
+    flexShrink: 1,
   },
-  assigneeText: {
-    fontSize: 11,
+  participantsText: {
+    fontSize: 12,
     color: colors.taskOrange,
+    marginLeft: 6,
     fontWeight: '600',
+    flexShrink: 1,
   },
   timeText: {
-    fontSize: 12,
+    fontSize: 11,
     color: colors.textSecondary,
-    minWidth: 40,
-    textAlign: 'right',
+    marginLeft: 8,
+  },
+  showAllButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 0,
+    paddingVertical: spacing.sm,
+  },
+  showAllText: {
+    color: colors.taskOrange,
+    fontWeight: '600',
+    fontSize: 14,
   }
 });
