@@ -26,14 +26,12 @@ export function DaySummaryCard() {
           {/* События */}
           <View style={styles.statColumn}>
             <View style={[styles.iconBox, { backgroundColor: 'rgba(140, 119, 246, 0.1)' }]}>
-              <Ionicons name="calendar-outline" size={18} color="#8C77F6" />
+              <Ionicons name="calendar-outline" size={20} color="#8C77F6" />
             </View>
             <View style={styles.statInfo}>
               <Text style={styles.statNumber}>2</Text>
-              <View>
-                <Text style={styles.statLabelMain}>события</Text>
-                <Text style={styles.statLabelSub}>запланировано</Text>
-              </View>
+              <Text style={styles.statLabelMain}>события</Text>
+              <Text style={styles.statLabelSub}>запланировано</Text>
             </View>
           </View>
 
@@ -42,14 +40,12 @@ export function DaySummaryCard() {
           {/* Задачи */}
           <View style={styles.statColumn}>
             <View style={[styles.iconBox, { backgroundColor: 'rgba(239, 138, 31, 0.1)' }]}>
-              <Ionicons name="checkmark-circle-outline" size={18} color={colors.taskOrange} />
+              <Ionicons name="checkmark-circle-outline" size={20} color={colors.taskOrange} />
             </View>
             <View style={styles.statInfo}>
               <Text style={styles.statNumber}>4</Text>
-              <View>
-                <Text style={styles.statLabelMain}>задачи</Text>
-                <Text style={styles.statLabelSub}>на сегодня</Text>
-              </View>
+              <Text style={styles.statLabelMain}>задачи</Text>
+              <Text style={styles.statLabelSub}>на сегодня</Text>
             </View>
           </View>
 
@@ -58,14 +54,12 @@ export function DaySummaryCard() {
           {/* Покупки */}
           <View style={styles.statColumn}>
             <View style={[styles.iconBox, { backgroundColor: 'rgba(95, 150, 105, 0.1)' }]}>
-              <Ionicons name="cart-outline" size={18} color={colors.shoppingGreen} />
+              <Ionicons name="cart-outline" size={20} color={colors.shoppingGreen} />
             </View>
             <View style={styles.statInfo}>
               <Text style={styles.statNumber}>3</Text>
-              <View>
-                <Text style={styles.statLabelMain}>покупки</Text>
-                <Text style={styles.statLabelSub}>нужно купить</Text>
-              </View>
+              <Text style={styles.statLabelMain}>покупки</Text>
+              <Text style={styles.statLabelSub}>нужно купить</Text>
             </View>
           </View>
         </View>
@@ -90,7 +84,9 @@ const styles = StyleSheet.create({
   innerCore: {
     backgroundColor: colors.surfacePrimary,
     borderRadius: radius.xxl,
-    padding: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.lg,
   },
   headerRow: {
     flexDirection: 'row',
@@ -121,13 +117,13 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   statColumn: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   iconBox: {
     width: 32,
@@ -135,32 +131,34 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 6,
+    marginRight: 8,
+    marginTop: 2,
   },
   statInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'center',
   },
   statNumber: {
     fontSize: 24,
     fontWeight: '700',
     color: colors.textPrimary,
-    marginRight: 6,
+    lineHeight: 28,
   },
   statLabelMain: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     color: colors.textPrimary,
-    lineHeight: 13,
+    lineHeight: 14,
   },
   statLabelSub: {
-    fontSize: 9,
+    fontSize: 10,
     color: colors.textTertiary,
-    lineHeight: 11,
+    lineHeight: 12,
   },
   divider: {
     width: 1,
-    height: 36,
+    height: 48,
     backgroundColor: colors.strokeLight,
+    marginTop: 4,
+    marginHorizontal: 8,
   }
 });

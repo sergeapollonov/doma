@@ -162,8 +162,6 @@ const styles = StyleSheet.create({
   stickyContainer: {
     backgroundColor: colors.warmBackground, // Важно для перекрытия контента под ним
     paddingTop: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.strokeSoft,
   },
   mainContent: {
     paddingHorizontal: 20,
