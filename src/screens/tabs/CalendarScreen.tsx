@@ -83,7 +83,6 @@ export function CalendarScreen({
       <View style={styles.mainContent}>
         <DaySummaryCard />
         
-        <SectionHeader title="События" colorTheme="purple" />
         <EventsTimeline events={mockCalendarEvents} />
 
         <SectionHeader title="Задачи на день" actionLabel="4 задачи" colorTheme="orange" />
