@@ -81,6 +81,20 @@ Every pull request should include:
 
 Do not mix broad refactors with feature work.
 
+### PR Workflow Rule
+When requested to create a Pull Request at the end of a task, you MUST follow this exact sequence:
+
+1. **Commit & Push:** 
+   - Create a new branch: `git checkout -b feature/<task-name>`
+   - Commit all changes: `git commit -m "..."`
+   - **CRITICAL:** Push the branch to the `public` remote, NOT `origin`: `git push -u public feature/<task-name>`
+2. **Generate Working Link:**
+   - Provide the user with a clickable link to open the PR: `https://github.com/sergeapollonov/doma/pull/new/feature/<task-name>`
+3. **PR Description (English):**
+   - Provide a clear, well-structured PR description in English (Title, Description, Changes, Verification).
+4. **Valid Labels Only:**
+   - Suggest labels ONLY from the project's actual approved list (e.g., `refactor`, `design-system`, `bug`, `accessibility`). DO NOT invent or guess labels (e.g., avoid `enhancement`, `ui`, `localization` unless explicitly confirmed they exist in the repo).
+
 ## Things to Avoid
 
 - Do not turn Doma into a Trello, Jira, Notion, or Google Calendar clone.
