@@ -365,42 +365,68 @@ export default function App() {
               <StatusBar style="dark" />
               <SafeAreaView style={styles.safe}>
                 <View style={styles.app}>
-                  <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                    <Header
-                      tab={activeTab}
-                      greetingTitle={text.todayGreeting}
-                      title={activeTab === "today" ? text.brand : text.tabs[activeTab]}
-                      todayDateLabel={selectedDateLabel}
-                      subtitle={
-                        activeTab === "tasks"
-                          ? text.tasksSubtitle
-                          : activeTab === "shopping"
-                            ? text.shoppingSubtitle
-                            : activeTab === "calendar"
-                              ? text.calendarSubtitle
+                  {activeTab !== "calendar" ? (
+                    <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                      <Header
+                        tab={activeTab}
+                        greetingTitle={text.todayGreeting}
+                        title={activeTab === "today" ? text.brand : text.tabs[activeTab]}
+                        todayDateLabel={selectedDateLabel}
+                        subtitle={
+                          activeTab === "tasks"
+                            ? text.tasksSubtitle
+                            : activeTab === "shopping"
+                              ? text.shoppingSubtitle
                               : text.morning
-                      }
-                      onFamily={() => setSheet("family")}
-                      onSettings={() => setSheet("settings")}
-                      onAdd={() => setSheet("quick")}
-                    />
-                    {activeTab === "today" && (
-                      <TodayScreen
-                        text={text}
-                        selectedEvents={selectedEvents}
-                        activeTasks={activeTasks}
-                        pendingShopping={pendingShopping}
-                        purchasedCount={purchasedCount}
-                        participantsLabel={participantsLabel}
-                        assigneeLabel={assigneeLabel}
-                        onOpenQuickAdd={() => setSheet("quick")}
-                        onOpenCalendar={() => setActiveTab("calendar")}
-                        onOpenTasks={() => setActiveTab("tasks")}
-                        onOpenShopping={() => setActiveTab("shopping")}
-                        onToggleTask={toggleTask}
+                        }
+                        onFamily={() => setSheet("family")}
+                        onSettings={() => setSheet("settings")}
+                        onAdd={() => setSheet("quick")}
                       />
-                    )}
-                    {activeTab === "calendar" && (
+                      {activeTab === "today" && (
+                        <TodayScreen
+                          text={text}
+                          selectedEvents={selectedEvents}
+                          activeTasks={activeTasks}
+                          pendingShopping={pendingShopping}
+                          purchasedCount={purchasedCount}
+                          participantsLabel={participantsLabel}
+                          assigneeLabel={assigneeLabel}
+                          onOpenQuickAdd={() => setSheet("quick")}
+                          onOpenCalendar={() => setActiveTab("calendar")}
+                          onOpenTasks={() => setActiveTab("tasks")}
+                          onOpenShopping={() => setActiveTab("shopping")}
+                          onToggleTask={toggleTask}
+                        />
+                      )}
+                      {activeTab === "tasks" && (
+                        <TasksScreen
+                          text={text}
+                          tasks={tasks}
+                          filter={taskFilter}
+                          filteredTasks={filteredTasks}
+                          assigneeLabel={assigneeLabel}
+                          onChangeFilter={setTaskFilter}
+                          onOpenTaskSheet={() => setSheet("task")}
+                          onToggleTask={toggleTask}
+                        />
+                      )}
+                      {activeTab === "shopping" && (
+                        <ShoppingScreen
+                          text={text}
+                          shopping={shopping}
+                          categories={shoppingList.categories}
+                          language={language}
+                          frequentShopping={frequentShopping}
+                          categoryName={shoppingCategoryName}
+                          onOpenShoppingSheet={() => setSheet("shopping")}
+                          onAddFrequentItem={addShoppingItem}
+                          onToggleShoppingItem={toggleShopping}
+                        />
+                      )}
+                    </ScrollView>
+                  ) : (
+                    <View style={{ flex: 1 }}>
                       <CalendarScreen
                         text={text}
                         selectedDateTitle={selectedDateSectionTitle}
@@ -411,33 +437,8 @@ export default function App() {
                         onSelectDay={selectCalendarDay}
                         onAddEvent={() => setSheet("event")}
                       />
-                    )}
-                    {activeTab === "tasks" && (
-                      <TasksScreen
-                        text={text}
-                        tasks={tasks}
-                        filter={taskFilter}
-                        filteredTasks={filteredTasks}
-                        assigneeLabel={assigneeLabel}
-                        onChangeFilter={setTaskFilter}
-                        onOpenTaskSheet={() => setSheet("task")}
-                        onToggleTask={toggleTask}
-                      />
-                    )}
-                    {activeTab === "shopping" && (
-                      <ShoppingScreen
-                        text={text}
-                        shopping={shopping}
-                        categories={shoppingList.categories}
-                        language={language}
-                        frequentShopping={frequentShopping}
-                        categoryName={shoppingCategoryName}
-                        onOpenShoppingSheet={() => setSheet("shopping")}
-                        onAddFrequentItem={addShoppingItem}
-                        onToggleShoppingItem={toggleShopping}
-                      />
-                    )}
-                  </ScrollView>
+                    </View>
+                  )}
                   <TabBar activeTab={activeTab} onChange={setActiveTab} labels={text.tabs} />
                 </View>
               </SafeAreaView>
