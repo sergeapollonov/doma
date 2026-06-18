@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
   eventRow: {
     flexDirection: 'row',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   eventPast: {
     opacity: 0.6,
@@ -220,6 +220,8 @@ const styles = StyleSheet.create({
   chipsRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   participantsChip: {
     flexDirection: 'row',
@@ -242,16 +244,17 @@ const styles = StyleSheet.create({
     flexShrink: 1, // Позволяет тексту усекаться
   },
   conflictBadge: {
-    flexDirection: 'row', // Это не даст тексту переноситься на 2 строки
+    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(216, 92, 74, 0.1)', 
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
     paddingVertical: 4,
     borderRadius: radius.pill,
-    flexShrink: 0, // Запрещает сжатие плашки
+    flexShrink: 0,
+    marginLeft: 'auto',
   },
   conflictText: {
-    fontSize: 11,
+    fontSize: 10,
     color: colors.dangerRed,
     fontWeight: '600',
   },
@@ -264,7 +267,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   durationText: {
-    fontSize: 13,
+    fontSize: 11,
     color: colors.textSecondary,
   },
   nowBadge: {
@@ -283,7 +286,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: spacing.sm,
+    marginTop: 0,
     paddingVertical: spacing.sm,
   },
   showAllText: {
