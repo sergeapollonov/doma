@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   taskRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   taskCompleted: {
     opacity: 0.5,
@@ -112,11 +112,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 15,
+    fontSize: 14,
     color: colors.textPrimary,
-    fontWeight: '500',
+    fontWeight: '700',
     lineHeight: 20,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   titleCompleted: {
     textDecorationLine: 'line-through',
