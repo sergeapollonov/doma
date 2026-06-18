@@ -69,7 +69,7 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
                           </View>
                         ))}
                       </View>
-                      <Text style={styles.participantsText}>
+                      <Text style={styles.participantsText} numberOfLines={1} ellipsizeMode="tail">
                         {event.participants.map(p => p.name).join(', ')}
                       </Text>
                     </View>
@@ -220,7 +220,6 @@ const styles = StyleSheet.create({
   chipsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
     gap: 8,
   },
   participantsChip: {
@@ -230,6 +229,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: radius.pill,
+    flexShrink: 1,
   },
   avatarsRow: {
     flexDirection: 'row',
@@ -239,14 +239,16 @@ const styles = StyleSheet.create({
     color: '#8C77F6',
     marginLeft: 6,
     fontWeight: '600',
+    flexShrink: 1,
   },
   conflictBadge: {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(216, 92, 74, 0.1)', 
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: radius.pill,
+    flexShrink: 0,
   },
   conflictText: {
     fontSize: 11,
