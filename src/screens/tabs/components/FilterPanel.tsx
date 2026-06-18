@@ -1,7 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { colors, radius, spacing } from '../../../theme';
 import { Ionicons } from '@expo/vector-icons';
+import { Avatar } from '../../../components/family';
 
 type FilterPanelProps = {
   activeUserFilter: string;
@@ -24,13 +25,13 @@ export function FilterPanel({ activeUserFilter, activeTypeFilter }: FilterPanelP
           </TouchableOpacity>
           
           <TouchableOpacity style={[styles.islandChip, activeUserFilter === 'alex' && styles.islandChipActive]}>
-            <Image source={{ uri: 'https://i.pravatar.cc/150?u=sergey' }} style={styles.avatar} />
-            <Text style={[styles.islandChipText, activeUserFilter === 'alex' && styles.islandChipTextActive]}>Сергей</Text>
+            <View style={{ marginRight: 6 }}><Avatar person="alex" size={22} /></View>
+            <Text style={[styles.islandChipText, activeUserFilter === 'alex' && styles.islandChipTextActive]}>Алексей</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.islandChip, activeUserFilter === 'maya' && styles.islandChipActive]}>
-            <Image source={{ uri: 'https://i.pravatar.cc/150?u=olya' }} style={styles.avatar} />
-            <Text style={[styles.islandChipText, activeUserFilter === 'maya' && styles.islandChipTextActive]}>Оля</Text>
+            <View style={{ marginRight: 6 }}><Avatar person="maya" size={22} /></View>
+            <Text style={[styles.islandChipText, activeUserFilter === 'maya' && styles.islandChipTextActive]}>Мая</Text>
           </TouchableOpacity>
         </View>
 

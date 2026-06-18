@@ -3,9 +3,8 @@ export type TaskStatus = 'open' | 'in_progress' | 'completed' | 'overdue';
 export type ShoppingStatus = 'pending' | 'purchased';
 
 export interface User {
-  id: string;
+  id: 'alex' | 'maya';
   name: string;
-  avatarUrl?: string;
 }
 
 export interface CalendarEvent {

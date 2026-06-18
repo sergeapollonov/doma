@@ -1,8 +1,8 @@
 import { CalendarEvent, CalendarTask, CalendarShoppingItem, User } from '../types/calendar';
 
 export const mockUsers: Record<string, User> = {
-  alex: { id: 'u1', name: 'Сергей', avatarUrl: 'https://i.pravatar.cc/150?u=sergey' },
-  maya: { id: 'u2', name: 'Оля', avatarUrl: 'https://i.pravatar.cc/150?u=olya' },
+  alex: { id: 'alex', name: 'Алексей' },
+  maya: { id: 'maya', name: 'Мая' },
 };
 
 export const mockCalendarEvents: CalendarEvent[] = [

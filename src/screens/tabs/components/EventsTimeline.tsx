@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { colors, radius, spacing } from '../../../theme';
 import { CalendarEvent } from '../../../types/calendar';
 import { useCalendarConflicts } from '../hooks/useCalendarConflicts';
 import { Ionicons } from '@expo/vector-icons';
+import { Avatar } from '../../../components/family';
 
 type EventsTimelineProps = {
   events: CalendarEvent[];
@@ -65,7 +66,9 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
                     {/* Участники */}
                     <View style={styles.participants}>
                       {event.participants.map((p, idx) => (
-                        <Image key={p.id} source={{ uri: p.avatarUrl }} style={[styles.avatar, { marginLeft: idx > 0 ? -8 : 0 }]} />
+                        <View key={p.id} style={{ marginLeft: idx > 0 ? -8 : 0 }}>
+                          <Avatar person={p.id} size={20} />
+                        </View>
                       ))}
                       <Text style={styles.participantsText}>
                         {event.participants.map(p => p.name).join(', ')}
