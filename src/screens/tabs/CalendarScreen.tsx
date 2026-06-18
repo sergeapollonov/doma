@@ -65,10 +65,10 @@ export function CalendarScreen({
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.actionButtonLight}>
-            <Ionicons name="search" size={18} color={colors.textPrimary} />
+            <Ionicons name="search" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButtonPrimary} onPress={onAddEvent}>
-            <Ionicons name="add" size={22} color={colors.white} />
+            <Ionicons name="add" size={32} color={colors.white} />
           </TouchableOpacity>
         </View>
       </View>
@@ -142,9 +142,9 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   actionButtonLight: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: colors.surfacePrimary,
     justifyContent: "center",
     alignItems: "center",
@@ -152,9 +152,9 @@ const styles = StyleSheet.create({
     borderColor: colors.strokeSoft,
   },
   actionButtonPrimary: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#8C77F6', // Фиолетовый с макета для кнопки плюс
     justifyContent: "center",
     alignItems: "center",
@@ -162,7 +162,6 @@ const styles = StyleSheet.create({
   stickyContainer: {
     backgroundColor: colors.warmBackground, // Важно для перекрытия контента под ним
     paddingTop: 8,
-    alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: colors.strokeSoft,
   },

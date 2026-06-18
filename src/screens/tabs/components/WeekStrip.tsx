@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { colors, radius, spacing } from '../../../theme';
+import { Ionicons } from '@expo/vector-icons';
 
 type WeekStripProps = {
   selectedDate: number;
@@ -19,56 +20,93 @@ const weekDays = [
 
 export function WeekStrip({ selectedDate }: WeekStripProps) {
   return (
-    <View style={styles.container}>
-      {weekDays.map((item) => {
-        const isSelected = item.date === selectedDate;
-        return (
-          <TouchableOpacity key={item.date} style={[styles.dayCell, isSelected && styles.dayCellSelected]}>
-            <Text style={[styles.dayName, isSelected && styles.textWhite]}>{item.dayName}</Text>
-            <Text style={[styles.dateNumber, isSelected && styles.textWhite]}>{item.date}</Text>
-            
-            <View style={styles.dotsContainer}>
-              {item.dots.map((dotColor, idx) => (
-                <View key={idx} style={[styles.dot, { backgroundColor: dotColor }]} />
-              ))}
-            </View>
-          </TouchableOpacity>
-        );
-      })}
+    <View style={styles.outerShell}>
+      <View style={styles.innerCore}>
+        <TouchableOpacity style={styles.navButton}>
+          <Ionicons name="chevron-back" size={20} color={colors.textSecondary} />
+        </TouchableOpacity>
+
+        <View style={styles.daysContainer}>
+          {weekDays.map((item) => {
+            const isSelected = item.date === selectedDate;
+            return (
+              <TouchableOpacity key={item.date} style={[styles.dayCell, isSelected && styles.dayCellSelected]}>
+                <Text style={[styles.dayName, isSelected && styles.textWhite]}>{item.dayName}</Text>
+                <Text style={[styles.dateNumber, isSelected && styles.textWhite]}>{item.date}</Text>
+                
+                <View style={styles.dotsContainer}>
+                  {item.dots.map((dotColor, idx) => (
+                    <View key={idx} style={[styles.dot, { backgroundColor: dotColor }]} />
+                  ))}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <TouchableOpacity style={styles.navButton}>
+          <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  outerShell: {
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    padding: 4,
+    borderRadius: radius.xlarge,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.6)',
+    shadowColor: colors.domaBlue,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.05,
+    shadowRadius: 24,
+    marginBottom: spacing.sm,
+    marginHorizontal: 20,
+    width: 'auto',
+  },
+  innerCore: {
+    backgroundColor: colors.surfacePrimary,
+    borderRadius: radius.xxl,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  navButton: {
+    padding: 2,
+  },
+  daysContainer: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.sm,
-    width: '100%',
+    paddingHorizontal: 8,
   },
   dayCell: {
-    width: 44,
-    height: 56,
+    width: 36,
+    height: 52,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: radius.md,
   },
   dayCellSelected: {
-    backgroundColor: colors.domaBlue,
-    shadowColor: colors.domaBlue,
+    backgroundColor: '#8C77F6', // Фиолетовый вместо domaBlue
+    shadowColor: '#8C77F6',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
   },
   dayName: {
-    fontSize: 12,
+    fontSize: 11,
     color: colors.textSecondary,
     marginBottom: 2,
   },
   dateNumber: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: colors.textPrimary,
   },

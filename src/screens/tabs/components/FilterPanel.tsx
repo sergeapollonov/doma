@@ -69,9 +69,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   scrollContent: {
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: 20,
     alignItems: 'center',
-    gap: spacing.md,
+    gap: spacing.sm,
   },
   islandContainer: {
     flexDirection: 'row',
