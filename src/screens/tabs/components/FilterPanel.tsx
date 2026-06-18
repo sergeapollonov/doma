@@ -64,20 +64,20 @@ export function FilterPanel({ activeUserFilter, activeTypeFilter }: FilterPanelP
 
 const styles = StyleSheet.create({
   container: {
-    height: 52,
+    height: 44,
     justifyContent: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   scrollContent: {
     paddingHorizontal: spacing.xl,
     alignItems: 'center',
-    gap: spacing.lg,
+    gap: spacing.md,
   },
   islandContainer: {
     flexDirection: 'row',
     backgroundColor: colors.surfacePrimary,
     borderRadius: radius.pill,
-    padding: 4,
+    padding: 3,
     shadowColor: colors.domaBlue,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.04,
@@ -88,8 +88,8 @@ const styles = StyleSheet.create({
   islandChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 36,
-    paddingHorizontal: spacing.md,
+    height: 32,
+    paddingHorizontal: spacing.sm,
     borderRadius: radius.pill,
   },
   islandChipActive: {
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#8C77F6', // Фиолетовый
   },
   islandChipText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
     color: colors.textSecondary,
   },
@@ -112,9 +112,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   avatar: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     marginRight: 6,
     borderWidth: 1,
     borderColor: colors.strokeLight,

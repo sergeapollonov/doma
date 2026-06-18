@@ -26,7 +26,7 @@ export function DaySummaryCard() {
           {/* События */}
           <View style={styles.statColumn}>
             <View style={[styles.iconBox, { backgroundColor: 'rgba(140, 119, 246, 0.1)' }]}>
-              <Ionicons name="calendar-outline" size={24} color="#8C77F6" />
+              <Ionicons name="calendar-outline" size={18} color="#8C77F6" />
             </View>
             <View style={styles.statInfo}>
               <Text style={styles.statNumber}>2</Text>
@@ -42,7 +42,7 @@ export function DaySummaryCard() {
           {/* Задачи */}
           <View style={styles.statColumn}>
             <View style={[styles.iconBox, { backgroundColor: 'rgba(239, 138, 31, 0.1)' }]}>
-              <Ionicons name="checkmark-circle-outline" size={24} color={colors.taskOrange} />
+              <Ionicons name="checkmark-circle-outline" size={18} color={colors.taskOrange} />
             </View>
             <View style={styles.statInfo}>
               <Text style={styles.statNumber}>4</Text>
@@ -58,7 +58,7 @@ export function DaySummaryCard() {
           {/* Покупки */}
           <View style={styles.statColumn}>
             <View style={[styles.iconBox, { backgroundColor: 'rgba(95, 150, 105, 0.1)' }]}>
-              <Ionicons name="cart-outline" size={24} color={colors.shoppingGreen} />
+              <Ionicons name="cart-outline" size={18} color={colors.shoppingGreen} />
             </View>
             <View style={styles.statInfo}>
               <Text style={styles.statNumber}>3</Text>
@@ -77,7 +77,7 @@ export function DaySummaryCard() {
 const styles = StyleSheet.create({
   outerShell: {
     backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    padding: 6,
+    padding: 4,
     borderRadius: radius.xlarge,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.6)',
@@ -85,18 +85,18 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.05,
     shadowRadius: 24,
-    marginBottom: spacing.xxl,
+    marginBottom: spacing.md,
   },
   innerCore: {
     backgroundColor: colors.surfacePrimary,
     borderRadius: radius.xxl,
-    padding: spacing.lg,
+    padding: spacing.md,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   title: {
     fontSize: 18,
@@ -130,37 +130,37 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconBox: {
-    width: 38,
-    height: 38,
-    borderRadius: 14,
+    width: 32,
+    height: 32,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 8,
+    marginRight: 6,
   },
   statInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   statNumber: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
     color: colors.textPrimary,
     marginRight: 6,
   },
   statLabelMain: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: colors.textPrimary,
-    lineHeight: 14,
+    lineHeight: 13,
   },
   statLabelSub: {
-    fontSize: 10,
+    fontSize: 9,
     color: colors.textTertiary,
-    lineHeight: 12,
+    lineHeight: 11,
   },
   divider: {
     width: 1,
-    height: 44,
+    height: 36,
     backgroundColor: colors.strokeLight,
   }
 });

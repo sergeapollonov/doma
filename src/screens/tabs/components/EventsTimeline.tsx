@@ -54,7 +54,7 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
                 <View style={styles.cardMain}>
                   {/* Иконка слева */}
                   <View style={[styles.iconWrapper, isActive && styles.iconWrapperActive]}>
-                    <Ionicons name={iconName} size={24} color={isActive ? colors.white : '#8C77F6'} />
+                    <Ionicons name={iconName} size={20} color={isActive ? colors.white : '#8C77F6'} />
                   </View>
                   
                   <View style={styles.details}>
@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
   },
   eventRow: {
     flexDirection: 'row',
-    marginBottom: spacing.md,
-    minHeight: 100,
+    marginBottom: spacing.sm,
+    minHeight: 80,
   },
   eventPast: {
     opacity: 0.6,
@@ -143,14 +143,14 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flex: 1,
-    paddingBottom: spacing.sm,
+    paddingBottom: spacing.xs,
   },
   card: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: spacing.md,
+    padding: 12,
     backgroundColor: colors.surfacePrimary,
-    borderRadius: radius.xl, // Крупное скругление (20px)
+    borderRadius: 16, // Крупное скругление
     shadowColor: colors.domaBlue,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.03,
@@ -167,13 +167,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   iconWrapper: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     backgroundColor: 'rgba(140, 119, 246, 0.1)', // Светло-фиолетовый фон для иконки
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: spacing.md,
+    marginRight: spacing.sm,
   },
   iconWrapperActive: {
     backgroundColor: colors.domaBlue,
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   textPast: {
     color: colors.textSecondary,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   location: {
     fontSize: 13,
     color: colors.textSecondary,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   participants: {
     flexDirection: 'row',

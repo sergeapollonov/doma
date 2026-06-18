@@ -44,12 +44,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
     width: '100%',
   },
   dayCell: {
     width: 44,
-    height: 64,
+    height: 56,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: radius.md,
@@ -65,10 +65,10 @@ const styles = StyleSheet.create({
   dayName: {
     fontSize: 12,
     color: colors.textSecondary,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   dateNumber: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: colors.textPrimary,
   },

@@ -65,10 +65,10 @@ export function CalendarScreen({
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.actionButtonLight}>
-            <Ionicons name="search" size={20} color={colors.textPrimary} />
+            <Ionicons name="search" size={18} color={colors.textPrimary} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButtonPrimary} onPress={onAddEvent}>
-            <Ionicons name="add" size={24} color={colors.white} />
+            <Ionicons name="add" size={22} color={colors.white} />
           </TouchableOpacity>
         </View>
       </View>
@@ -105,15 +105,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.warmBackground, // F7F1E8
   },
   scrollContent: {
-    paddingBottom: 120, // Чтобы не перекрывалось таб-баром
+    paddingBottom: 100, // Чтобы не перекрывалось таб-баром
   },
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
     paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 16,
+    paddingTop: 50,
+    paddingBottom: 8,
     backgroundColor: colors.warmBackground,
   },
   headerTitles: {
@@ -142,9 +142,9 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   actionButtonLight: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: colors.surfacePrimary,
     justifyContent: "center",
     alignItems: "center",
@@ -152,22 +152,22 @@ const styles = StyleSheet.create({
     borderColor: colors.strokeSoft,
   },
   actionButtonPrimary: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: '#8C77F6', // Фиолетовый с макета для кнопки плюс
     justifyContent: "center",
     alignItems: "center",
   },
   stickyContainer: {
     backgroundColor: colors.warmBackground, // Важно для перекрытия контента под ним
-    paddingTop: 12,
+    paddingTop: 8,
     alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: colors.strokeSoft,
   },
   mainContent: {
     paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingTop: 16,
   },
 });
