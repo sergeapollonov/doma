@@ -10,7 +10,12 @@ type ShoppingSectionProps = {
 
 export function ShoppingSection({ items }: ShoppingSectionProps) {
   return (
-    <View style={styles.container}>
+    <View style={styles.outerContainer}>
+      <View style={styles.headerRow}>
+        <Text style={styles.headerTitle}>ПОКУПКИ НА СЕГОДНЯ</Text>
+        <Text style={styles.actionLabel}>3 из 17</Text>
+      </View>
+
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
@@ -19,18 +24,18 @@ export function ShoppingSection({ items }: ShoppingSectionProps) {
         {items.map((item) => {
           const isPurchased = item.status === 'purchased';
 
-          // Скрываем купленные из активного скролла (как вариант) или показываем тусклыми
           if (isPurchased) return null; 
 
           return (
             <TouchableOpacity key={item.id} style={styles.card}>
+              <View style={[styles.checkbox, isPurchased && styles.checkboxPurchased]}>
+                {isPurchased && <Ionicons name="checkmark" size={14} color={colors.white} />}
+              </View>
+
               <Text style={styles.icon}>{item.iconUrl}</Text>
               
               <View style={styles.details}>
-                <View style={styles.titleRow}>
-                  <View style={styles.checkbox} />
-                  <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
-                </View>
+                <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
                 {item.quantity && (
                   <Text style={styles.quantity}>{item.quantity}</Text>
                 )}
@@ -39,7 +44,6 @@ export function ShoppingSection({ items }: ShoppingSectionProps) {
           );
         })}
 
-        {/* Карточка "Ещё N товаров" */}
         <TouchableOpacity style={styles.moreCard}>
           <View style={styles.moreIconWrapper}>
             <Ionicons name="ellipsis-horizontal" size={16} color={colors.textSecondary} />
@@ -55,31 +59,60 @@ export function ShoppingSection({ items }: ShoppingSectionProps) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    // Выходим за пределы паддинга родителя для горизонтального скролла от края до края
-    marginHorizontal: -spacing.xl, 
+  outerContainer: {
+    backgroundColor: colors.surfacePrimary,
+    borderRadius: radius.xxl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.lg,
+    marginBottom: spacing.md,
+    shadowColor: colors.domaBlue,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.strokeLight,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
+  },
+  headerTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.shoppingGreen,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  actionLabel: {
+    fontSize: 13,
+    color: colors.shoppingGreen,
+    fontWeight: '600',
   },
   scrollContent: {
-    paddingHorizontal: spacing.xl,
-    gap: spacing.md,
-    paddingBottom: spacing.sm,
+    paddingHorizontal: spacing.md,
+    gap: spacing.sm,
   },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.surfaceWarm,
-    padding: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     borderRadius: radius.large,
     borderWidth: 1,
     borderColor: colors.strokeSoft,
-    minWidth: 140,
+    minWidth: 160,
     height: 60,
   },
   moreCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    padding: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     borderRadius: radius.large,
     borderWidth: 1,
     borderColor: colors.strokeSoft,
@@ -87,8 +120,21 @@ const styles = StyleSheet.create({
     minWidth: 120,
     height: 60,
   },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.shoppingGreen,
+    marginRight: spacing.sm,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxPurchased: {
+    backgroundColor: colors.shoppingGreen,
+  },
   icon: {
-    fontSize: 24,
+    fontSize: 22,
     marginRight: spacing.sm,
   },
   moreIconWrapper: {
@@ -101,29 +147,16 @@ const styles = StyleSheet.create({
     marginRight: spacing.sm,
   },
   details: {
-    flex: 1,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  checkbox: {
-    width: 12,
-    height: 12,
-    borderRadius: 3,
-    borderWidth: 1,
-    borderColor: colors.shoppingGreen,
-    marginRight: 6,
+    justifyContent: 'center',
   },
   title: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.textPrimary,
+    marginBottom: 2,
   },
   quantity: {
-    fontSize: 12,
+    fontSize: 11,
     color: colors.textSecondary,
-    marginLeft: 18, // Выравнивание под текстом (12 checkbox + 6 margin)
   }
 });
