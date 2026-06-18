@@ -29,7 +29,7 @@ export function DaySummaryCard() {
               <Ionicons name="calendar-outline" size={20} color="#8C77F6" />
             </View>
             <View style={styles.statInfo}>
-              <Text style={[styles.statNumber, { color: '#8C77F6' }]}>2</Text>
+              <Text style={styles.statNumber}>2</Text>
               <Text style={styles.statLabelMain}>события</Text>
               <Text style={styles.statLabelSub}>запланировано</Text>
             </View>
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   },
   statColumn: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'flex-start',
   },
@@ -132,7 +132,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 6,
-    marginTop: 2,
   },
   statInfo: {
     justifyContent: 'center',
