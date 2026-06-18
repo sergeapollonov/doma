@@ -29,7 +29,7 @@ export function DaySummaryCard() {
               <Ionicons name="calendar-outline" size={20} color="#8C77F6" />
             </View>
             <View style={styles.statInfo}>
-              <Text style={styles.statNumber}>2</Text>
+              <Text style={[styles.statNumber, { color: '#8C77F6' }]}>2</Text>
               <Text style={styles.statLabelMain}>события</Text>
               <Text style={styles.statLabelSub}>запланировано</Text>
             </View>
@@ -85,8 +85,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfacePrimary,
     borderRadius: radius.xxl,
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.md,
   },
   headerRow: {
     flexDirection: 'row',
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   title: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '700',
     color: colors.textPrimary,
   },
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     borderColor: colors.strokeSoft,
   },
   weatherText: {
-    fontSize: 13,
+    fontSize: 11,
     color: colors.textSecondary,
     fontWeight: '500',
   },
@@ -126,39 +126,39 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   iconBox: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+    width: 24,
+    height: 24,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 8,
+    marginRight: 6,
     marginTop: 2,
   },
   statInfo: {
     justifyContent: 'center',
   },
   statNumber: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: '700',
     color: colors.textPrimary,
-    lineHeight: 28,
+    lineHeight: 22,
   },
   statLabelMain: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '700',
     color: colors.textPrimary,
-    lineHeight: 14,
+    lineHeight: 16,
   },
   statLabelSub: {
-    fontSize: 10,
+    fontSize: 11,
     color: colors.textTertiary,
-    lineHeight: 12,
+    lineHeight: 13,
   },
   divider: {
     width: 1,
-    height: 48,
+    height: 32,
     backgroundColor: colors.strokeLight,
-    marginTop: 4,
+    marginTop: 6,
     marginHorizontal: 8,
   }
 });
