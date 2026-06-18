@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     paddingTop: 2,
   },
   title: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '700',
     color: colors.textPrimary,
     marginBottom: 2,
@@ -213,15 +213,13 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   location: {
-    fontSize: 13,
+    fontSize: 11,
     color: colors.textSecondary,
     marginBottom: 6,
   },
   chipsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
   },
   participantsChip: {
     flexDirection: 'row',
@@ -251,7 +249,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: radius.pill,
     flexShrink: 0,
-    marginLeft: 'auto',
+    marginTop: 6,
   },
   conflictText: {
     fontSize: 10,
