@@ -26,36 +26,41 @@ export function TasksSection({ tasks, title = 'ЗАДАЧИ НА ДЕНЬ', acti
       </View>
 
       <View style={styles.tasksList}>
-        {tasks.map((task) => {
+        {tasks.map((task, index) => {
           const isCompleted = task.status === 'completed' || task.completed === true;
           const isOverdue = task.status === 'overdue';
 
           return (
-            <TouchableOpacity key={task.id} style={[styles.taskRow, isCompleted && styles.taskCompleted]}>
-              {/* Checkbox */}
+            <TouchableOpacity key={task.id} style={[styles.taskRow, index > 0 && styles.rowBorder, isCompleted && styles.taskCompleted]}>
+              <View style={styles.accentLine} />
+              
               <View style={[styles.checkbox, isCompleted && styles.checkboxCompleted]}>
                 {isCompleted && <Ionicons name="checkmark" size={14} color={colors.white} />}
               </View>
 
-              {/* Title & Details */}
               <View style={styles.contentContainer}>
-                <Text style={[styles.title, isCompleted && styles.titleCompleted, isOverdue && styles.titleOverdue]} numberOfLines={2}>
+                <Text style={[styles.title, isCompleted && styles.titleCompleted, isOverdue && styles.titleOverdue]} numberOfLines={1}>
                   {isOverdue && <Text style={{ color: colors.dangerRed }}>Просрочено • </Text>}
                   {task.title}
                 </Text>
 
-                <View style={styles.detailsRow}>
-                  {task.assignee && (
-                    <View style={styles.participantsChip}>
-                      <Avatar person={task.assignee.id as any} size={20} />
-                      <Text style={styles.participantsText} numberOfLines={1}>{task.assignee.name}</Text>
-                    </View>
-                  )}
+                {task.dueTime && (
+                  <Text style={styles.timeText}>{task.dueTime}</Text>
+                )}
+              </View>
 
-                  {task.dueTime && (
-                    <Text style={styles.timeText}>{task.dueTime}</Text>
-                  )}
-                </View>
+              <View style={styles.iconColumn}>
+                {task.assignee && task.assignee !== 'shared' && (() => {
+                  const assigneeId = task.assignee.id || task.assignee;
+                  const assigneeName = task.assignee.name || (task.assignee === 'alex' ? 'Алекс' : task.assignee === 'maya' ? 'Майя' : task.assignee);
+                  return (
+                    <View style={styles.participantsChip}>
+                      <Avatar person={assigneeId as any} size={20} />
+                      <Text style={styles.participantsText} numberOfLines={1}>{assigneeName}</Text>
+                    </View>
+                  );
+                })()}
+                <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
               </View>
             </TouchableOpacity>
           );
@@ -76,9 +81,8 @@ const styles = StyleSheet.create({
   outerContainer: {
     backgroundColor: colors.surfacePrimary,
     borderRadius: radius.xxl,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
-    paddingHorizontal: spacing.md,
+    paddingTop: 20,
+    paddingBottom: 4,
     marginBottom: spacing.md,
     shadowColor: colors.domaBlue,
     shadowOffset: { width: 0, height: 4 },
@@ -91,7 +95,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    paddingHorizontal: spacing.md,
+    marginBottom: 4,
   },
   headerTitle: {
     fontSize: 12,
@@ -111,12 +116,26 @@ const styles = StyleSheet.create({
     marginRight: 2,
   },
   tasksList: {
-    paddingLeft: 4,
+    paddingHorizontal: spacing.md,
   },
   taskRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: spacing.sm,
+    alignItems: 'center',
+    paddingVertical: 12,
+    position: 'relative',
+  },
+  rowBorder: {
+    borderTopWidth: 1,
+    borderTopColor: colors.strokeLight,
+  },
+  accentLine: {
+    position: 'absolute',
+    left: -spacing.md,
+    width: 3,
+    height: 32,
+    backgroundColor: colors.taskOrange,
+    borderTopRightRadius: 3,
+    borderBottomRightRadius: 3,
   },
   taskCompleted: {
     opacity: 0.5,
@@ -130,7 +149,6 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 2, // Выравнивание с первой строкой текста
   },
   checkboxCompleted: {
     backgroundColor: colors.taskOrange,
@@ -138,34 +156,34 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     justifyContent: 'center',
+    paddingRight: spacing.md,
   },
   title: {
     fontSize: 14,
     color: colors.textPrimary,
     fontWeight: '700',
     lineHeight: 20,
-    marginBottom: 4,
+    marginBottom: 0,
   },
   titleCompleted: {
     textDecorationLine: 'line-through',
     color: colors.textSecondary,
   },
   titleOverdue: {
-    // Специфические стили для просроченной задачи, если нужно
+    // Специфические стили
   },
-  detailsRow: {
+  iconColumn: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
   participantsChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(239, 138, 31, 0.08)', // Светлая оранжевая подложка
+    backgroundColor: 'rgba(239, 138, 31, 0.08)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: radius.pill,
-    flexShrink: 1,
+    marginRight: 8,
   },
   participantsText: {
     fontSize: 12,
@@ -177,7 +195,7 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 11,
     color: colors.textSecondary,
-    marginLeft: 8,
+    marginTop: 2,
   },
   showAllButton: {
     flexDirection: 'row',

@@ -14,6 +14,8 @@ import { colors, typography } from "../../theme";
 import type { EventItem, TaskItem, ShoppingItem } from "../../types";
 import type { copy } from "../../i18n";
 import { getTodayBriefing, getFamilyPulse } from "../../mappers/appUiMappers";
+import { mockCalendarShopping } from "../../utils/calendarMocks";
+import { useWeather } from "./hooks/useWeather";
 
 type TodayScreenProps = {
   text: typeof copy.ru;
@@ -48,14 +50,39 @@ export function TodayScreen({
   const briefing = getTodayBriefing(selectedEvents, activeTasks, pendingShopping, todayIso);
   const pulse = getFamilyPulse(activeTasks, selectedEvents, todayIso);
   
+  const hour = new Date().getHours();
+  let timeOfDay: 'morning' | 'day' | 'evening' | 'night' = 'day';
+  if (hour >= 6 && hour < 12) timeOfDay = 'morning';
+  else if (hour >= 12 && hour < 18) timeOfDay = 'day';
+  else if (hour >= 18 && hour < 23) timeOfDay = 'evening';
+  else timeOfDay = 'night';
+
+  const { weather } = useWeather();
+  let weatherIcon = '☀️';
+  if (timeOfDay === 'night') {
+    weatherIcon = '🌙';
+  } else if (weather) {
+    if (weather.condition === 'cloudy') weatherIcon = '☁️';
+    else if (weather.condition === 'rainy') weatherIcon = '🌧️';
+    else if (weather.condition === 'snowy') weatherIcon = '❄️';
+  }
+
+  const todayDateObj = new Date(todayIso);
+  const dayOfWeekIndex = todayDateObj.getDay(); 
+  const adjustedDayIndex = dayOfWeekIndex === 0 ? 6 : dayOfWeekIndex - 1;
+  const dayOfWeek = text.weekDaysFull[adjustedDayIndex];
+  const dateText = `${dayOfWeek}, ${text.formatMonthDay(todayDateObj.getDate())}`;
+
   return (
     <View style={styles.container}>
       <View style={styles.sunWash} />
 
       <View style={styles.headerRow}>
         <View style={styles.greetingBlock}>
-          <Text style={styles.greetingTitle}>{text.morning}</Text>
-          <Text style={styles.greetingDate}>{text.todayDate}</Text>
+          <Text style={styles.greetingTitle}>
+            {text.greetingTime(timeOfDay, 'Алексей')} {weatherIcon}
+          </Text>
+          <Text style={styles.greetingDate}>{dateText}</Text>
         </View>
         <View style={styles.headerAvatars}>
           <View style={styles.avatarWithLabel}>
@@ -77,7 +104,9 @@ export function TodayScreen({
         eventsSubLabel="сегодня"
         tasksSubLabel="сегодня"
         shoppingSubLabel="осталось"
-        onPress={onOpenCalendar}
+        onPressEvents={onOpenCalendar}
+        onPressTasks={onOpenTasks}
+        onPressShopping={onOpenShopping}
       />
 
       {selectedEvents.length > 0 ? (
@@ -101,17 +130,15 @@ export function TodayScreen({
       )}
 
       <TasksSection 
-        tasks={activeTasks.slice(0, 4)} 
+        tasks={activeTasks.slice(0, 2)} 
         title="ЗАДАЧИ СЕГОДНЯ"
         actionLabel={`${activeTasks.length} задачи`}
         onActionPress={onOpenCalendar}
       />
 
       <ShoppingSection 
-        items={pendingShopping}
-        title="ПОКУПКИ"
-        actionLabel={`${pendingShopping.length} из 17`}
-        onActionPress={onOpenCalendar}
+        items={mockCalendarShopping}
+        onActionPress={onOpenShopping}
       />
 
       <FamilyPulseCard 
@@ -120,9 +147,6 @@ export function TodayScreen({
         shoppingCount={pendingShopping.length}
       />
 
-      <Pressable style={styles.fab} onPress={onOpenQuickAdd} accessibilityRole="button" accessibilityLabel={text.add}>
-        <Ionicons name="add" size={32} color={colors.white} />
-      </Pressable>
     </View>
   );
 }
@@ -130,7 +154,7 @@ export function TodayScreen({
 const styles = StyleSheet.create({
   container: {
     paddingTop: 40,
-    paddingBottom: 80
+    paddingBottom: 0
   },
   sunWash: {
     position: "absolute",
@@ -150,15 +174,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 32
+    marginBottom: 16
   },
   greetingBlock: {
     flex: 1
   },
   greetingTitle: {
     color: colors.domaBlue,
-    fontSize: 28,
-    lineHeight: 34,
+    fontSize: 24,
+    lineHeight: 30,
     fontWeight: "700",
     fontFamily: typography.fontFamily.brand,
     letterSpacing: 0

@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import { colors, radius, spacing } from '../../../theme';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type NextEventCardProps = {
   event: any; // EventItem
@@ -14,16 +15,22 @@ export function NextEventCard({ event, onPress, timeUntilStart }: NextEventCardP
 
   return (
     <View style={styles.outerContainer}>
-      <Text style={styles.headerTitle}>БЛИЖАЙШЕЕ СОБЫТИЕ</Text>
-
       <TouchableOpacity style={styles.card} onPress={onPress}>
         {/* Placeholder for map */}
         <Image 
-          source={{ uri: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=600&q=80' }} 
+          source={require('../../../../assets/map.png')} 
           style={styles.mapBackground}
           resizeMode="cover"
         />
-        <View style={styles.mapOverlay} />
+        <LinearGradient
+          colors={[colors.surfacePrimary, colors.surfacePrimary, 'rgba(255,255,255,0)']}
+          locations={[0, 0.45, 1]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={StyleSheet.absoluteFill}
+        />
+        
+        <Text style={styles.headerTitle}>БЛИЖАЙШЕЕ СОБЫТИЕ</Text>
 
         <View style={styles.mainContent}>
           {/* Date Square */}
@@ -43,13 +50,13 @@ export function NextEventCard({ event, onPress, timeUntilStart }: NextEventCardP
                 <Text style={styles.todayText}>Сегодня</Text>
               </View>
               <Ionicons name="time-outline" size={14} color={colors.textSecondary} />
-              <Text style={styles.timeText}>{event.startTime}</Text>
+              <Text style={styles.timeText}>{event.time}</Text>
             </View>
           </View>
           
           {/* Map Pin icon */}
           <View style={styles.pinIcon}>
-             <Ionicons name="location" size={20} color="#8C77F6" />
+             <Ionicons name="location" size={18} color={colors.white} />
           </View>
         </View>
 
@@ -57,7 +64,7 @@ export function NextEventCard({ event, onPress, timeUntilStart }: NextEventCardP
 
         <View style={styles.footer}>
           <Text style={styles.timeUntil}>{timeUntilStart || 'скоро'}</Text>
-          <Ionicons name="chevron-forward" size={16} color="#8C77F6" />
+          <Ionicons name="chevron-forward" size={14} color="#8C77F6" />
         </View>
       </TouchableOpacity>
     </View>
@@ -69,12 +76,14 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   headerTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     color: '#8C77F6',
     letterSpacing: 0.5,
-    marginBottom: spacing.md,
     textTransform: 'uppercase',
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+    marginBottom: spacing.xs,
   },
   card: {
     backgroundColor: colors.surfacePrimary,
@@ -88,16 +97,17 @@ const styles = StyleSheet.create({
     borderColor: colors.strokeLight,
   },
   mapBackground: {
-    ...StyleSheet.absoluteFill,
-    opacity: 0.3,
-  },
-  mapOverlay: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(255,255,255,0.7)',
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: '55%',
+    opacity: 0.35,
   },
   mainContent: {
     flexDirection: 'row',
-    padding: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
     position: 'relative',
   },
   dateSquare: {
@@ -162,7 +172,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: colors.white,
+    backgroundColor: '#8C77F6',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: colors.domaBlue,
@@ -183,10 +193,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    paddingVertical: 12,
+    paddingVertical: 6,
   },
   timeUntil: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#8C77F6',
     fontWeight: '600',
   }

@@ -12,7 +12,9 @@ type DaySummaryCardProps = {
   eventsSubLabel?: string;
   tasksSubLabel?: string;
   shoppingSubLabel?: string;
-  onPress?: () => void;
+  onPressEvents?: () => void;
+  onPressTasks?: () => void;
+  onPressShopping?: () => void;
 };
 
 export function DaySummaryCard({
@@ -23,14 +25,14 @@ export function DaySummaryCard({
   eventsSubLabel = 'запланировано',
   tasksSubLabel = 'на сегодня',
   shoppingSubLabel = 'нужно купить',
-  onPress
+  onPressEvents,
+  onPressTasks,
+  onPressShopping
 }: DaySummaryCardProps) {
   const { weather } = useWeather();
 
-  const CardComponent = onPress ? Pressable : View;
-
   return (
-    <CardComponent style={styles.outerShell} onPress={onPress}>
+    <View style={styles.outerShell}>
       <View style={styles.innerCore}>
         {/* Заголовок и погода */}
         {!hideHeader && (
@@ -48,7 +50,7 @@ export function DaySummaryCard({
         {/* Счетчики */}
         <View style={styles.statsRow}>
           {/* События */}
-          <View style={styles.statColumn}>
+          <Pressable style={styles.statColumn} onPress={onPressEvents}>
             <View style={[styles.iconBox, { backgroundColor: 'rgba(140, 119, 246, 0.1)' }]}>
               <Ionicons name="calendar-outline" size={20} color="#8C77F6" />
             </View>
@@ -57,12 +59,12 @@ export function DaySummaryCard({
               <Text style={styles.statLabelMain}>события</Text>
               <Text style={styles.statLabelSub}>{eventsSubLabel}</Text>
             </View>
-          </View>
+          </Pressable>
 
           <View style={styles.divider} />
           
           {/* Задачи */}
-          <View style={styles.statColumn}>
+          <Pressable style={styles.statColumn} onPress={onPressTasks}>
             <View style={[styles.iconBox, { backgroundColor: 'rgba(239, 138, 31, 0.1)' }]}>
               <Ionicons name="checkmark-circle-outline" size={20} color={colors.taskOrange} />
             </View>
@@ -71,12 +73,12 @@ export function DaySummaryCard({
               <Text style={styles.statLabelMain}>задачи</Text>
               <Text style={styles.statLabelSub}>{tasksSubLabel}</Text>
             </View>
-          </View>
+          </Pressable>
 
           <View style={styles.divider} />
 
           {/* Покупки */}
-          <View style={styles.statColumn}>
+          <Pressable style={styles.statColumn} onPress={onPressShopping}>
             <View style={[styles.iconBox, { backgroundColor: 'rgba(95, 150, 105, 0.1)' }]}>
               <Ionicons name="cart-outline" size={20} color={colors.shoppingGreen} />
             </View>
@@ -85,10 +87,10 @@ export function DaySummaryCard({
               <Text style={styles.statLabelMain}>покупки</Text>
               <Text style={styles.statLabelSub}>{shoppingSubLabel}</Text>
             </View>
-          </View>
+          </Pressable>
         </View>
       </View>
-    </CardComponent>
+    </View>
   );
 }
 
