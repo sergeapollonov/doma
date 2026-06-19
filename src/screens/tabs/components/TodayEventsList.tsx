@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { colors, radius, spacing } from '../../../theme';
 import { CalendarEvent } from '../../../types/calendar';
 import { Ionicons } from '@expo/vector-icons';
+import { Avatar } from '../../../components/family';
 
 type TodayEventsListProps = {
   events: any[]; // EventItem[]
@@ -17,20 +18,21 @@ export function TodayEventsList({ events, onPressEvent }: TodayEventsListProps) 
       <View style={styles.headerRow}>
         <Text style={styles.headerTitle}>СОБЫТИЯ СЕГОДНЯ</Text>
         <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionLabel}>{events.length} события</Text>
+          <Text style={styles.actionLabel}>{events.length > 2 ? '2 события' : `${events.length} события`}</Text>
           <Ionicons name="chevron-forward" size={14} color="#8C77F6" />
         </TouchableOpacity>
       </View>
 
       <View style={styles.list}>
-        {events.map((event, index) => (
+        {events.slice(0, 2).map((event, index) => (
           <TouchableOpacity 
             key={event.id} 
             style={[styles.eventRow, index > 0 && styles.rowBorder]}
             onPress={() => onPressEvent?.(event)}
           >
+            <View style={styles.accentLine} />
             <View style={styles.timeColumn}>
-              <Text style={styles.timeText}>{event.startTime}</Text>
+              <Text style={styles.timeText}>{event.time}</Text>
             </View>
             
             <View style={styles.detailsColumn}>
@@ -41,8 +43,12 @@ export function TodayEventsList({ events, onPressEvent }: TodayEventsListProps) 
             </View>
 
             <View style={styles.iconColumn}>
-              <View style={styles.calendarIconBg}>
-                <Ionicons name="calendar-outline" size={16} color="#8C77F6" />
+              <View style={styles.participantsChip}>
+                {event.participants?.map((p: string, idx: number) => (
+                  <View key={p} style={{ marginLeft: idx > 0 ? -6 : 0, zIndex: 10 - idx }}>
+                    <Avatar person={p as any} size={22} />
+                  </View>
+                ))}
               </View>
               <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
             </View>
@@ -57,8 +63,8 @@ const styles = StyleSheet.create({
   outerContainer: {
     backgroundColor: colors.surfacePrimary,
     borderRadius: radius.xxl,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
+    paddingTop: 20,
+    paddingBottom: 4,
     marginBottom: spacing.md,
     shadowColor: colors.domaBlue,
     shadowOffset: { width: 0, height: 4 },
@@ -72,7 +78,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    marginBottom: spacing.sm,
+    marginBottom: 4,
   },
   headerTitle: {
     fontSize: 12,
@@ -97,19 +103,29 @@ const styles = StyleSheet.create({
   eventRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.md,
+    paddingVertical: 12,
+    position: 'relative',
   },
   rowBorder: {
     borderTopWidth: 1,
     borderTopColor: colors.strokeLight,
   },
+  accentLine: {
+    position: 'absolute',
+    left: -spacing.md,
+    width: 3,
+    height: 32,
+    backgroundColor: '#8C77F6',
+    borderTopRightRadius: 3,
+    borderBottomRightRadius: 3,
+  },
   timeColumn: {
-    width: 60,
+    width: 50,
   },
   timeText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#8C77F6', // Фиолетовый
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#8C77F6',
   },
   detailsColumn: {
     flex: 1,
@@ -129,13 +145,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  calendarIconBg: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    backgroundColor: 'rgba(140, 119, 246, 0.1)',
-    justifyContent: 'center',
+  participantsChip: {
+    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'rgba(140, 119, 246, 0.08)',
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: 20,
     marginRight: 8,
   }
 });

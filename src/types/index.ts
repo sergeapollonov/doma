@@ -155,8 +155,9 @@ export type EventItem = {
   date: string;
   time: string;
   participants: PersonId[];
-  reminder: string;
+  reminder?: string;
   comment?: string;
+  location?: string;
 };
 
 export type TaskItem = {

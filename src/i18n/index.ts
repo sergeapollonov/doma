@@ -8,6 +8,8 @@ type DomaCopy = {
   morning: string;
   todayDate: string;
   todayGreeting: string;
+  greetingTime: (time: 'morning' | 'day' | 'evening' | 'night', name: string) => string;
+  weekDaysFull: string[];
   synced: string;
   syncedAgo: string;
   offline: string;
@@ -143,6 +145,11 @@ export const copy = {
     morning: "Доброе утро, Алексей",
     todayDate: "Сегодня, 3 июня",
     todayGreeting: "Доброе утро,\nАлексей 👋",
+    greetingTime: (time, name) => {
+      const greetings = { morning: "Доброе утро", day: "Добрый день", evening: "Добрый вечер", night: "Доброй ночи" };
+      return `${greetings[time]}, ${name}`;
+    },
+    weekDaysFull: ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"],
     synced: "Всё синхронизировано",
     syncedAgo: "Обновлено 1 мин назад",
     offline: "Нет соединения",
@@ -293,6 +300,11 @@ export const copy = {
     morning: "Dzień dobry, Alex",
     todayDate: "Dzisiaj, 3 czerwca",
     todayGreeting: "Dzień dobry,\nAlex 👋",
+    greetingTime: (time, name) => {
+      const greetings = { morning: "Dzień dobry", day: "Dzień dobry", evening: "Dobry wieczór", night: "Dobranoc" };
+      return `${greetings[time]}, ${name}`;
+    },
+    weekDaysFull: ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"],
     synced: "Wszystko zsynchronizowane",
     syncedAgo: "Zaktualizowano 1 min temu",
     offline: "Brak połączenia",

@@ -16,27 +16,29 @@ export const people: Record<PersonId, { name: string; initials: string; color: s
 
 export const initialEvents: EventItem[] = [
   {
-    id: "event-1",
-    title: "Врач",
+    id: "e2",
+    title: "Детский врач",
     date: "3 июня",
-    time: "09:00",
+    time: "15:30",
     participants: ["alex", "maya"],
-    reminder: "За 30 минут"
+    location: "Поликлиника №4",
   },
   {
     id: "event-2",
-    title: "Забрать посылку",
+    title: "Школьное собрание",
     date: "3 июня",
-    time: "14:30",
-    participants: ["alex"],
+    time: "15:30",
+    participants: ["alex", "maya"],
+    location: "Кабинет 302",
     reminder: "За 1 час"
   },
   {
     id: "event-3",
-    title: "Ужин с родителями",
+    title: "Тренировка по плаванию",
     date: "3 июня",
-    time: "19:00",
-    participants: ["alex", "maya"],
+    time: "18:00",
+    participants: ["maya"],
+    location: "Бассейн «Олимп»",
     reminder: "За 30 минут"
   }
 ];
