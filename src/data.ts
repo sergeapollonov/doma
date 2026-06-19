@@ -16,7 +16,7 @@ export const people: Record<PersonId, { name: string; initials: string; color: s
 
 export const initialEvents: EventItem[] = [
   {
-    id: "e2",
+    id: "event-1",
     title: "Детский врач",
     date: "3 июня",
     time: "15:30",
