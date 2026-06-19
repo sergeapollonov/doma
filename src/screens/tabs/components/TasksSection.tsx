@@ -26,7 +26,7 @@ export function TasksSection({ tasks, title = 'ЗАДАЧИ НА ДЕНЬ', acti
       </View>
 
       <View style={styles.tasksList}>
-        {tasks.slice(0, 2).map((task, index) => {
+        {tasks.map((task, index) => {
           const isCompleted = task.status === 'completed' || task.completed === true;
           const isOverdue = task.status === 'overdue';
 
@@ -62,6 +62,12 @@ export function TasksSection({ tasks, title = 'ЗАДАЧИ НА ДЕНЬ', acti
         })}
       </View>
 
+      {!actionLabel && (
+        <TouchableOpacity style={styles.showAllButton}>
+          <Text style={styles.showAllText}>Показать все задачи ({tasks.length})</Text>
+          <Ionicons name="chevron-down" size={16} color={colors.taskOrange} style={{ marginLeft: 4, marginTop: 2 }} />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -178,5 +184,17 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: colors.textSecondary,
     marginTop: 2,
+  },
+  showAllButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 0,
+    paddingVertical: spacing.sm,
+  },
+  showAllText: {
+    color: colors.taskOrange,
+    fontWeight: '600',
+    fontSize: 14,
   }
 });

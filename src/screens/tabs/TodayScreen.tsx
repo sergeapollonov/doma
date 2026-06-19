@@ -130,7 +130,7 @@ export function TodayScreen({
       )}
 
       <TasksSection 
-        tasks={activeTasks.slice(0, 4)} 
+        tasks={activeTasks.slice(0, 2)} 
         title="ЗАДАЧИ СЕГОДНЯ"
         actionLabel={`${activeTasks.length} задачи`}
         onActionPress={onOpenCalendar}
