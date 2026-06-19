@@ -6,17 +6,28 @@ import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '../../../components/family';
 
 type TasksSectionProps = {
-  tasks: CalendarTask[];
+  tasks: any[];
+  title?: string;
+  actionLabel?: string;
+  onActionPress?: () => void;
 };
 
-export function TasksSection({ tasks }: TasksSectionProps) {
+export function TasksSection({ tasks, title = 'ЗАДАЧИ НА ДЕНЬ', actionLabel, onActionPress }: TasksSectionProps) {
   return (
     <View style={styles.outerContainer}>
-      <Text style={styles.headerTitle}>ЗАДАЧИ НА ДЕНЬ</Text>
+      <View style={styles.headerRow}>
+        <Text style={styles.headerTitle}>{title}</Text>
+        {actionLabel && (
+          <TouchableOpacity onPress={onActionPress} style={styles.actionButton}>
+            <Text style={styles.actionLabel}>{actionLabel}</Text>
+            <Ionicons name="chevron-forward" size={14} color={colors.taskOrange} />
+          </TouchableOpacity>
+        )}
+      </View>
 
       <View style={styles.tasksList}>
         {tasks.map((task) => {
-          const isCompleted = task.status === 'completed';
+          const isCompleted = task.status === 'completed' || task.completed === true;
           const isOverdue = task.status === 'overdue';
 
           return (
@@ -51,10 +62,12 @@ export function TasksSection({ tasks }: TasksSectionProps) {
         })}
       </View>
 
-      <TouchableOpacity style={styles.showAllButton}>
-        <Text style={styles.showAllText}>Показать все задачи ({tasks.length})</Text>
-        <Ionicons name="chevron-down" size={16} color={colors.taskOrange} style={{ marginLeft: 4, marginTop: 2 }} />
-      </TouchableOpacity>
+      {!actionLabel && (
+        <TouchableOpacity style={styles.showAllButton}>
+          <Text style={styles.showAllText}>Показать все задачи ({tasks.length})</Text>
+          <Ionicons name="chevron-down" size={16} color={colors.taskOrange} style={{ marginLeft: 4, marginTop: 2 }} />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -74,13 +87,28 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.strokeLight,
   },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
   headerTitle: {
     fontSize: 12,
     fontWeight: '700',
     color: colors.taskOrange,
     letterSpacing: 0.5,
-    marginBottom: spacing.md,
     textTransform: 'uppercase',
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  actionLabel: {
+    fontSize: 13,
+    color: colors.taskOrange,
+    fontWeight: '600',
+    marginRight: 2,
   },
   tasksList: {
     paddingLeft: 4,

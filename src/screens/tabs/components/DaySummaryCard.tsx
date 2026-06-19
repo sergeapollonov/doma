@@ -1,25 +1,49 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { colors, radius, spacing } from '../../../theme';
 import { useWeather } from '../hooks/useWeather';
 import { Ionicons } from '@expo/vector-icons';
 
-export function DaySummaryCard() {
+type DaySummaryCardProps = {
+  eventsCount?: number;
+  tasksCount?: number;
+  shoppingCount?: number;
+  hideHeader?: boolean;
+  eventsSubLabel?: string;
+  tasksSubLabel?: string;
+  shoppingSubLabel?: string;
+  onPress?: () => void;
+};
+
+export function DaySummaryCard({
+  eventsCount = 2,
+  tasksCount = 4,
+  shoppingCount = 3,
+  hideHeader = false,
+  eventsSubLabel = 'запланировано',
+  tasksSubLabel = 'на сегодня',
+  shoppingSubLabel = 'нужно купить',
+  onPress
+}: DaySummaryCardProps) {
   const { weather } = useWeather();
 
+  const CardComponent = onPress ? Pressable : View;
+
   return (
-    <View style={styles.outerShell}>
+    <CardComponent style={styles.outerShell} onPress={onPress}>
       <View style={styles.innerCore}>
         {/* Заголовок и погода */}
-        <View style={styles.headerRow}>
-          <Text style={styles.title}>Четверг, 12 июня</Text>
-          <View style={styles.weatherBadge}>
-            <Text style={styles.weatherText}>
-              {weather ? (weather.condition === 'sunny' ? '☀️' : '☁️') : '...'} {weather?.temp ?? '--'}°
-            </Text>
-            <Ionicons name="chevron-down" size={12} color={colors.textSecondary} style={{ marginLeft: 4 }} />
+        {!hideHeader && (
+          <View style={styles.headerRow}>
+            <Text style={styles.title}>Четверг, 12 июня</Text>
+            <View style={styles.weatherBadge}>
+              <Text style={styles.weatherText}>
+                {weather ? (weather.condition === 'sunny' ? '☀️' : '☁️') : '...'} {weather?.temp ?? '--'}°
+              </Text>
+              <Ionicons name="chevron-down" size={12} color={colors.textSecondary} style={{ marginLeft: 4 }} />
+            </View>
           </View>
-        </View>
+        )}
 
         {/* Счетчики */}
         <View style={styles.statsRow}>
@@ -29,9 +53,9 @@ export function DaySummaryCard() {
               <Ionicons name="calendar-outline" size={20} color="#8C77F6" />
             </View>
             <View style={styles.statInfo}>
-              <Text style={styles.statNumber}>2</Text>
+              <Text style={styles.statNumber}>{eventsCount}</Text>
               <Text style={styles.statLabelMain}>события</Text>
-              <Text style={styles.statLabelSub}>запланировано</Text>
+              <Text style={styles.statLabelSub}>{eventsSubLabel}</Text>
             </View>
           </View>
 
@@ -43,9 +67,9 @@ export function DaySummaryCard() {
               <Ionicons name="checkmark-circle-outline" size={20} color={colors.taskOrange} />
             </View>
             <View style={styles.statInfo}>
-              <Text style={styles.statNumber}>4</Text>
+              <Text style={styles.statNumber}>{tasksCount}</Text>
               <Text style={styles.statLabelMain}>задачи</Text>
-              <Text style={styles.statLabelSub}>на сегодня</Text>
+              <Text style={styles.statLabelSub}>{tasksSubLabel}</Text>
             </View>
           </View>
 
@@ -57,14 +81,14 @@ export function DaySummaryCard() {
               <Ionicons name="cart-outline" size={20} color={colors.shoppingGreen} />
             </View>
             <View style={styles.statInfo}>
-              <Text style={styles.statNumber}>3</Text>
+              <Text style={styles.statNumber}>{shoppingCount}</Text>
               <Text style={styles.statLabelMain}>покупки</Text>
-              <Text style={styles.statLabelSub}>нужно купить</Text>
+              <Text style={styles.statLabelSub}>{shoppingSubLabel}</Text>
             </View>
           </View>
         </View>
       </View>
-    </View>
+    </CardComponent>
   );
 }
 

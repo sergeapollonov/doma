@@ -5,15 +5,26 @@ import { CalendarShoppingItem } from '../../../types/calendar';
 import { Ionicons } from '@expo/vector-icons';
 
 type ShoppingSectionProps = {
-  items: CalendarShoppingItem[];
+  items: any[];
+  title?: string;
+  actionLabel?: string;
+  onActionPress?: () => void;
 };
 
-export function ShoppingSection({ items }: ShoppingSectionProps) {
+export function ShoppingSection({ 
+  items, 
+  title = 'ПОКУПКИ НА СЕГОДНЯ', 
+  actionLabel = '3 из 17',
+  onActionPress 
+}: ShoppingSectionProps) {
   return (
     <View style={styles.outerContainer}>
       <View style={styles.headerRow}>
-        <Text style={styles.headerTitle}>ПОКУПКИ НА СЕГОДНЯ</Text>
-        <Text style={styles.actionLabel}>3 из 17</Text>
+        <Text style={styles.headerTitle}>{title}</Text>
+        <TouchableOpacity onPress={onActionPress} style={styles.actionButton}>
+          <Text style={styles.actionLabel}>{actionLabel}</Text>
+          {onActionPress && <Ionicons name="chevron-forward" size={14} color={colors.shoppingGreen} />}
+        </TouchableOpacity>
       </View>
 
       <ScrollView 
@@ -22,7 +33,7 @@ export function ShoppingSection({ items }: ShoppingSectionProps) {
         contentContainerStyle={styles.scrollContent}
       >
         {items.map((item) => {
-          const isPurchased = item.status === 'purchased';
+          const isPurchased = item.status === 'purchased' || item.purchased === true;
 
           if (isPurchased) return null; 
 
@@ -86,10 +97,15 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   actionLabel: {
     fontSize: 13,
     color: colors.shoppingGreen,
     fontWeight: '600',
+    marginRight: 2,
   },
   scrollContent: {
     paddingHorizontal: spacing.md,
