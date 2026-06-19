@@ -50,11 +50,16 @@ export function TasksSection({ tasks, title = 'ЗАДАЧИ НА ДЕНЬ', acti
               </View>
 
               <View style={styles.iconColumn}>
-                {task.assignee && task.assignee !== 'shared' && (
-                  <View style={styles.participantsChip}>
-                    <Avatar person={task.assignee as any} size={22} />
-                  </View>
-                )}
+                {task.assignee && task.assignee !== 'shared' && (() => {
+                  const assigneeId = task.assignee.id || task.assignee;
+                  const assigneeName = task.assignee.name || (task.assignee === 'alex' ? 'Алекс' : task.assignee === 'maya' ? 'Майя' : task.assignee);
+                  return (
+                    <View style={styles.participantsChip}>
+                      <Avatar person={assigneeId as any} size={20} />
+                      <Text style={styles.participantsText} numberOfLines={1}>{assigneeName}</Text>
+                    </View>
+                  );
+                })()}
                 <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
               </View>
             </TouchableOpacity>
@@ -175,10 +180,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(239, 138, 31, 0.08)',
-    paddingHorizontal: 6,
+    paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 20,
+    borderRadius: radius.pill,
     marginRight: 8,
+  },
+  participantsText: {
+    fontSize: 12,
+    color: colors.taskOrange,
+    marginLeft: 6,
+    fontWeight: '600',
+    flexShrink: 1,
   },
   timeText: {
     fontSize: 11,
