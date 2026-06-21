@@ -439,7 +439,7 @@ export default function App() {
                       />
                     </View>
                   )}
-                  <TabBar activeTab={activeTab} onChange={setActiveTab} labels={text.tabs} />
+                  <TabBar activeTab={activeTab} onChange={setActiveTab} onAdd={() => setSheet("quick")} labels={text.tabs} />
                 </View>
               </SafeAreaView>
               <BottomSheet visible={sheet !== null} onClose={() => setSheet(null)}>
