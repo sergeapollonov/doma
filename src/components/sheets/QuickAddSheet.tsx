@@ -18,23 +18,30 @@ type QuickAddSheetProps = {
 };
 
 export function QuickAddSheet({ text, onSelectSheet }: QuickAddSheetProps) {
-  const options: Array<{ label: string; icon: IconName; color: string; next: AppSheet }> = [
-    { label: text.event, icon: "calendar-outline", color: colors.domaBlue, next: "event" },
-    { label: text.task, icon: "checkmark-circle-outline", color: colors.taskOrange, next: "task" },
-    { label: text.item, icon: "bag-outline", color: colors.shoppingGreen, next: "shopping" },
-    { label: text.reminder, icon: "notifications-outline", color: colors.familySand, next: "event" }
+  const options: Array<{ label: string; description: string; icon: IconName; color: string; next: AppSheet | "cancel" }> = [
+    { label: "Создать событие", description: "Добавить в календарь", icon: "calendar-outline", color: colors.domaPurple, next: "event" },
+    { label: "Создать задачу", description: "Добавить дело для себя или семьи", icon: "checkmark-circle-outline", color: colors.taskOrange, next: "task" },
+    { label: "Добавить покупку", description: "Добавить товар в список покупок", icon: "cart-outline", color: colors.shoppingGreen, next: "shopping" },
+    { label: "Отмена", description: "", icon: "close-outline", color: colors.textSecondary, next: "cancel" }
   ];
 
   return (
     <View>
-      <SheetTitle title={text.quickAddTitle} />
+      <View style={{ marginBottom: 16 }} />
       {options.map((option) => (
-        <Pressable key={option.label} style={styles.sheetOption} onPress={() => onSelectSheet(option.next)}>
-          <View style={[styles.sheetOptionIcon, { backgroundColor: `${option.color}18` }]}>
+        <Pressable 
+          key={option.label} 
+          style={[styles.sheetOption, option.next === "cancel" && { borderWidth: 0, backgroundColor: 'transparent' }]} 
+          onPress={() => option.next === "cancel" ? onSelectSheet(null as any) : onSelectSheet(option.next)}
+        >
+          <View style={[styles.sheetOptionIcon, { backgroundColor: option.next === "cancel" ? "#F2F2F7" : `${option.color}18` }]}>
             <Ionicons name={option.icon} size={22} color={option.color} />
           </View>
-          <Text style={styles.sheetOptionText}>{option.label}</Text>
-          <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.sheetOptionText, option.next === "cancel" && { color: colors.textSecondary }]}>{option.label}</Text>
+            {!!option.description && <Text style={styles.sheetOptionDesc}>{option.description}</Text>}
+          </View>
+          {option.next !== "cancel" && <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />}
         </Pressable>
       ))}
     </View>
@@ -62,9 +69,13 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   sheetOptionText: {
-    flex: 1,
     color: colors.textPrimary,
     fontSize: 16,
     fontWeight: "800"
+  },
+  sheetOptionDesc: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    marginTop: 2
   }
 });

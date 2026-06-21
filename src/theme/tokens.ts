@@ -38,19 +38,20 @@ export const colors = {
   divider: 'rgba(232, 222, 210, 0.72)',
 
   // Brand / accents
+  domaPurple: '#6D5DF6',
   domaBlue: '#163A5F',
   domaBlueLight: '#1D4A76',
   domaGold: '#D69A45',
   domaGoldLight: '#E5B76C',
-  taskOrange: '#EF8A1F',
-  shoppingGreen: '#5F9669',
+  taskOrange: '#FF8A34',
+  shoppingGreen: '#52B788',
   familySand: '#D7B98B',
   dangerRed: '#D85C4A',
 
   // Utility
   white: '#FFFFFF',
   black: '#000000',
-  inactive: '#8A8F98',
+  inactive: '#8E8E93',
   transparent: 'transparent',
 } as const;
 
@@ -102,7 +103,7 @@ export const typography = {
 export const sizes = {
   minTouchTarget: 44,
 
-  tabBarHeight: 84,
+  tabBarHeight: 70,
   headerHeight: 64,
 
   listRowMinHeight: 52,

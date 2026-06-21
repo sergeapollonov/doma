@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useRef } from "react";
+import { Pressable, StyleSheet, Text, View, Animated } from "react-native";
+import * as Haptics from 'expo-haptics';
 
 import { colors, sizes, spacing } from "../../theme";
 import type { TabKey } from "../../types";
@@ -10,80 +11,137 @@ const tabIcons: Record<TabKey, IconName> = {
   today: "home-outline",
   calendar: "calendar-outline",
   tasks: "checkmark-circle-outline",
-  shopping: "bag-outline"
+  shopping: "cart-outline"
+};
+
+const tabColors: Record<TabKey, string> = {
+  today: colors.domaPurple,
+  calendar: colors.domaPurple,
+  tasks: colors.taskOrange,
+  shopping: colors.shoppingGreen
 };
 
 type TabBarProps = {
   activeTab: TabKey;
   onChange: (tab: TabKey) => void;
+  onAdd?: () => void;
   labels: Record<TabKey, string>;
 };
 
-export function TabBar({ activeTab, onChange, labels }: TabBarProps) {
-  const tabs: TabKey[] = ["today", "calendar", "tasks", "shopping"];
+export function TabBar({ activeTab, onChange, onAdd, labels }: TabBarProps) {
+  const leftTabs: TabKey[] = ["today", "calendar"];
+  const rightTabs: TabKey[] = ["tasks", "shopping"];
+  
+  const scaleValue = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleValue, {
+      toValue: 1.08,
+      useNativeDriver: true,
+      speed: 20,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleValue, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 20,
+    }).start();
+  };
+
+  const handleAddPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (onAdd) onAdd();
+  };
+
+  const handleTabPress = (tab: TabKey) => {
+    if (tab !== activeTab) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onChange(tab);
+    }
+  };
+
+  const plusColor = tabColors[activeTab] || colors.domaBlue;
 
   return (
     <View style={styles.tabBar}>
-      {tabs.map((tab) => {
-        const active = tab === activeTab;
-        return (
-          <Pressable key={tab} style={styles.tabItem} onPress={() => onChange(tab)}>
-            <View style={[styles.tabIconWrap, active && styles.tabIconWrapActive]}>
-              <Ionicons name={tabIcons[tab]} size={21} color={active ? colors.domaBlue : colors.inactive} />
-            </View>
-            <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{labels[tab]}</Text>
-          </Pressable>
-        );
-      })}
+      <View style={styles.tabGroup}>
+        {leftTabs.map((tab) => renderTab(tab))}
+      </View>
+
+      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+        <Pressable 
+          style={[styles.plusButton, { backgroundColor: plusColor }]} 
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          onPress={handleAddPress}
+        >
+          <Ionicons name="add" size={32} color={colors.white} />
+        </Pressable>
+      </Animated.View>
+
+      <View style={styles.tabGroup}>
+        {rightTabs.map((tab) => renderTab(tab))}
+      </View>
     </View>
   );
+
+  function renderTab(tab: TabKey) {
+    const active = tab === activeTab;
+    const activeColor = tabColors[tab];
+    return (
+      <Pressable key={tab} style={styles.tabItem} onPress={() => handleTabPress(tab)}>
+        <Ionicons name={tabIcons[tab]} size={24} color={active ? activeColor : colors.inactive} />
+        <Text style={[styles.tabLabel, active && { color: activeColor }]}>{labels[tab]}</Text>
+      </Pressable>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   tabBar: {
     position: "absolute",
-    left: 18,
-    right: 18,
-    bottom: spacing.md,
-    height: sizes.tabBarHeight,
-    borderRadius: 29,
-    backgroundColor: colors.glass.solid,
+    left: 16,
+    right: 16,
+    bottom: spacing.lg,
+    height: 70,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
     borderWidth: 1,
-    borderColor: colors.glass.borderMedium,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 10,
+    justifyContent: "space-between",
+    paddingHorizontal: 8,
     shadowColor: "#372614",
     shadowOpacity: 0.12,
     shadowRadius: 30,
     shadowOffset: { width: 0, height: 14 }
   },
-  tabItem: {
+  tabGroup: {
+    flexDirection: 'row',
     flex: 1,
+    justifyContent: 'space-around'
+  },
+  tabItem: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 8
+    gap: 4
   },
-  tabIconWrap: {
+  plusButton: {
     width: 56,
-    height: 44,
-    borderRadius: 21,
+    height: 56,
+    borderRadius: 28,
     alignItems: "center",
-    justifyContent: "center"
-  },
-  tabIconWrapActive: {
-    backgroundColor: colors.glass.heavy,
-    shadowColor: "#372614",
-    shadowOpacity: 0.1,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 }
+    justifyContent: "center",
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
   },
   tabLabel: {
     color: colors.inactive,
-    fontSize: 14,
-    fontWeight: "500"
-  },
-  tabLabelActive: {
-    color: colors.domaBlue
+    fontSize: 10,
+    fontWeight: "600"
   }
 });
