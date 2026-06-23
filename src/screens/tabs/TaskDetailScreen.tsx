@@ -5,23 +5,21 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-
 import { colors, spacing } from "../../theme";
 import type { HouseholdTaskPriority, PersonId, TaskComment, TaskHistoryEntry, TaskItem, TaskSubtask } from "../../types";
 import { people } from "../../data";
+import { Avatar, AvatarGroup } from "../../components/family";
+import { MOCK_TODAY } from "../../utils/appDates";
+import { copy } from "../../i18n";
 
 type TaskDetailScreenProps = {
+  text: typeof copy.ru;
   task: TaskItem;
   onBack: () => void;
   onToggleTask: (taskId: string) => void;
 };
 
 const priorityColors: Record<HouseholdTaskPriority, string> = {
-  high: "#E53935",
+  high: colors.overdueRed,
   normal: colors.taskOrange,
   low: colors.inactive,
-};
-
-const priorityLabels: Record<HouseholdTaskPriority, string> = {
-  high: "Высокий приоритет",
-  normal: "Средний приоритет",
-  low: "Низкий приоритет",
 };
 
 function getPersonName(id: PersonId): string {
@@ -36,35 +34,30 @@ function getPersonColor(id: PersonId): string {
   return people[id]?.color ?? colors.inactive;
 }
 
-function formatDueDate(dueDate: string | null, dueTime: string | null): string {
-  if (!dueDate) return "Не указан";
-  const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
-  const weekDays = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
+function formatDueDate(dueDate: string | null, dueTime: string | null, text: typeof copy.ru): string {
+  if (!dueDate) return text.noDueDate;
   const d = new Date(dueDate);
   const day = d.getDate();
-  const month = months[d.getMonth()];
+  const month = text.monthNamesGenitive[d.getMonth()];
   const year = d.getFullYear();
-  const weekDay = weekDays[d.getDay()];
+  const weekDay = text.weekDaysFullSundayFirst[d.getDay()];
   let result = `${day} ${month} ${year}\n${weekDay}`;
   if (dueTime) result += `, ${dueTime}`;
   return result;
 }
 
-function formatHistoryTime(createdAt: string): string {
+function formatHistoryTime(createdAt: string, text: typeof copy.ru): string {
   const d = new Date(createdAt);
   const h = d.getHours().toString().padStart(2, "0");
   const m = d.getMinutes().toString().padStart(2, "0");
-  const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
-  const day = d.getDate();
-  const month = months[d.getMonth()];
-  return `Сегодня, ${h}:${m}`;
+  return `${text.preview.today}, ${h}:${m}`;
 }
 
-function formatCommentTime(createdAt: string): string {
+function formatCommentTime(createdAt: string, text: typeof copy.ru): string {
   const d = new Date(createdAt);
   const h = d.getHours().toString().padStart(2, "0");
   const m = d.getMinutes().toString().padStart(2, "0");
-  return `Сегодня, ${h}:${m}`;
+  return `${text.preview.today}, ${h}:${m}`;
 }
 
 const historyIcons: Record<TaskHistoryEntry["type"], string> = {
@@ -76,10 +69,15 @@ const historyIcons: Record<TaskHistoryEntry["type"], string> = {
   assigned: "person-outline",
 };
 
-export function TaskDetailScreen({ task, onBack, onToggleTask }: TaskDetailScreenProps) {
+export function TaskDetailScreen({ text, task, onBack, onToggleTask }: TaskDetailScreenProps) {
   const pColor = priorityColors[task.priority];
+  const priorityLabels: Record<HouseholdTaskPriority, string> = {
+    high: text.priorityHighFull,
+    normal: text.priorityMediumFull,
+    low: text.priorityLowFull,
+  };
   const pLabel = priorityLabels[task.priority];
-  const assigneeName = task.assignee === "shared" ? "Семейная" : getPersonName(task.assignee);
+  const assigneeName = task.assignee === "shared" ? text.sharedAssignee : getPersonName(task.assignee);
   const assigneeData = task.assignee !== "shared" ? people[task.assignee] : null;
   const completedSubtasks = task.subtasks.filter((s) => s.completed).length;
   const totalSubtasks = task.subtasks.length;
@@ -111,23 +109,23 @@ export function TaskDetailScreen({ task, onBack, onToggleTask }: TaskDetailScree
         <View style={styles.infoSection}>
           <InfoRow
             icon="person-outline"
-            label="Ответственный"
+            label={text.responsible}
             value={assigneeName}
             rightContent={
-              assigneeData ? (
-                <View style={[styles.avatarSmall, { backgroundColor: assigneeData.color }]}>
-                  <Text style={styles.avatarSmallText}>{assigneeData.initials}</Text>
-                </View>
-              ) : null
+              task.assignee !== "shared" ? (
+                <Avatar person={task.assignee as PersonId} size={28} />
+              ) : (
+                <AvatarGroup participants={["alex", "maya"]} small />
+              )
             }
           />
-          <InfoRow icon="calendar-outline" label="Срок" value={formatDueDate(task.dueDate, task.dueTime)} />
-          <InfoRow icon="repeat-outline" label="Повторять" value={task.recurrence ?? "Не повторять"} />
-          <InfoRow icon="notifications-outline" label="Напоминание" value={task.reminder} />
+          <InfoRow icon="calendar-outline" label={text.deadline} value={formatDueDate(task.dueDate, task.dueTime, text)} />
+          <InfoRow icon="repeat-outline" label={text.repeat} value={task.recurrence ?? text.noRepeatLabel} />
+          <InfoRow icon="notifications-outline" label={text.reminder} value={task.reminder} />
           {task.category && (
             <InfoRow
               icon="pricetag-outline"
-              label="Категория"
+              label={text.category}
               value={`${task.category.name} ${task.category.emoji}`}
             />
           )}
@@ -136,7 +134,7 @@ export function TaskDetailScreen({ task, onBack, onToggleTask }: TaskDetailScree
         {/* Description */}
         {task.description && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Описание</Text>
+            <Text style={styles.sectionTitle}>{text.description}</Text>
             <Text style={styles.descriptionText}>{task.description}</Text>
           </View>
         )}
@@ -145,7 +143,7 @@ export function TaskDetailScreen({ task, onBack, onToggleTask }: TaskDetailScree
         {totalSubtasks > 0 && (
           <View style={styles.section}>
             <View style={styles.subtasksHeader}>
-              <Text style={styles.sectionTitle}>Подзадачи</Text>
+              <Text style={styles.sectionTitle}>{text.subtasks}</Text>
               <Text style={styles.subtasksCount}>{completedSubtasks}/{totalSubtasks}</Text>
               <View style={styles.progressBarWrap}>
                 <View style={[styles.progressBar, { width: `${subtaskProgress * 100}%` }]} />
@@ -155,7 +153,7 @@ export function TaskDetailScreen({ task, onBack, onToggleTask }: TaskDetailScree
               <SubtaskRow key={sub.id} subtask={sub} />
             ))}
             <Pressable style={styles.addSubtaskButton}>
-              <Text style={styles.addSubtaskText}>Добавить подзадачу</Text>
+              <Text style={styles.addSubtaskText}>{text.addSubtask}</Text>
               <View style={styles.addSubtaskIcon}>
                 <Ionicons name="add" size={16} color={colors.white} />
               </View>
@@ -166,13 +164,13 @@ export function TaskDetailScreen({ task, onBack, onToggleTask }: TaskDetailScree
         {/* Comments */}
         {task.comments.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Комментарии</Text>
+            <Text style={styles.sectionTitle}>{text.comments}</Text>
             {task.comments.map((comment) => (
-              <CommentRow key={comment.id} comment={comment} />
+              <CommentRow key={comment.id} comment={comment} text={text} />
             ))}
             <TextInput
               style={styles.commentInput}
-              placeholder="Добавить комментарий..."
+              placeholder={text.addComment}
               placeholderTextColor={colors.textTertiary}
             />
           </View>
@@ -181,27 +179,37 @@ export function TaskDetailScreen({ task, onBack, onToggleTask }: TaskDetailScree
         {/* History */}
         {task.history.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>История</Text>
+            <Text style={styles.sectionTitle}>{text.history}</Text>
             {task.history.map((entry) => (
-              <HistoryRow key={entry.id} entry={entry} />
+              <HistoryRow key={entry.id} entry={entry} text={text} />
             ))}
           </View>
         )}
 
-        <View style={{ height: 100 }} />
-      </ScrollView>
+        {/* Bottom action buttons */}
+        {!task.completed && (
+          <View style={styles.bottomAction}>
+            <Pressable
+              style={styles.completeButton}
+              onPress={() => onToggleTask(task.id)}
+            >
+              <Ionicons name="checkmark-circle-outline" size={20} color={colors.white} />
+              <Text style={styles.completeButtonText}>{text.markComplete}</Text>
+            </Pressable>
 
-      {/* Bottom action button */}
-      {!task.completed && (
-        <View style={styles.bottomAction}>
-          <Pressable
-            style={styles.completeButton}
-            onPress={() => onToggleTask(task.id)}
-          >
-            <Text style={styles.completeButtonText}>Отметить как выполненную</Text>
-          </Pressable>
-        </View>
-      )}
+            <Pressable
+              style={styles.deleteButton}
+              onPress={() => {
+                // Delete mocked for now, just go back
+                onBack();
+              }}
+            >
+              <Ionicons name="trash-outline" size={20} color={colors.dangerRed} />
+              <Text style={styles.deleteButtonText}>{text.deleteTask}</Text>
+            </Pressable>
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 }
@@ -250,20 +258,16 @@ function SubtaskRow({ subtask }: { subtask: TaskSubtask }) {
   );
 }
 
-function CommentRow({ comment }: { comment: TaskComment }) {
+function CommentRow({ comment, text }: { comment: TaskComment, text: typeof copy.ru }) {
   const name = getPersonName(comment.authorId);
-  const initials = getPersonInitials(comment.authorId);
-  const color = getPersonColor(comment.authorId);
 
   return (
     <View style={styles.commentRow}>
-      <View style={[styles.commentAvatar, { backgroundColor: color }]}>
-        <Text style={styles.commentAvatarText}>{initials}</Text>
-      </View>
+      <Avatar person={comment.authorId as PersonId} size={32} />
       <View style={styles.commentContent}>
         <View style={styles.commentHeader}>
           <Text style={styles.commentAuthor}>{name}</Text>
-          <Text style={styles.commentTime}>{formatCommentTime(comment.createdAt)}</Text>
+          <Text style={styles.commentTime}>{formatCommentTime(comment.createdAt, text)}</Text>
         </View>
         <Text style={styles.commentText}>{comment.text}</Text>
       </View>
@@ -271,17 +275,17 @@ function CommentRow({ comment }: { comment: TaskComment }) {
   );
 }
 
-function HistoryRow({ entry }: { entry: TaskHistoryEntry }) {
+function HistoryRow({ entry, text }: { entry: TaskHistoryEntry, text: typeof copy.ru }) {
   const name = getPersonName(entry.actorId);
   const iconName = historyIcons[entry.type] ?? "ellipse-outline";
 
   const labels: Record<TaskHistoryEntry["type"], string> = {
-    created: "Задача создана",
-    due_changed: "Изменён срок",
-    comment_added: "Добавлен комментарий",
-    completed: "Задача выполнена",
-    reopened: "Задача переоткрыта",
-    assigned: "Назначен ответственный",
+    created: text.historyCreated,
+    due_changed: text.historyDueChanged,
+    comment_added: text.historyCommentAdded,
+    completed: text.historyCompleted,
+    reopened: text.historyReopened,
+    assigned: text.historyAssigned,
   };
 
   return (
@@ -290,7 +294,7 @@ function HistoryRow({ entry }: { entry: TaskHistoryEntry }) {
       <View style={styles.historyContent}>
         <Text style={styles.historyLabel}>{labels[entry.type]}</Text>
         <Text style={styles.historyMeta}>
-          {formatHistoryTime(entry.createdAt)}
+          {formatHistoryTime(entry.createdAt, text)}
           {entry.details ? `\n${entry.details}` : ""}
         </Text>
       </View>
@@ -310,7 +314,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 50,
     paddingBottom: 8,
   },
   backButton: {
@@ -383,18 +387,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     textAlign: "right",
   },
-  avatarSmall: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarSmallText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: colors.white,
-  },
+
   section: {
     backgroundColor: colors.white,
     borderRadius: 16,
@@ -450,9 +443,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  subtaskCheckboxOverdue: {
+    borderColor: colors.overdueRed,
+  },
   subtaskCheckboxDone: {
-    backgroundColor: "#E53935",
-    borderColor: "#E53935",
+    backgroundColor: colors.shoppingGreen,
+    borderColor: colors.shoppingGreen,
   },
   subtaskTitle: {
     fontSize: 14,
@@ -489,18 +485,7 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 16,
   },
-  commentAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  commentAvatarText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: colors.white,
-  },
+
   commentContent: {
     flex: 1,
   },
@@ -562,19 +547,39 @@ const styles = StyleSheet.create({
   },
   bottomAction: {
     paddingHorizontal: 24,
-    paddingVertical: 16,
-    paddingBottom: 32,
+    paddingTop: 16,
+    paddingBottom: 100,
     backgroundColor: colors.warmBackground,
+    gap: 12,
   },
   completeButton: {
     backgroundColor: colors.taskOrange,
     paddingVertical: 16,
     borderRadius: 16,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
   },
   completeButtonText: {
     fontSize: 16,
     fontWeight: "700",
     color: colors.white,
+  },
+  deleteButton: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: colors.dangerRed,
+    paddingVertical: 16,
+    borderRadius: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  deleteButtonText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: colors.dangerRed,
   },
 });

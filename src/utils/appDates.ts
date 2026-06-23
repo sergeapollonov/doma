@@ -1,5 +1,7 @@
 import type { ISODateString, ISODateTimeString } from "../types";
 
+export const MOCK_TODAY = "2026-06-03";
+
 export type CalendarDateCopy = {
   formatTodayDate: (day: number) => string;
   formatMonthDay: (day: number) => string;
@@ -36,7 +38,7 @@ export function eventDateToISODate(dateLabel: string): ISODateString | null {
 export function formatSelectedDate(date: ISODateString, text: CalendarDateCopy) {
   const day = Number(date.slice(-2));
 
-  if (date === "2026-06-03") {
+  if (date === MOCK_TODAY) {
     return text.formatTodayDate(day);
   }
 

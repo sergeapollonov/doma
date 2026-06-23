@@ -47,6 +47,7 @@ export const colors = {
   shoppingGreen: '#52B788',
   familySand: '#D7B98B',
   dangerRed: '#D85C4A',
+  overdueRed: '#E53935',
 
   // Utility
   white: '#FFFFFF',
