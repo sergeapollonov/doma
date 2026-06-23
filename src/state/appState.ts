@@ -3,12 +3,13 @@ import {
   initialHouseholdTasks,
   initialShoppingListState
 } from "../data";
-import { completeHouseholdTask, createHouseholdTask, reopenHouseholdTask } from "../tasks";
+import { completeHouseholdTask, createHouseholdTask, deleteHouseholdTask, reopenHouseholdTask, updateHouseholdTask } from "../tasks";
 import { createShoppingListItem, purchaseShoppingListItem, unpurchaseShoppingListItem } from "../shopping";
 import type {
   AddHouseholdTaskActionInput,
   AddShoppingListItemActionInput,
   CompleteHouseholdTaskInput,
+  DeleteHouseholdTaskInput,
   EventItem,
   FamilyId,
   ISODateString,
@@ -17,6 +18,7 @@ import type {
   PurchaseShoppingListItemInput,
   ReopenHouseholdTaskInput,
   UnpurchaseShoppingListItemInput,
+  UpdateHouseholdTaskInput,
   UserId
 } from "../types";
 
@@ -115,5 +117,19 @@ export function unpurchaseShoppingItem(state: LocalAppState, input: UnpurchaseSh
       ...state.shoppingList,
       items: state.shoppingList.items.map((item) => unpurchaseShoppingListItem(item, input))
     }
+  };
+}
+
+export function updateTask(state: LocalAppState, input: UpdateHouseholdTaskInput): LocalAppState {
+  return {
+    ...state,
+    householdTasks: state.householdTasks.map((task) => updateHouseholdTask(task, input))
+  };
+}
+
+export function deleteTask(state: LocalAppState, input: DeleteHouseholdTaskInput): LocalAppState {
+  return {
+    ...state,
+    householdTasks: state.householdTasks.map((task) => deleteHouseholdTask(task, input))
   };
 }

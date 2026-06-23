@@ -17,15 +17,17 @@ describe("app UI mappers", () => {
     expect(dueLabelToDateTime(copy.ru.noDue, copy.ru)).toBeNull();
     expect(dueLabelToDateTime(copy.ru.dueJune5, copy.ru)).toBe("2026-06-05T18:00:00+02:00");
 
-    expect(toTaskItem(initialHouseholdTasks[0], copy.ru)).toMatchObject({
+    const mapped = toTaskItem(initialHouseholdTasks[0], copy.ru);
+    expect(mapped).toMatchObject({
       id: "task-1",
-      title: "Позвонить мастеру",
+      title: "Оплатить интернет",
       assignee: "alex",
-      due: copy.ru.taskToday,
-      reminder: copy.ru.noReminder,
-      completed: false
+      completed: false,
+      priority: "high",
+      isOverdue: true
     });
 
+    // task-6 is "Полить цветы" (completed), index 5
     expect(toTaskItem(initialHouseholdTasks[5], copy.ru).completed).toBe(true);
   });
 

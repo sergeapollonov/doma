@@ -1,5 +1,6 @@
 import type {
   FamilyMemberId,
+  HouseholdAreaId,
   HouseholdTask,
   ISODateTimeString,
   Language,
@@ -11,6 +12,7 @@ import type {
   TaskItem,
   EventItem
 } from "../types";
+import { householdAreas } from "../data";
 
 export type TaskMapperCopy = {
   noDue: string;
@@ -42,14 +44,54 @@ export function dueLabelToDateTime(dueLabel: string, text: TaskMapperCopy): ISOD
   return "2026-06-03T18:00:00+02:00";
 }
 
-export function toTaskItem(task: HouseholdTask, text: TaskMapperCopy): TaskItem {
+function mapCategoryId(categoryId: HouseholdAreaId | null, language: Language): TaskItem["category"] {
+  if (!categoryId) return null;
+  const area = householdAreas.find((a) => a.id === categoryId);
+  if (!area) return null;
+  return { emoji: area.emoji, name: language === "pl" ? area.namePl : area.nameRu };
+}
+
+function mapRecurrence(recurrence: HouseholdTask["recurrence"], language: Language): string | null {
+  if (!recurrence) return null;
+  const labels: Record<string, Record<Language, string>> = {
+    daily: { ru: "Ежедневно", pl: "Codziennie" },
+    weekly: { ru: "Еженедельно", pl: "Co tydzień" },
+    monthly: { ru: "Ежемесячно", pl: "Co miesiąc" },
+  };
+  if (recurrence.type === "custom") {
+    return language === "pl" ? `Каждые ${recurrence.interval} дн.` : `Каждые ${recurrence.interval} дн.`;
+  }
+  return labels[recurrence.type]?.[language] ?? null;
+}
+
+const TODAY_ISO = "2026-06-03";
+
+function isOverdue(dueAt: ISODateTimeString | null, status: string): boolean {
+  if (!dueAt || status === "completed") return false;
+  return dueAt.slice(0, 10) < TODAY_ISO;
+}
+
+export function toTaskItem(task: HouseholdTask, text: TaskMapperCopy, language: Language = "ru"): TaskItem {
+  const dueAtDate = task.dueAt ? task.dueAt.slice(0, 10) : null;
+  const dueAtTime = task.dueAt ? task.dueAt.slice(11, 16) : null;
+
   return {
     id: task.id,
     title: task.title,
+    description: task.description,
     assignee: memberIdToTaskAssignee(task.assigneeMemberId),
     due: dueDateToLabel(task.dueAt, text),
+    dueDate: dueAtDate,
+    dueTime: dueAtTime,
     reminder: task.reminderAt ? text.thirtyMin : text.noReminder,
-    completed: task.status === "completed"
+    completed: task.status === "completed",
+    priority: task.priority,
+    isOverdue: isOverdue(task.dueAt, task.status),
+    category: mapCategoryId(task.categoryId, language),
+    recurrence: mapRecurrence(task.recurrence, language),
+    subtasks: task.subtasks,
+    comments: task.comments,
+    history: task.history,
   };
 }
 

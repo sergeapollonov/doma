@@ -1,10 +1,12 @@
 import type {
   CompleteHouseholdTaskInput,
+  DeleteHouseholdTaskInput,
   HouseholdTask,
   HouseholdTaskId,
   ISODateTimeString,
   NewHouseholdTaskInput,
-  ReopenHouseholdTaskInput
+  ReopenHouseholdTaskInput,
+  UpdateHouseholdTaskInput
 } from "./types";
 
 export function createHouseholdTask(
@@ -12,17 +14,23 @@ export function createHouseholdTask(
   id: HouseholdTaskId,
   createdAt: ISODateTimeString
 ): HouseholdTask {
+  const assignee = input.assigneeMemberId ?? null;
   return {
     id,
     familyId: input.familyId,
     title: input.title.trim(),
     description: input.description?.trim() || null,
-    assigneeMemberId: input.assigneeMemberId ?? null,
-    isShared: true,
+    assigneeMemberId: assignee,
+    isShared: assignee === null,
     dueAt: input.dueAt ?? null,
     reminderAt: input.reminderAt ?? null,
     status: "active",
     priority: input.priority ?? "normal",
+    categoryId: null,
+    recurrence: null,
+    subtasks: [],
+    comments: [],
+    history: [],
     createdBy: input.createdBy,
     updatedBy: null,
     completedBy: null,
@@ -111,4 +119,35 @@ export function sortHouseholdTasksByPriorityAndDueDate(tasks: HouseholdTask[]) {
 
     return first.dueAt.localeCompare(second.dueAt);
   });
+}
+
+export function updateHouseholdTask(task: HouseholdTask, input: UpdateHouseholdTaskInput): HouseholdTask {
+  if (task.id !== input.taskId) {
+    return task;
+  }
+
+  return {
+    ...task,
+    title: input.title?.trim() ?? task.title,
+    description: input.description !== undefined ? (input.description?.trim() || null) : task.description,
+    assigneeMemberId: input.assigneeMemberId !== undefined ? input.assigneeMemberId : task.assigneeMemberId,
+    isShared: (input.assigneeMemberId !== undefined ? input.assigneeMemberId : task.assigneeMemberId) === null,
+    dueAt: input.dueAt !== undefined ? input.dueAt : task.dueAt,
+    reminderAt: input.reminderAt !== undefined ? input.reminderAt : task.reminderAt,
+    priority: input.priority ?? task.priority,
+    categoryId: input.categoryId !== undefined ? input.categoryId : task.categoryId,
+    updatedBy: input.updatedBy,
+    updatedAt: input.updatedAt,
+  };
+}
+
+export function deleteHouseholdTask(task: HouseholdTask, input: DeleteHouseholdTaskInput): HouseholdTask {
+  if (task.id !== input.taskId) {
+    return task;
+  }
+
+  return {
+    ...task,
+    deletedAt: input.deletedAt,
+  };
 }

@@ -23,7 +23,7 @@ export type FormValidationResult<Field extends string> = {
 };
 
 export type EventFormField = "title" | "date" | "time" | "participants";
-export type TaskFormField = "title" | "assignee" | "due";
+export type TaskFormField = "title" | "assignee" | "due" | "description" | "priority" | "category" | "reminder";
 export type ShoppingFormField = "title" | "quantity" | "category";
 export type LoginFormField = "email";
 export type FamilySetupFormField = "familyName" | "userName";
@@ -39,6 +39,10 @@ export type TaskFormInput = {
   title: string;
   assignee: "alex" | "maya" | "shared";
   due: string;
+  description?: string;
+  priority?: "low" | "normal" | "high";
+  category?: string;
+  reminder?: string;
 };
 
 export type ShoppingFormInput = {
@@ -87,7 +91,11 @@ export const eventFormSchema = z.object({
 export const taskFormSchema = z.object({
   title: titleSchema,
   assignee: z.enum(["alex", "maya", "shared"]),
-  due: z.string()
+  due: z.string(),
+  description: z.string().trim().max(500).optional().default(""),
+  priority: z.enum(["low", "normal", "high"]).default("normal"),
+  category: z.string().optional().default(""),
+  reminder: z.string().optional().default("")
 });
 
 export const shoppingFormSchema = z.object({
