@@ -173,6 +173,7 @@ type DomaCopy = {
   historyCompleted: string;
   historyReopened: string;
   historyAssigned: string;
+  deleteTask: string;
   monthNamesGenitive: string[];
   weekDaysFullSundayFirst: string[];
 };
