@@ -158,6 +158,23 @@ type DomaCopy = {
   areaChild: string;
   areaPet: string;
   areaFinance: string;
+  // Phase 2: Tasks screen full localization
+  tasksScreenTitle: string;
+  sharedAssignee: string;
+  noDueDate: string;
+  thisWeek: string;
+  showMoreN: (n: number) => string;
+  priorityHighFull: string;
+  priorityMediumFull: string;
+  priorityLowFull: string;
+  historyCreated: string;
+  historyDueChanged: string;
+  historyCommentAdded: string;
+  historyCompleted: string;
+  historyReopened: string;
+  historyAssigned: string;
+  monthNamesGenitive: string[];
+  weekDaysFullSundayFirst: string[];
 };
 
 export const copy = {
@@ -337,7 +354,24 @@ export const copy = {
     areaCar: "Машина",
     areaChild: "Ребёнок",
     areaPet: "Питомец",
-    areaFinance: "Финансы"
+    areaFinance: "Финансы",
+    tasksScreenTitle: "Задачи",
+    sharedAssignee: "Семейная",
+    noDueDate: "Не указан",
+    thisWeek: "На этой неделе",
+    showMoreN: (n) => `Показать ещё ${n} задач`,
+    priorityHighFull: "Высокий приоритет",
+    priorityMediumFull: "Средний приоритет",
+    priorityLowFull: "Низкий приоритет",
+    historyCreated: "Задача создана",
+    historyDueChanged: "Изменён срок",
+    historyCommentAdded: "Добавлен комментарий",
+    historyCompleted: "Задача выполнена",
+    historyReopened: "Задача переоткрыта",
+    historyAssigned: "Назначен ответственный",
+    deleteTask: "Удалить задачу",
+    monthNamesGenitive: ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"],
+    weekDaysFullSundayFirst: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"]
   },
   pl: {
     brand: "Doma",
@@ -515,6 +549,23 @@ export const copy = {
     areaCar: "Samochód",
     areaChild: "Dziecko",
     areaPet: "Zwierzak",
-    areaFinance: "Finanse"
+    areaFinance: "Finanse",
+    tasksScreenTitle: "Sprawy",
+    sharedAssignee: "Rodzinna",
+    noDueDate: "Nie podano",
+    thisWeek: "W tym tygodniu",
+    showMoreN: (n) => `Pokaż jeszcze ${n} spraw`,
+    priorityHighFull: "Wysoki priorytet",
+    priorityMediumFull: "Średni priorytet",
+    priorityLowFull: "Niski priorytet",
+    historyCreated: "Zadanie utworzone",
+    historyDueChanged: "Zmieniono termin",
+    historyCommentAdded: "Dodano komentarz",
+    historyCompleted: "Zadanie wykonane",
+    historyReopened: "Zadanie wznowione",
+    historyAssigned: "Przypisano osobę",
+    deleteTask: "Usuń zadanie",
+    monthNamesGenitive: ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"],
+    weekDaysFullSundayFirst: ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"]
   }
 } satisfies Record<Language, DomaCopy>;

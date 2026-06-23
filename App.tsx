@@ -359,7 +359,7 @@ export default function App() {
               <StatusBar style="dark" />
               <SafeAreaView style={styles.safe}>
                 <View style={styles.app}>
-                  {activeTab !== "calendar" ? (
+                  {activeTab !== "calendar" && activeTab !== "tasks" ? (
                     <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                       <Header
                         tab={activeTab}
@@ -367,11 +367,9 @@ export default function App() {
                         title={activeTab === "today" ? text.brand : text.tabs[activeTab]}
                         todayDateLabel={selectedDateLabel}
                         subtitle={
-                          activeTab === "tasks"
-                            ? text.tasksSubtitle
-                            : activeTab === "shopping"
-                              ? text.shoppingSubtitle
-                              : text.morning
+                          activeTab === "shopping"
+                            ? text.shoppingSubtitle
+                            : text.morning
                         }
                         onFamily={() => setSheet("family")}
                         onSettings={() => setSheet("settings")}
@@ -393,28 +391,6 @@ export default function App() {
                           onToggleTask={toggleTask}
                         />
                       )}
-                      {activeTab === "tasks" && !selectedTaskId && (
-                        <TasksScreen
-                          text={text}
-                          tasks={tasks}
-                          filter={taskFilter}
-                          onChangeFilter={setTaskFilter}
-                          onOpenTaskSheet={() => setSheet("task")}
-                          onToggleTask={toggleTask}
-                          onSelectTask={(taskId) => setSelectedTaskId(taskId)}
-                        />
-                      )}
-                      {activeTab === "tasks" && selectedTaskId && (() => {
-                        const selectedTask = tasks.find((t) => t.id === selectedTaskId);
-                        if (!selectedTask) return null;
-                        return (
-                          <TaskDetailScreen
-                            task={selectedTask}
-                            onBack={() => setSelectedTaskId(null)}
-                            onToggleTask={toggleTask}
-                          />
-                        );
-                      })()}
                       {activeTab === "shopping" && (
                         <ShoppingScreen
                           text={text}
@@ -429,6 +405,31 @@ export default function App() {
                         />
                       )}
                     </ScrollView>
+                  ) : activeTab === "tasks" ? (
+                    <View style={{ flex: 1 }}>
+                      {!selectedTaskId ? (
+                        <TasksScreen
+                          text={text}
+                          tasks={tasks}
+                          filter={taskFilter}
+                          onChangeFilter={setTaskFilter}
+                          onOpenTaskSheet={() => setSheet("task")}
+                          onToggleTask={toggleTask}
+                          onSelectTask={(taskId) => setSelectedTaskId(taskId)}
+                        />
+                      ) : (() => {
+                        const selectedTask = tasks.find((t) => t.id === selectedTaskId);
+                        if (!selectedTask) return null;
+                        return (
+                          <TaskDetailScreen
+                            text={text}
+                            task={selectedTask}
+                            onBack={() => setSelectedTaskId(null)}
+                            onToggleTask={toggleTask}
+                          />
+                        );
+                      })()}
+                    </View>
                   ) : (
                     <View style={{ flex: 1 }}>
                       <CalendarScreen

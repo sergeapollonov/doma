@@ -3,32 +3,34 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors } from "../../../theme";
-import type { HouseholdTaskPriority, TaskItem } from "../../../types";
+import type { HouseholdTaskPriority, PersonId, TaskItem } from "../../../types";
 import { people } from "../../../data";
+import { Avatar, AvatarGroup } from "../../../components/family";
+import { MOCK_TODAY } from "../../../utils/appDates";
+import { copy } from "../../../i18n";
 
 type TaskCardProps = {
+  text: typeof copy.ru;
   task: TaskItem;
   onToggle: () => void;
   onPress?: () => void;
 };
 
 const priorityColors: Record<HouseholdTaskPriority, string> = {
-  high: "#E53935",
+  high: colors.overdueRed,
   normal: colors.taskOrange,
-  low: colors.inactive,
+  low: colors.shoppingGreen,
 };
 
-const priorityLabels: Record<HouseholdTaskPriority, string> = {
-  high: "Высокий",
-  normal: "Средний",
-  low: "Низкий",
-};
-
-export function TaskCard({ task, onToggle, onPress }: TaskCardProps) {
+export function TaskCard({ text, task, onToggle, onPress }: TaskCardProps) {
   const pColor = priorityColors[task.priority];
+  const priorityLabels: Record<HouseholdTaskPriority, string> = {
+    high: text.priorityHigh,
+    normal: text.priorityMedium,
+    low: text.priorityLow,
+  };
   const pLabel = priorityLabels[task.priority];
-  const assigneeName = task.assignee === "shared" ? "Семейная" : people[task.assignee]?.name ?? task.assignee;
-  const assigneeData = task.assignee !== "shared" ? people[task.assignee] : null;
+  const assigneeName = task.assignee === "shared" ? text.sharedAssignee : people[task.assignee]?.name ?? task.assignee;
 
   return (
     <Pressable style={styles.card} onPress={onPress}>
@@ -53,20 +55,20 @@ export function TaskCard({ task, onToggle, onPress }: TaskCardProps) {
         </Text>
         {task.isOverdue && !task.completed && task.dueDate && (
           <Text style={styles.overdueText}>
-            Просрочено {getOverdueLabel(task.dueDate)}
+            {getOverdueLabel(task.dueDate, text)}
           </Text>
         )}
         <View style={styles.metaRow}>
-          {assigneeData ? (
+          {task.assignee !== "shared" ? (
             <View style={styles.assigneeChip}>
-              <View style={[styles.avatarMini, { backgroundColor: assigneeData.color }]}>
-                <Text style={styles.avatarText}>{assigneeData.initials}</Text>
-              </View>
+              <Avatar person={task.assignee as PersonId} size={20} />
               <Text style={styles.assigneeName}>{assigneeName}</Text>
             </View>
           ) : (
             <View style={styles.assigneeChip}>
-              <Ionicons name="people-outline" size={14} color={colors.taskOrange} />
+              <View style={{ marginLeft: 6 }}>
+                <AvatarGroup participants={["alex", "maya"]} small />
+              </View>
               <Text style={styles.assigneeName}>{assigneeName}</Text>
             </View>
           )}
@@ -76,7 +78,7 @@ export function TaskCard({ task, onToggle, onPress }: TaskCardProps) {
       {/* Right side */}
       <View style={styles.rightCol}>
         {task.dueTime && !task.completed && (
-          <Text style={[styles.timeText, task.isOverdue && { color: "#E53935" }]}>
+          <Text style={[styles.timeText, task.isOverdue && { color: colors.overdueRed }]}>
             {task.dueTime}
           </Text>
         )}
@@ -90,12 +92,12 @@ export function TaskCard({ task, onToggle, onPress }: TaskCardProps) {
   );
 }
 
-function getOverdueLabel(dueDate: string): string {
+function getOverdueLabel(dueDate: string, text: typeof copy.ru): string {
   const due = new Date(dueDate);
-  const today = new Date("2026-06-03");
+  const today = new Date(MOCK_TODAY);
   const diffDays = Math.floor((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24));
-  if (diffDays === 1) return "вчера";
-  return `${diffDays} дн. назад`;
+  if (diffDays === 1) return text.overdueYesterday;
+  return text.overdueDaysAgo(diffDays);
 }
 
 const styles = StyleSheet.create({
@@ -121,11 +123,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   checkboxOverdue: {
-    borderColor: "#E53935",
+    borderColor: colors.overdueRed,
   },
   checkboxDone: {
-    backgroundColor: "#52B788",
-    borderColor: "#52B788",
+    backgroundColor: colors.shoppingGreen,
+    borderColor: colors.shoppingGreen,
   },
   content: {
     flex: 1,
@@ -142,7 +144,7 @@ const styles = StyleSheet.create({
   },
   overdueText: {
     fontSize: 12,
-    color: "#E53935",
+    color: colors.overdueRed,
     fontWeight: "500",
   },
   metaRow: {
@@ -153,23 +155,16 @@ const styles = StyleSheet.create({
   assigneeChip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
-  },
-  avatarMini: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarText: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: colors.white,
+    backgroundColor: "rgba(239, 138, 31, 0.08)",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
   },
   assigneeName: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: colors.taskOrange,
+    marginLeft: 6,
+    fontWeight: "600",
   },
   rightCol: {
     alignItems: "flex-end",
