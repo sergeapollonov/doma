@@ -46,6 +46,7 @@ import {
   TodayScreen,
   type TaskFilter
 } from "./src/screens/tabs";
+import { TaskDetailScreen } from "./src/screens/tabs/TaskDetailScreen";
 import {
   AcceptInviteScreen,
   FamilySetupScreen,
@@ -122,6 +123,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<TabKey>("today");
   const [sheet, setSheet] = useState<AppSheet>(null);
   const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const loginForm = useForm<LoginFormInput>({
     defaultValues: { email: "alex@example.com" },
     mode: "onChange",
@@ -163,8 +165,8 @@ export default function App() {
   const selectedDateLabel = formatSelectedDate(selectedDate, text);
   const selectedDateSectionTitle = formatCalendarSectionDate(selectedDate, text);
   const tasks = useMemo(
-    () => householdTasks.map((task) => toTaskItem(task, text)),
-    [householdTasks, text]
+    () => householdTasks.map((task) => toTaskItem(task, text, language)),
+    [householdTasks, text, language]
   );
   const shopping = useMemo(
     () => shoppingList.items.map((item) => toShoppingItem(item, shoppingList.categories, language, text)),
@@ -295,14 +297,6 @@ export default function App() {
     return people[assignee].name;
   }
 
-  const filteredTasks = tasks.filter((task) => {
-    if (taskFilter === "done") return task.completed;
-    if (taskFilter === "mine") return task.assignee === "alex";
-    if (taskFilter === "maya") return task.assignee === "maya";
-    if (taskFilter === "shared") return task.assignee === "shared";
-    return true;
-  });
-
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator screenOptions={{ headerShown: false, animation: "slide_from_right" }}>
@@ -399,18 +393,28 @@ export default function App() {
                           onToggleTask={toggleTask}
                         />
                       )}
-                      {activeTab === "tasks" && (
+                      {activeTab === "tasks" && !selectedTaskId && (
                         <TasksScreen
                           text={text}
                           tasks={tasks}
                           filter={taskFilter}
-                          filteredTasks={filteredTasks}
-                          assigneeLabel={assigneeLabel}
                           onChangeFilter={setTaskFilter}
                           onOpenTaskSheet={() => setSheet("task")}
                           onToggleTask={toggleTask}
+                          onSelectTask={(taskId) => setSelectedTaskId(taskId)}
                         />
                       )}
+                      {activeTab === "tasks" && selectedTaskId && (() => {
+                        const selectedTask = tasks.find((t) => t.id === selectedTaskId);
+                        if (!selectedTask) return null;
+                        return (
+                          <TaskDetailScreen
+                            task={selectedTask}
+                            onBack={() => setSelectedTaskId(null)}
+                            onToggleTask={toggleTask}
+                          />
+                        );
+                      })()}
                       {activeTab === "shopping" && (
                         <ShoppingScreen
                           text={text}

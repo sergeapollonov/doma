@@ -134,6 +134,30 @@ type DomaCopy = {
   allDone: string;
   fridgeFull: string;
   briefingSubtitle: (events: number, tasks: number, shopping: number) => string;
+  // Tasks screen keys
+  overdue: string;
+  priorityHigh: string;
+  priorityMedium: string;
+  priorityLow: string;
+  markComplete: string;
+  showCompleted: string;
+  showMore: string;
+  familyFilter: string;
+  overdueYesterday: string;
+  overdueDaysAgo: (n: number) => string;
+  responsible: string;
+  deadline: string;
+  description: string;
+  subtasks: string;
+  addSubtask: string;
+  comments: string;
+  history: string;
+  noRepeatLabel: string;
+  areaHome: string;
+  areaCar: string;
+  areaChild: string;
+  areaPet: string;
+  areaFinance: string;
 };
 
 export const copy = {
@@ -290,7 +314,30 @@ export const copy = {
     todayFree: "Сегодня свободный день 🍃",
     allDone: "Все дела сделаны",
     fridgeFull: "Холодильник полон",
-    briefingSubtitle: (e, t, s) => `${e} события, ${t} задач, ${s} покупок`
+    briefingSubtitle: (e, t, s) => `${e} события, ${t} задач, ${s} покупок`,
+    overdue: "Просроченные",
+    priorityHigh: "Высокий",
+    priorityMedium: "Средний",
+    priorityLow: "Низкий",
+    markComplete: "Отметить как выполненную",
+    showCompleted: "Показать выполненные",
+    showMore: "Показать ещё",
+    familyFilter: "Семейные",
+    overdueYesterday: "Просрочено вчера",
+    overdueDaysAgo: (n) => `Просрочено ${n} дн. назад`,
+    responsible: "Ответственный",
+    deadline: "Срок",
+    description: "Описание",
+    subtasks: "Подзадачи",
+    addSubtask: "Добавить подзадачу",
+    comments: "Комментарии",
+    history: "История",
+    noRepeatLabel: "Не повторять",
+    areaHome: "Дом",
+    areaCar: "Машина",
+    areaChild: "Ребёнок",
+    areaPet: "Питомец",
+    areaFinance: "Финансы"
   },
   pl: {
     brand: "Doma",
@@ -445,6 +492,29 @@ export const copy = {
     todayFree: "Dzisiaj wolny dzień 🍃",
     allDone: "Wszystkie sprawy załatwione",
     fridgeFull: "Lodówka jest pełna",
-    briefingSubtitle: (e, t, s) => `${e} wydarzenia, ${t} spraw, ${s} zakupów`
+    briefingSubtitle: (e, t, s) => `${e} wydarzenia, ${t} spraw, ${s} zakupów`,
+    overdue: "Zaległe",
+    priorityHigh: "Wysoki",
+    priorityMedium: "Średni",
+    priorityLow: "Niski",
+    markComplete: "Oznacz jako wykonane",
+    showCompleted: "Pokaż wykonane",
+    showMore: "Pokaż więcej",
+    familyFilter: "Rodzinne",
+    overdueYesterday: "Zaległe od wczoraj",
+    overdueDaysAgo: (n) => `Zaległe od ${n} dni`,
+    responsible: "Osoba odpowiedzialna",
+    deadline: "Termin",
+    description: "Opis",
+    subtasks: "Podzadania",
+    addSubtask: "Dodaj podzadanie",
+    comments: "Komentarze",
+    history: "Historia",
+    noRepeatLabel: "Bez powtórzeń",
+    areaHome: "Dom",
+    areaCar: "Samochód",
+    areaChild: "Dziecko",
+    areaPet: "Zwierzak",
+    areaFinance: "Finanse"
   }
 } satisfies Record<Language, DomaCopy>;

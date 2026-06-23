@@ -20,6 +20,43 @@ export type HouseholdTaskStatus = "active" | "completed" | "archived";
 
 export type HouseholdTaskPriority = "low" | "normal" | "high";
 
+export type HouseholdAreaId = "area-home" | "area-car" | "area-child" | "area-pet" | "area-finance";
+
+export type RecurrenceType = "daily" | "weekly" | "monthly" | "custom";
+
+export type RecurrenceRule = {
+  type: RecurrenceType;
+  interval: number;
+};
+
+export type HouseholdArea = {
+  id: HouseholdAreaId;
+  emoji: string;
+  nameRu: string;
+  namePl: string;
+};
+
+export type TaskSubtask = {
+  id: string;
+  title: string;
+  completed: boolean;
+};
+
+export type TaskComment = {
+  id: string;
+  authorId: PersonId;
+  text: string;
+  createdAt: ISODateTimeString;
+};
+
+export type TaskHistoryEntry = {
+  id: string;
+  type: "created" | "due_changed" | "comment_added" | "completed" | "reopened" | "assigned";
+  actorId: PersonId;
+  createdAt: ISODateTimeString;
+  details?: string;
+};
+
 export type ShoppingCategoryId = `cat-${string}`;
 
 export type ShoppingItemId = `shop-${string}`;
@@ -39,6 +76,11 @@ export type HouseholdTask = {
   reminderAt: ISODateTimeString | null;
   status: HouseholdTaskStatus;
   priority: HouseholdTaskPriority;
+  categoryId: HouseholdAreaId | null;
+  recurrence: RecurrenceRule | null;
+  subtasks: TaskSubtask[];
+  comments: TaskComment[];
+  history: TaskHistoryEntry[];
   createdBy: UserId;
   updatedBy: UserId | null;
   completedBy: UserId | null;
@@ -69,6 +111,24 @@ export type ReopenHouseholdTaskInput = {
   taskId: HouseholdTaskId;
   updatedBy: UserId;
   updatedAt: ISODateTimeString;
+};
+
+export type UpdateHouseholdTaskInput = {
+  taskId: HouseholdTaskId;
+  title?: string;
+  description?: string | null;
+  assigneeMemberId?: FamilyMemberId | null;
+  dueAt?: ISODateTimeString | null;
+  reminderAt?: ISODateTimeString | null;
+  priority?: HouseholdTaskPriority;
+  categoryId?: HouseholdAreaId | null;
+  updatedBy: UserId;
+  updatedAt: ISODateTimeString;
+};
+
+export type DeleteHouseholdTaskInput = {
+  taskId: HouseholdTaskId;
+  deletedAt: ISODateTimeString;
 };
 
 export type ShoppingCategory = {
@@ -163,10 +223,20 @@ export type EventItem = {
 export type TaskItem = {
   id: string;
   title: string;
+  description: string | null;
   assignee: PersonId | "shared";
   due: string;
+  dueDate: string | null;
+  dueTime: string | null;
   reminder: string;
   completed: boolean;
+  priority: HouseholdTaskPriority;
+  isOverdue: boolean;
+  category: { emoji: string; name: string } | null;
+  recurrence: string | null;
+  subtasks: TaskSubtask[];
+  comments: TaskComment[];
+  history: TaskHistoryEntry[];
 };
 
 export type ShoppingItem = {

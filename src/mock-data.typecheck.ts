@@ -5,7 +5,6 @@ import {
   initialShoppingCategories,
   initialShoppingListItems,
   initialShoppingListState,
-  initialTasks,
   people
 } from "./data";
 import { completeHouseholdTask, createHouseholdTask, reopenHouseholdTask } from "./tasks";
@@ -32,7 +31,6 @@ type IsAssignable<Actual, Expected> = Actual extends Expected ? true : false;
 
 type _PeopleUseKnownPersonIds = Expect<IsAssignable<keyof typeof people, PersonId>>;
 type _EventsMatchUiModel = Expect<IsAssignable<(typeof initialEvents)[number], EventItem>>;
-type _TasksMatchUiModel = Expect<IsAssignable<(typeof initialTasks)[number], TaskItem>>;
 type _ShoppingMatchesUiModel = Expect<IsAssignable<(typeof initialShopping)[number], ShoppingItem>>;
 type _HouseholdTasksMatchDomainModel = Expect<IsAssignable<(typeof initialHouseholdTasks)[number], HouseholdTask>>;
 type _ShoppingCategoriesMatchDomainModel = Expect<
