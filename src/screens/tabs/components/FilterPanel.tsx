@@ -80,10 +80,8 @@ const styles = StyleSheet.create({
     padding: 3,
     shadowColor: colors.domaBlue,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
+    shadowOpacity: 0.08,
     shadowRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.strokeLight,
   },
   islandChip: {
     flexDirection: 'row',

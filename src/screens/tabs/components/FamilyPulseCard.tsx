@@ -95,10 +95,8 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
     shadowColor: colors.domaBlue,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
+    shadowOpacity: 0.08,
     shadowRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.strokeLight,
   },
   statsRow: {
     flexDirection: 'row',
@@ -116,6 +114,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     lineHeight: 24,
     marginBottom: 4,
+    fontVariant: ['tabular-nums'],
   },
   statLabelMain: {
     fontSize: 12,

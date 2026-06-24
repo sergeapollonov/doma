@@ -102,7 +102,7 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
         })}
       </View>
 
-      <TouchableOpacity style={styles.showAllButton}>
+      <TouchableOpacity style={styles.showAllButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
         <Text style={styles.showAllText}>Показать весь день (2)</Text>
         <Ionicons name="chevron-down" size={16} color="#8C77F6" style={{ marginLeft: 4, marginTop: 2 }} />
       </TouchableOpacity>
@@ -120,10 +120,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     shadowColor: colors.domaBlue,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
+    shadowOpacity: 0.06,
     shadowRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.strokeLight,
   },
   headerTitle: {
     fontSize: 12,

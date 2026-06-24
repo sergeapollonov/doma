@@ -18,7 +18,7 @@ export function TasksSection({ tasks, title = 'ЗАДАЧИ НА ДЕНЬ', acti
       <View style={styles.headerRow}>
         <Text style={styles.headerTitle}>{title}</Text>
         {actionLabel && (
-          <TouchableOpacity onPress={onActionPress} style={styles.actionButton}>
+          <TouchableOpacity onPress={onActionPress} style={styles.actionButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Text style={styles.actionLabel}>{actionLabel}</Text>
             <Ionicons name="chevron-forward" size={14} color={colors.taskOrange} />
           </TouchableOpacity>
@@ -68,7 +68,7 @@ export function TasksSection({ tasks, title = 'ЗАДАЧИ НА ДЕНЬ', acti
       </View>
 
       {!actionLabel && (
-        <TouchableOpacity style={styles.showAllButton}>
+        <TouchableOpacity style={styles.showAllButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Text style={styles.showAllText}>Показать все задачи ({tasks.length})</Text>
           <Ionicons name="chevron-down" size={16} color={colors.taskOrange} style={{ marginLeft: 4, marginTop: 2 }} />
         </TouchableOpacity>
@@ -86,10 +86,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     shadowColor: colors.domaBlue,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
+    shadowOpacity: 0.06,
     shadowRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.strokeLight,
   },
   headerRow: {
     flexDirection: 'row',

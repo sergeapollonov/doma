@@ -87,11 +87,11 @@ export function TaskDetailScreen({ text, task, onBack, onToggleTask }: TaskDetai
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable style={styles.backButton} onPress={onBack}>
+        <Pressable style={styles.backButton} onPress={onBack} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
         </Pressable>
         <View style={{ flex: 1 }} />
-        <Pressable style={styles.moreButton}>
+        <Pressable style={styles.moreButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Ionicons name="ellipsis-horizontal" size={22} color={colors.textPrimary} />
         </Pressable>
       </View>
@@ -152,7 +152,7 @@ export function TaskDetailScreen({ text, task, onBack, onToggleTask }: TaskDetai
             {task.subtasks.map((sub) => (
               <SubtaskRow key={sub.id} subtask={sub} />
             ))}
-            <Pressable style={styles.addSubtaskButton}>
+            <Pressable style={styles.addSubtaskButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
               <Text style={styles.addSubtaskText}>{text.addSubtask}</Text>
               <View style={styles.addSubtaskIcon}>
                 <Ionicons name="add" size={16} color={colors.white} />
@@ -560,6 +560,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
+    paddingRight: 4, // optical alignment
   },
   completeButtonText: {
     fontSize: 16,
@@ -576,6 +577,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
+    paddingRight: 4, // optical alignment
   },
   deleteButtonText: {
     fontSize: 16,
