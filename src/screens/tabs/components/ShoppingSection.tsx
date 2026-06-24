@@ -21,7 +21,7 @@ export function ShoppingSection({
     <View style={styles.outerContainer}>
       <View style={styles.headerRow}>
         <Text style={styles.headerTitle}>{title}</Text>
-        <TouchableOpacity onPress={onActionPress} style={styles.actionButton}>
+        <TouchableOpacity onPress={onActionPress} style={styles.actionButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Text style={styles.actionLabel}>{actionLabel}</Text>
           {onActionPress && <Ionicons name="chevron-forward" size={14} color={colors.shoppingGreen} />}
         </TouchableOpacity>
@@ -78,10 +78,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     shadowColor: colors.domaBlue,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
+    shadowOpacity: 0.06,
     shadowRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.strokeLight,
   },
   headerRow: {
     flexDirection: 'row',

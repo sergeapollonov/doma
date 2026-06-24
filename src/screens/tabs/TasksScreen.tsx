@@ -169,7 +169,7 @@ export function TasksScreen({
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{text.tasksScreenTitle}</Text>
         <View style={styles.headerActions}>
-          <Pressable style={styles.headerButton}>
+          <Pressable style={styles.headerButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Ionicons name="search-outline" size={22} color={colors.textPrimary} />
           </Pressable>
           <Pressable style={styles.addButton} onPress={onOpenTaskSheet}>
@@ -394,6 +394,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: colors.textSecondary,
+    fontVariant: ['tabular-nums'],
   },
   taskListContainer: {
     gap: 8,

@@ -45,7 +45,8 @@ const styles = StyleSheet.create({
   dayText: {
     color: colors.textPrimary,
     fontSize: 25,
-    fontWeight: "500"
+    fontWeight: "500",
+    fontVariant: ['tabular-nums'],
   },
   dayTextSelected: {
     color: colors.white

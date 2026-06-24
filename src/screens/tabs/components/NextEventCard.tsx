@@ -91,10 +91,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     shadowColor: colors.domaBlue,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.08,
     shadowRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.strokeLight,
   },
   mapBackground: {
     position: 'absolute',

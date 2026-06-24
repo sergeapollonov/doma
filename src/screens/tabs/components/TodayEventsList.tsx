@@ -17,7 +17,7 @@ export function TodayEventsList({ events, onPressEvent }: TodayEventsListProps) 
     <View style={styles.outerContainer}>
       <View style={styles.headerRow}>
         <Text style={styles.headerTitle}>СОБЫТИЯ СЕГОДНЯ</Text>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Text style={styles.actionLabel}>{events.length > 2 ? '2 события' : `${events.length} события`}</Text>
           <Ionicons name="chevron-forward" size={14} color="#8C77F6" />
         </TouchableOpacity>
@@ -68,10 +68,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     shadowColor: colors.domaBlue,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
+    shadowOpacity: 0.06,
     shadowRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.strokeLight,
   },
   headerRow: {
     flexDirection: 'row',

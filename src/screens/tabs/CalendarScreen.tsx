@@ -58,7 +58,7 @@ export function CalendarScreen({
       <View style={styles.headerContainer}>
         <View style={styles.headerTitles}>
           <Text style={styles.headerTitleMain}>Календарь</Text>
-          <TouchableOpacity style={styles.monthSelector}>
+          <TouchableOpacity style={styles.monthSelector} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Text style={styles.monthSelectorText}>{text.monthJune2026}</Text>
             <Ionicons name="chevron-down" size={12} color={colors.textSecondary} />
           </TouchableOpacity>
