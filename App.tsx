@@ -38,6 +38,7 @@ import {
 import { CalendarScreen } from "./src/screens/tabs/CalendarScreen";
 import { ShoppingScreen } from "./src/screens/tabs/ShoppingScreen";
 import { ShoppingItemDetailScreen } from "./src/screens/tabs/ShoppingItemDetailScreen";
+import { ShoppingModeScreen } from "./src/screens/tabs/ShoppingModeScreen";
 import { TasksScreen, TodayScreen, type TaskFilter } from "./src/screens/tabs";
 import { TaskDetailScreen } from "./src/screens/tabs/TaskDetailScreen";
 import {
@@ -120,6 +121,7 @@ export default function App() {
   const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [selectedShoppingItemId, setSelectedShoppingItemId] = useState<string | "new" | null>(null);
+  const [isShoppingModeActive, setIsShoppingModeActive] = useState(false);
   const loginForm = useForm<LoginFormInput>({
     defaultValues: { email: "alex@example.com" },
     mode: "onChange",
@@ -444,11 +446,18 @@ export default function App() {
                             />
                           );
                         })()
+                      ) : isShoppingModeActive ? (
+                        <ShoppingModeScreen
+                          items={shoppingItems}
+                          onExit={() => setIsShoppingModeActive(false)}
+                          onToggleItem={(id) => toggleShopping(id)}
+                          onOpenItemDetail={(id) => setSelectedShoppingItemId(id ?? "new")}
+                        />
                       ) : (
                         <ShoppingScreen
                           items={shoppingItems}
                           onOpenItemDetail={(id) => setSelectedShoppingItemId(id ?? "new")}
-                          onStartShoppingMode={() => {}}
+                          onStartShoppingMode={() => setIsShoppingModeActive(true)}
                           onOpenTemplates={() => {}}
                           onSelectTemplate={() => {}}
                           onToggleItem={(id) => toggleShopping(id)}
@@ -494,7 +503,9 @@ export default function App() {
                       />
                     </View>
                   )}
-                  <TabBar activeTab={activeTab} onChange={setActiveTab} onAdd={() => setSheet("quick")} labels={text.tabs} />
+                  {!(isShoppingModeActive || selectedShoppingItemId !== null || selectedTaskId !== null) && (
+                    <TabBar activeTab={activeTab} onChange={setActiveTab} onAdd={() => setSheet("quick")} labels={text.tabs} />
+                  )}
                 </View>
               </SafeAreaView>
               <BottomSheet visible={sheet !== null} onClose={() => setSheet(null)}>
