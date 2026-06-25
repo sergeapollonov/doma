@@ -245,5 +245,24 @@ export type ShoppingItem = {
   quantity?: string;
   categoryId: ShoppingCategoryId | null;
   category: string;
+  categoryColor?: string;
+  categoryIcon?: string;
   purchased: boolean;
+  assignee?: PersonId | 'shared';
+  urgency?: 'today' | 'running-out' | 'soon' | null;
+  urgencyLabel?: string;
+  daysUntilNeeded?: number;
+  estimatedPrice?: number;
+};
+
+export type ShoppingTemplate = {
+  id: string;
+  name: string;
+  iconBg: string;
+  iconColor: string;
+  iconName: string;
+  itemCount: number;
+  scope: 'family' | 'personal';
+  lastUsedDaysAgo?: number;
+  description?: string;
 };

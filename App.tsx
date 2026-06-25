@@ -359,18 +359,14 @@ export default function App() {
               <StatusBar style="dark" />
               <SafeAreaView style={styles.safe}>
                 <View style={styles.app}>
-                  {activeTab !== "calendar" && activeTab !== "tasks" ? (
+                  {activeTab !== "calendar" && activeTab !== "tasks" && activeTab !== "shopping" ? (
                     <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                       <Header
                         tab={activeTab}
                         greetingTitle={text.todayGreeting}
                         title={activeTab === "today" ? text.brand : text.tabs[activeTab]}
                         todayDateLabel={selectedDateLabel}
-                        subtitle={
-                          activeTab === "shopping"
-                            ? text.shoppingSubtitle
-                            : text.morning
-                        }
+                        subtitle={text.morning}
                         onFamily={() => setSheet("family")}
                         onSettings={() => setSheet("settings")}
                         onAdd={() => setSheet("quick")}
@@ -391,20 +387,16 @@ export default function App() {
                           onToggleTask={toggleTask}
                         />
                       )}
-                      {activeTab === "shopping" && (
-                        <ShoppingScreen
-                          text={text}
-                          shopping={shopping}
-                          categories={shoppingList.categories}
-                          language={language}
-                          frequentShopping={frequentShopping}
-                          categoryName={shoppingCategoryName}
-                          onOpenShoppingSheet={() => setSheet("shopping")}
-                          onAddFrequentItem={addShoppingItem}
-                          onToggleShoppingItem={toggleShopping}
-                        />
-                      )}
                     </ScrollView>
+                  ) : activeTab === "shopping" ? (
+                    <View style={{ flex: 1 }}>
+                      <ShoppingScreen
+                        onOpenItemDetail={() => setSheet("shopping")}
+                        onStartShoppingMode={() => {}}
+                        onOpenTemplates={() => {}}
+                        onSelectTemplate={() => {}}
+                      />
+                    </View>
                   ) : activeTab === "tasks" ? (
                     <View style={{ flex: 1 }}>
                       {!selectedTaskId ? (
