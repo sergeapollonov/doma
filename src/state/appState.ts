@@ -38,10 +38,10 @@ export function createInitialLocalAppState(): LocalAppState {
     events: [...initialEvents],
     householdTasks: [...initialHouseholdTasks],
     shoppingList: {
-      categories: initialShoppingListState.categories,
-      items: initialShoppingListState.items,
-      frequentItemTitles: initialShoppingListState.frequentItemTitles,
-      templates: initialShoppingListState.templates
+      categories: [...initialShoppingListState.categories],
+      items: [...initialShoppingListState.items],
+      frequentItemTitles: [...initialShoppingListState.frequentItemTitles],
+      templates: [...(initialShoppingListState.templates || [])]
     }
   };
 }
