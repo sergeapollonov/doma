@@ -24,7 +24,7 @@ export type FormValidationResult<Field extends string> = {
 
 export type EventFormField = "title" | "date" | "time" | "participants";
 export type TaskFormField = "title" | "assignee" | "due" | "description" | "priority" | "category" | "reminder";
-export type ShoppingFormField = "title" | "quantity" | "category" | "assignee" | "urgency";
+export type ShoppingFormField = "title" | "quantity" | "category" | "assignee" | "dueDate" | "priority" | "recurrence" | "note" | "isTemplate";
 export type LoginFormField = "email";
 export type FamilySetupFormField = "familyName" | "userName";
 
@@ -50,7 +50,11 @@ export type ShoppingFormInput = {
   quantity: string;
   category: string;
   assignee?: "alex" | "maya" | "shared" | "unassigned";
-  urgency?: "today" | "soon" | "running-out" | "normal";
+  dueDate?: string;
+  priority?: "low" | "normal" | "high";
+  recurrence?: string;
+  note?: string;
+  isTemplate?: boolean;
 };
 
 export type LoginFormInput = {
@@ -105,7 +109,11 @@ export const shoppingFormSchema = z.object({
   quantity: z.string().trim().max(MAX_QUANTITY_LENGTH, "quantity_too_long"),
   category: z.string().trim().min(1, "category_required"),
   assignee: z.enum(["alex", "maya", "shared", "unassigned"]).optional(),
-  urgency: z.enum(["today", "soon", "running-out", "normal"]).optional()
+  dueDate: z.string().optional().default(""),
+  priority: z.enum(["low", "normal", "high"]).optional().default("normal"),
+  recurrence: z.string().optional().default(""),
+  note: z.string().trim().max(500).optional().default(""),
+  isTemplate: z.boolean().optional().default(false)
 });
 
 export function validateLoginForm(input: LoginFormInput): FormValidationResult<LoginFormField> {

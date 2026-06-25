@@ -151,7 +151,10 @@ export type ShoppingListItem = {
   quantity: string | null;
   note: string | null;
   assignee?: "alex" | "maya" | "shared" | "unassigned";
-  urgency?: "today" | "soon" | "running-out" | "normal";
+  dueDate?: string | null;
+  priority?: HouseholdTaskPriority;
+  recurrence?: string | null;
+  isTemplate?: boolean;
   status: ShoppingItemStatus;
   sortOrder: number;
   createdBy: UserId;
@@ -176,7 +179,10 @@ export type NewShoppingListItemInput = {
   quantity?: string | null;
   note?: string | null;
   assignee?: "alex" | "maya" | "shared" | "unassigned";
-  urgency?: "today" | "soon" | "running-out" | "normal";
+  dueDate?: string | null;
+  priority?: HouseholdTaskPriority;
+  recurrence?: string | null;
+  isTemplate?: boolean;
   sortOrder?: number;
   createdBy: UserId;
 };
@@ -253,9 +259,11 @@ export type ShoppingItem = {
   categoryIcon?: string;
   purchased: boolean;
   assignee?: PersonId | 'shared';
-  urgency?: 'today' | 'running-out' | 'soon' | null;
-  urgencyLabel?: string;
-  daysUntilNeeded?: number;
+  dueDate?: string | null;
+  priority?: HouseholdTaskPriority;
+  recurrence?: string | null;
+  note?: string | null;
+  isTemplate?: boolean;
   estimatedPrice?: number;
 };
 

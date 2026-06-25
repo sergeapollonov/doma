@@ -12,11 +12,14 @@ type ButtonProps = {
 type PrimaryButtonProps = ButtonProps & {
   disabled?: boolean;
   arrow?: boolean;
+  color?: string;
 };
 
-export function PrimaryButton({ label, onPress, disabled = false, arrow = false }: PrimaryButtonProps) {
+export function PrimaryButton({ label, onPress, disabled = false, arrow = false, color }: PrimaryButtonProps) {
+  const customColorStyle = color ? { backgroundColor: color, shadowColor: color } : undefined;
+
   return (
-    <Pressable style={[styles.primaryButton, disabled && styles.primaryButtonDisabled]} onPress={onPress} disabled={disabled}>
+    <Pressable style={[styles.primaryButton, customColorStyle, disabled && styles.primaryButtonDisabled]} onPress={onPress} disabled={disabled}>
       <Text style={[styles.primaryButtonText, disabled && styles.disabledText]}>{label}</Text>
       {arrow ? <Ionicons name="arrow-forward" size={24} color={colors.white} style={styles.primaryButtonArrow} /> : null}
     </Pressable>

@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors, radius, spacing } from '../../theme';
 import type { ShoppingItem, ShoppingTemplate } from '../../types';
@@ -43,6 +44,7 @@ export function ShoppingScreen({
   onOpenTemplates,
   onSelectTemplate,
 }: ShoppingScreenProps) {
+  const insets = useSafeAreaInsets();
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
   const [urgentItems, setUrgentItems] = useState<ShoppingItem[]>(mockUrgentItems);
   const [soonItems, setSoonItems] = useState<ShoppingItem[]>(mockSoonItems);
@@ -68,7 +70,7 @@ export function ShoppingScreen({
   return (
     <View style={styles.container}>
       {/* ── Header ── */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, 20) + 12 }]}>
         <Text style={styles.headerTitle}>Покупки</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity
@@ -154,7 +156,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.screen,
-    paddingTop: 50,
     paddingBottom: 12,
   },
   headerTitle: {
@@ -181,9 +182,9 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
   },
   headerButtonPrimary: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: colors.shoppingGreen,
     alignItems: 'center',
     justifyContent: 'center',
@@ -191,6 +192,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
+    elevation: 4,
   },
   filterWrap: {
     marginBottom: spacing.md,

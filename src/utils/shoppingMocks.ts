@@ -11,8 +11,8 @@ export const mockUrgentItems: ShoppingItem[] = [
     categoryIcon: '🥛',
     purchased: false,
     assignee: 'alex',
-    urgency: 'today',
-    urgencyLabel: 'Нужно сегодня',
+    priority: 'high',
+    
     estimatedPrice: 8,
   },
   {
@@ -25,8 +25,8 @@ export const mockUrgentItems: ShoppingItem[] = [
     categoryIcon: '🧷',
     purchased: false,
     assignee: 'maya',
-    urgency: 'running-out',
-    urgencyLabel: 'Заканчиваются',
+    priority: 'high',
+    
     estimatedPrice: 25,
   },
   {
@@ -39,8 +39,8 @@ export const mockUrgentItems: ShoppingItem[] = [
     categoryIcon: '🍞',
     purchased: false,
     assignee: 'shared',
-    urgency: 'today',
-    urgencyLabel: 'Нужно сегодня',
+    priority: 'high',
+    
     estimatedPrice: 5,
   },
   {
@@ -53,8 +53,8 @@ export const mockUrgentItems: ShoppingItem[] = [
     categoryIcon: '🐟',
     purchased: false,
     assignee: 'alex',
-    urgency: 'today',
-    urgencyLabel: 'Свежий',
+    priority: 'high',
+    
     estimatedPrice: 35,
   },
 ];
@@ -70,9 +70,9 @@ export const mockSoonItems: ShoppingItem[] = [
     categoryIcon: '🐱',
     purchased: false,
     assignee: 'maya',
-    urgency: 'soon',
-    urgencyLabel: 'Через 3 дня',
-    daysUntilNeeded: 3,
+    priority: 'high',
+    
+    
     estimatedPrice: 18,
   },
   {
@@ -85,9 +85,9 @@ export const mockSoonItems: ShoppingItem[] = [
     categoryIcon: '🧴',
     purchased: false,
     assignee: 'shared',
-    urgency: 'soon',
-    urgencyLabel: 'Через неделю',
-    daysUntilNeeded: 7,
+    priority: 'high',
+    
+    
     estimatedPrice: 22,
   },
   {
@@ -100,9 +100,9 @@ export const mockSoonItems: ShoppingItem[] = [
     categoryIcon: '🧻',
     purchased: false,
     assignee: 'alex',
-    urgency: 'soon',
-    urgencyLabel: 'Через 10 дней',
-    daysUntilNeeded: 10,
+    priority: 'high',
+    
+    
     estimatedPrice: 12,
   },
 ];

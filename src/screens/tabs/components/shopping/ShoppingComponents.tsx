@@ -108,10 +108,9 @@ type ShoppingItemRowProps = {
 };
 
 export function ShoppingItemRow({ item, onToggle, onPress, showUrgency = true }: ShoppingItemRowProps) {
-  const urgencyColor =
-    item.urgency === 'today' ? colors.taskOrange :
-    item.urgency === 'running-out' ? colors.overdueRed :
-    item.urgency === 'soon' ? colors.taskOrange : colors.textTertiary;
+  const priorityColor =
+    item.priority === 'high' ? colors.overdueRed :
+    item.priority === 'normal' ? colors.taskOrange : colors.textTertiary;
 
   return (
     <TouchableOpacity style={styles.itemRow} onPress={onPress} activeOpacity={0.7}>
@@ -140,8 +139,10 @@ export function ShoppingItemRow({ item, onToggle, onPress, showUrgency = true }:
         <Text style={[styles.itemTitle, item.purchased && styles.itemTitleDone]} numberOfLines={1}>
           {item.title}
         </Text>
-        {showUrgency && item.urgencyLabel ? (
-          <Text style={[styles.itemUrgency, { color: urgencyColor }]}>{item.urgencyLabel}</Text>
+        {showUrgency && item.priority ? (
+          <Text style={[styles.itemUrgency, { color: priorityColor }]}>
+            {item.priority === 'high' ? 'Pilne' : item.priority === 'normal' ? 'Średnie' : 'Niskie'}
+          </Text>
         ) : null}
       </View>
 
