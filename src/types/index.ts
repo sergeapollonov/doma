@@ -150,6 +150,8 @@ export type ShoppingListItem = {
   title: string;
   quantity: string | null;
   note: string | null;
+  assignee?: "alex" | "maya" | "shared" | "unassigned";
+  urgency?: "today" | "soon" | "running-out" | "normal";
   status: ShoppingItemStatus;
   sortOrder: number;
   createdBy: UserId;
@@ -173,6 +175,8 @@ export type NewShoppingListItemInput = {
   title: string;
   quantity?: string | null;
   note?: string | null;
+  assignee?: "alex" | "maya" | "shared" | "unassigned";
+  urgency?: "today" | "soon" | "running-out" | "normal";
   sortOrder?: number;
   createdBy: UserId;
 };

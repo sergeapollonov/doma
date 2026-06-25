@@ -145,7 +145,7 @@ export default function App() {
     resolver: zodResolver(taskFormSchema)
   });
   const shoppingForm = useForm<ShoppingFormInput>({
-    defaultValues: { title: "", quantity: "", category: text.categoryOther },
+    defaultValues: { title: "", quantity: "", category: "food", assignee: "unassigned", urgency: "normal" },
     mode: "onChange",
     resolver: zodResolver(shoppingFormSchema)
   });
@@ -275,10 +275,12 @@ export default function App() {
       categoryId: shoppingCategoryLabelToId(values.category, shoppingList.categories),
       title: nextTitle,
       quantity: values.quantity.trim() || null,
+      assignee: values.assignee,
+      urgency: values.urgency,
       createdBy: currentUserId,
       createdAt: nowDateTime()
     });
-    shoppingForm.reset({ title: "", quantity: "", category: text.categoryOther });
+    shoppingForm.reset({ title: "", quantity: "", category: "food", assignee: "unassigned", urgency: "normal" });
     setSheet(null);
     setActiveTab("shopping");
   }
