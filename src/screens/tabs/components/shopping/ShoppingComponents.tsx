@@ -108,10 +108,9 @@ type ShoppingItemRowProps = {
 };
 
 export function ShoppingItemRow({ item, onToggle, onPress, showUrgency = true }: ShoppingItemRowProps) {
-  const urgencyColor =
-    item.urgency === 'today' ? colors.taskOrange :
-    item.urgency === 'running-out' ? colors.overdueRed :
-    item.urgency === 'soon' ? colors.taskOrange : colors.textTertiary;
+  const priorityColor =
+    item.priority === 'high' ? colors.overdueRed :
+    item.priority === 'normal' ? colors.taskOrange : colors.textTertiary;
 
   return (
     <TouchableOpacity style={styles.itemRow} onPress={onPress} activeOpacity={0.7}>
@@ -140,8 +139,10 @@ export function ShoppingItemRow({ item, onToggle, onPress, showUrgency = true }:
         <Text style={[styles.itemTitle, item.purchased && styles.itemTitleDone]} numberOfLines={1}>
           {item.title}
         </Text>
-        {showUrgency && item.urgencyLabel ? (
-          <Text style={[styles.itemUrgency, { color: urgencyColor }]}>{item.urgencyLabel}</Text>
+        {showUrgency && item.priority ? (
+          <Text style={[styles.itemUrgency, { color: priorityColor }]}>
+            {item.priority === 'high' ? 'Pilne' : item.priority === 'normal' ? 'Średnie' : 'Niskie'}
+          </Text>
         ) : null}
       </View>
 
@@ -331,33 +332,67 @@ export function ShoppingSoonSection({ items, onToggleItem, onPressItem }: Shoppi
 // ─── Purchased Section ────────────────────────────────────────────────────────
 
 type ShoppingPurchasedSectionProps = {
-  count: number;
+  items: ShoppingItem[];
+  onToggleItem: (id: string) => void;
+  onPressItem: (id: string) => void;
 };
 
-export function ShoppingPurchasedSection({ count }: ShoppingPurchasedSectionProps) {
+export function ShoppingPurchasedSection({ items, onToggleItem, onPressItem }: ShoppingPurchasedSectionProps) {
   const [expanded, setExpanded] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+  const visible = showAll ? items : items.slice(0, 3);
+
+  if (items.length === 0) return null;
 
   return (
-    <TouchableOpacity
-      style={styles.purchasedHeader}
-      onPress={() => setExpanded((v) => !v)}
-      hitSlop={{ top: 6, bottom: 6 }}
-    >
-      <View style={styles.sectionHeaderLeft}>
-        <Ionicons name="checkmark-circle-outline" size={18} color={colors.shoppingGreen} />
-        <Text style={[styles.sectionTitle, { color: colors.shoppingGreen }]}>Куплено</Text>
-      </View>
-      <View style={styles.sectionHeaderRight}>
-        <View style={[styles.sectionBadge, { backgroundColor: colors.shoppingGreen }]}>
-          <Text style={styles.sectionBadgeText}>{count}</Text>
+    <View style={styles.sectionContainer}>
+      <TouchableOpacity
+        style={styles.purchasedHeader}
+        onPress={() => setExpanded((v) => !v)}
+        hitSlop={{ top: 6, bottom: 6 }}
+      >
+        <View style={styles.sectionHeaderLeft}>
+          <Ionicons name="checkmark-circle-outline" size={18} color={colors.shoppingGreen} />
+          <Text style={[styles.sectionTitle, { color: colors.shoppingGreen }]}>Куплено</Text>
         </View>
-        <Ionicons
-          name={expanded ? 'chevron-up' : 'chevron-down'}
-          size={18}
-          color={colors.textSecondary}
-        />
-      </View>
-    </TouchableOpacity>
+        <View style={styles.sectionHeaderRight}>
+          <View style={[styles.sectionBadge, { backgroundColor: colors.shoppingGreen }]}>
+            <Text style={styles.sectionBadgeText}>{items.length}</Text>
+          </View>
+          <Ionicons
+            name={expanded ? 'chevron-up' : 'chevron-down'}
+            size={18}
+            color={colors.textSecondary}
+          />
+        </View>
+      </TouchableOpacity>
+
+      {expanded && (
+        <>
+          {visible.map((item) => (
+            <ShoppingItemRow
+              key={item.id}
+              item={item}
+              onToggle={() => onToggleItem(item.id)}
+              onPress={() => onPressItem(item.id)}
+              showUrgency={false}
+            />
+          ))}
+          {!showAll && items.length > 3 && (
+            <TouchableOpacity
+              style={styles.showAllRow}
+              onPress={() => setShowAll(true)}
+              hitSlop={{ top: 8, bottom: 8 }}
+            >
+              <Text style={[styles.showAllText, { color: colors.shoppingGreen }]}>
+                Показать все ({items.length})
+              </Text>
+              <Ionicons name="chevron-down" size={15} color={colors.shoppingGreen} style={{ marginLeft: 4 }} />
+            </TouchableOpacity>
+          )}
+        </>
+      )}
+    </View>
   );
 }
 

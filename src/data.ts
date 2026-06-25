@@ -544,7 +544,8 @@ export const initialShoppingListItems = [
     purchasedAt: null,
     createdAt: "2026-06-03T08:00:00+02:00",
     updatedAt: "2026-06-03T08:00:00+02:00",
-    deletedAt: null
+    deletedAt: null,
+    priority: "high"
   },
   {
     id: "shop-2",
@@ -561,7 +562,8 @@ export const initialShoppingListItems = [
     purchasedAt: null,
     createdAt: "2026-06-03T08:02:00+02:00",
     updatedAt: "2026-06-03T08:02:00+02:00",
-    deletedAt: null
+    deletedAt: null,
+    priority: "high"
   },
   {
     id: "shop-3",
@@ -578,7 +580,8 @@ export const initialShoppingListItems = [
     purchasedAt: null,
     createdAt: "2026-06-03T08:04:00+02:00",
     updatedAt: "2026-06-03T08:04:00+02:00",
-    deletedAt: null
+    deletedAt: null,
+    priority: "high"
   },
   {
     id: "shop-4",

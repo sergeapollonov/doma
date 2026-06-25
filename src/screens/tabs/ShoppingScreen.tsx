@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors, radius, spacing } from '../../theme';
 import type { ShoppingItem, ShoppingTemplate } from '../../types';
@@ -31,44 +32,49 @@ import {
 type FilterKey = 'all' | 'mine' | 'family' | 'purchased';
 
 type ShoppingScreenProps = {
+  items: ShoppingItem[];
   onOpenItemDetail?: (id?: string) => void;
   onStartShoppingMode?: () => void;
   onOpenTemplates?: () => void;
   onSelectTemplate?: (id: string) => void;
+  onToggleItem?: (id: string) => void;
 };
 
 export function ShoppingScreen({
+  items,
   onOpenItemDetail,
   onStartShoppingMode,
   onOpenTemplates,
   onSelectTemplate,
+  onToggleItem,
 }: ShoppingScreenProps) {
+  const insets = useSafeAreaInsets();
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
-  const [urgentItems, setUrgentItems] = useState<ShoppingItem[]>(mockUrgentItems);
-  const [soonItems, setSoonItems] = useState<ShoppingItem[]>(mockSoonItems);
+  
+  // Basic sorting: urgent (high priority), soon (normal/low)
+  const urgentItems = items.filter(i => i.priority === 'high' && !i.purchased);
+  const soonItems = items.filter(i => i.priority !== 'high' && !i.purchased);
+  const purchasedItems = items.filter(i => i.purchased);
 
   const allCount = urgentItems.length + soonItems.length;
   const mineCount = urgentItems.filter((i) => i.assignee === 'alex').length +
     soonItems.filter((i) => i.assignee === 'alex').length;
   const familyCount = urgentItems.filter((i) => i.assignee === 'shared').length +
     soonItems.filter((i) => i.assignee === 'shared').length;
+  const currentPurchasedCount = purchasedItems.length;
 
   const handleToggleUrgent = (id: string) => {
-    setUrgentItems((prev) =>
-      prev.map((item) => item.id === id ? { ...item, purchased: !item.purchased } : item)
-    );
+    onToggleItem?.(id);
   };
 
   const handleToggleSoon = (id: string) => {
-    setSoonItems((prev) =>
-      prev.map((item) => item.id === id ? { ...item, purchased: !item.purchased } : item)
-    );
+    onToggleItem?.(id);
   };
 
   return (
     <View style={styles.container}>
       {/* ── Header ── */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, 20) + 12 }]}>
         <Text style={styles.headerTitle}>Покупки</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity
@@ -97,7 +103,7 @@ export function ShoppingScreen({
           allCount={allCount}
           mineCount={mineCount}
           familyCount={familyCount}
-          purchasedCount={mockPurchasedCount}
+          purchasedCount={currentPurchasedCount}
           onSelect={setActiveFilter}
         />
       </View>
@@ -129,7 +135,11 @@ export function ShoppingScreen({
         />
 
         {/* ── Purchased Section ── */}
-        <ShoppingPurchasedSection count={mockPurchasedCount} />
+        <ShoppingPurchasedSection
+          items={purchasedItems}
+          onToggleItem={onToggleItem ?? (() => {})}
+          onPressItem={(id) => onOpenItemDetail?.(id)}
+        />
 
         {/* ── Templates Strip ── */}
         <ShoppingTemplatesStrip
@@ -154,7 +164,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.screen,
-    paddingTop: 50,
     paddingBottom: 12,
   },
   headerTitle: {
@@ -181,9 +190,9 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
   },
   headerButtonPrimary: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: colors.shoppingGreen,
     alignItems: 'center',
     justifyContent: 'center',
@@ -191,6 +200,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
+    elevation: 4,
   },
   filterWrap: {
     marginBottom: spacing.md,

@@ -12,15 +12,11 @@ import {
 } from "react-native";
 
 import { AppShell, BottomSheet, Header, TabBar } from "./src/components/layout";
-import {
-  EventFormSheet,
-  FamilySheet,
-  QuickAddSheet,
-  SettingsSheet,
-  ShoppingFormSheet,
-  TaskFormSheet,
-  type AppSheet
-} from "./src/components/sheets";
+import { EventFormSheet } from "./src/components/sheets/EventFormSheet";
+import { FamilySheet } from "./src/components/sheets/FamilySheet";
+import { QuickAddSheet, SettingsSheet } from "./src/components/sheets";
+import { TaskFormSheet } from "./src/components/sheets/TaskFormSheet";
+import { type AppSheet } from "./src/components/sheets";
 import { people } from "./src/data";
 import { copy } from "./src/i18n";
 import {
@@ -39,13 +35,10 @@ import {
   TabKey,
   TaskItem
 } from "./src/types";
-import {
-  CalendarScreen,
-  ShoppingScreen,
-  TasksScreen,
-  TodayScreen,
-  type TaskFilter
-} from "./src/screens/tabs";
+import { CalendarScreen } from "./src/screens/tabs/CalendarScreen";
+import { ShoppingScreen } from "./src/screens/tabs/ShoppingScreen";
+import { ShoppingItemDetailScreen } from "./src/screens/tabs/ShoppingItemDetailScreen";
+import { TasksScreen, TodayScreen, type TaskFilter } from "./src/screens/tabs";
 import { TaskDetailScreen } from "./src/screens/tabs/TaskDetailScreen";
 import {
   AcceptInviteScreen,
@@ -116,6 +109,8 @@ export default function App() {
   const storeCompleteTask = useLocalAppStore((state) => state.completeTask);
   const storeReopenTask = useLocalAppStore((state) => state.reopenTask);
   const storeAddShoppingItem = useLocalAppStore((state) => state.addShoppingItem);
+  const storeUpdateShoppingItem = useLocalAppStore((state) => state.updateShoppingItem);
+  const storeDeleteShoppingItem = useLocalAppStore((state) => state.deleteShoppingItem);
   const storePurchaseShoppingItem = useLocalAppStore((state) => state.purchaseShoppingItem);
   const storeUnpurchaseShoppingItem = useLocalAppStore((state) => state.unpurchaseShoppingItem);
   const text = copy[language] as typeof copy.ru;
@@ -124,6 +119,7 @@ export default function App() {
   const [sheet, setSheet] = useState<AppSheet>(null);
   const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [selectedShoppingItemId, setSelectedShoppingItemId] = useState<string | "new" | null>(null);
   const loginForm = useForm<LoginFormInput>({
     defaultValues: { email: "alex@example.com" },
     mode: "onChange",
@@ -144,8 +140,13 @@ export default function App() {
     mode: "onChange",
     resolver: zodResolver(taskFormSchema)
   });
+
+  const shoppingItems = useMemo(
+    () => shoppingList.items.map((item) => toShoppingItem(item, shoppingList.categories, language, copy[language] as any)),
+    [shoppingList.items, shoppingList.categories, language]
+  );
   const shoppingForm = useForm<ShoppingFormInput>({
-    defaultValues: { title: "", quantity: "", category: text.categoryOther },
+    defaultValues: { title: "", quantity: "", category: "food", assignee: "unassigned", priority: "normal" },
     mode: "onChange",
     resolver: zodResolver(shoppingFormSchema)
   });
@@ -269,17 +270,41 @@ export default function App() {
 
   function submitShoppingItem(values: ShoppingFormInput) {
     const nextTitle = values.title.trim();
-    storeAddShoppingItem({
-      id: createShoppingItemId(nextTitle),
-      familyId,
-      categoryId: shoppingCategoryLabelToId(values.category, shoppingList.categories),
-      title: nextTitle,
-      quantity: values.quantity.trim() || null,
-      createdBy: currentUserId,
-      createdAt: nowDateTime()
-    });
-    shoppingForm.reset({ title: "", quantity: "", category: text.categoryOther });
-    setSheet(null);
+    if (selectedShoppingItemId && selectedShoppingItemId !== "new") {
+      storeUpdateShoppingItem({
+        itemId: selectedShoppingItemId as ShoppingItemId,
+        title: nextTitle,
+        quantity: values.quantity.trim() || null,
+        categoryId: shoppingCategoryLabelToId(values.category, shoppingList.categories),
+        assignee: values.assignee,
+        dueDate: values.dueDate,
+        priority: values.priority,
+        recurrence: values.recurrence,
+        note: values.note,
+        isTemplate: values.isTemplate,
+        updatedBy: currentUserId,
+        updatedAt: nowDateTime()
+      });
+    } else {
+      storeAddShoppingItem({
+        id: createShoppingItemId(nextTitle),
+        familyId,
+        categoryId: shoppingCategoryLabelToId(values.category, shoppingList.categories),
+        title: nextTitle,
+        quantity: values.quantity.trim() || null,
+        assignee: values.assignee,
+        dueDate: values.dueDate,
+        priority: values.priority,
+        recurrence: values.recurrence,
+        note: values.note,
+        isTemplate: values.isTemplate,
+        createdBy: currentUserId,
+        createdAt: nowDateTime()
+      });
+    }
+    
+    shoppingForm.reset({ title: "", quantity: "", category: "food", assignee: "unassigned", priority: "normal" });
+    setSelectedShoppingItemId(null);
     setActiveTab("shopping");
   }
 
@@ -390,12 +415,45 @@ export default function App() {
                     </ScrollView>
                   ) : activeTab === "shopping" ? (
                     <View style={{ flex: 1 }}>
-                      <ShoppingScreen
-                        onOpenItemDetail={() => setSheet("shopping")}
-                        onStartShoppingMode={() => {}}
-                        onOpenTemplates={() => {}}
-                        onSelectTemplate={() => {}}
-                      />
+
+                      {selectedShoppingItemId ? (
+                        (() => {
+                          const rawItem = selectedShoppingItemId !== "new" 
+                            ? shoppingList.items.find((i) => i.id === selectedShoppingItemId) 
+                            : undefined;
+                          const itemToEdit = rawItem 
+                            ? toShoppingItem(rawItem, shoppingList.categories, language, text) 
+                            : undefined;
+                            
+                          return (
+                            <ShoppingItemDetailScreen
+                              text={text}
+                              item={itemToEdit}
+                              onBack={() => setSelectedShoppingItemId(null)}
+                              onSave={(data) => {
+                                submitShoppingItem(data);
+                              }}
+                              onDelete={(id) => {
+                                storeDeleteShoppingItem({
+                                  itemId: id as ShoppingItemId,
+                                  deletedBy: currentUserId,
+                                  deletedAt: nowDateTime()
+                                });
+                                setSelectedShoppingItemId(null);
+                              }}
+                            />
+                          );
+                        })()
+                      ) : (
+                        <ShoppingScreen
+                          items={shoppingItems}
+                          onOpenItemDetail={(id) => setSelectedShoppingItemId(id ?? "new")}
+                          onStartShoppingMode={() => {}}
+                          onOpenTemplates={() => {}}
+                          onSelectTemplate={() => {}}
+                          onToggleItem={(id) => toggleShopping(id)}
+                        />
+                      )}
                     </View>
                   ) : activeTab === "tasks" ? (
                     <View style={{ flex: 1 }}>
@@ -453,15 +511,6 @@ export default function App() {
                 )}
                 {sheet === "task" && (
                   <TaskFormSheet form={taskForm} language={language} text={text} isValid={taskIsValid} onSubmit={addTask} />
-                )}
-                {sheet === "shopping" && (
-                  <ShoppingFormSheet
-                    form={shoppingForm}
-                    language={language}
-                    text={text}
-                    isValid={shoppingIsValid}
-                    onSubmit={() => addShoppingItem()}
-                  />
                 )}
                 {sheet === "family" && <FamilySheet text={text} userName={userName} onShareLink={() => setSheet(null)} />}
                 {sheet === "settings" && (

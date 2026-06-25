@@ -4,12 +4,13 @@ import {
   initialShoppingListState
 } from "../data";
 import { completeHouseholdTask, createHouseholdTask, deleteHouseholdTask, reopenHouseholdTask, updateHouseholdTask } from "../tasks";
-import { createShoppingListItem, purchaseShoppingListItem, unpurchaseShoppingListItem } from "../shopping";
+import { createShoppingListItem, purchaseShoppingListItem, unpurchaseShoppingListItem, updateShoppingListItem, deleteShoppingListItem } from "../shopping";
 import type {
   AddHouseholdTaskActionInput,
   AddShoppingListItemActionInput,
   CompleteHouseholdTaskInput,
   DeleteHouseholdTaskInput,
+  DeleteShoppingListItemInput,
   EventItem,
   FamilyId,
   ISODateString,
@@ -19,6 +20,7 @@ import type {
   ReopenHouseholdTaskInput,
   UnpurchaseShoppingListItemInput,
   UpdateHouseholdTaskInput,
+  UpdateShoppingListItemInput,
   UserId
 } from "../types";
 
@@ -116,6 +118,26 @@ export function unpurchaseShoppingItem(state: LocalAppState, input: UnpurchaseSh
     shoppingList: {
       ...state.shoppingList,
       items: state.shoppingList.items.map((item) => unpurchaseShoppingListItem(item, input))
+    }
+  };
+}
+
+export function updateShoppingItem(state: LocalAppState, input: UpdateShoppingListItemInput): LocalAppState {
+  return {
+    ...state,
+    shoppingList: {
+      ...state.shoppingList,
+      items: state.shoppingList.items.map((item) => updateShoppingListItem(item, input))
+    }
+  };
+}
+
+export function deleteShoppingItem(state: LocalAppState, input: DeleteShoppingListItemInput): LocalAppState {
+  return {
+    ...state,
+    shoppingList: {
+      ...state.shoppingList,
+      items: state.shoppingList.items.map((item) => deleteShoppingListItem(item, input))
     }
   };
 }

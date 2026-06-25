@@ -150,6 +150,11 @@ export type ShoppingListItem = {
   title: string;
   quantity: string | null;
   note: string | null;
+  assignee?: "alex" | "maya" | "shared" | "unassigned";
+  dueDate?: string | null;
+  priority?: HouseholdTaskPriority;
+  recurrence?: string | null;
+  isTemplate?: boolean;
   status: ShoppingItemStatus;
   sortOrder: number;
   createdBy: UserId;
@@ -173,6 +178,11 @@ export type NewShoppingListItemInput = {
   title: string;
   quantity?: string | null;
   note?: string | null;
+  assignee?: "alex" | "maya" | "shared" | "unassigned";
+  dueDate?: string | null;
+  priority?: HouseholdTaskPriority;
+  recurrence?: string | null;
+  isTemplate?: boolean;
   sortOrder?: number;
   createdBy: UserId;
 };
@@ -187,6 +197,27 @@ export type UnpurchaseShoppingListItemInput = {
   itemId: ShoppingItemId;
   updatedBy: UserId;
   updatedAt: ISODateTimeString;
+};
+
+export type UpdateShoppingListItemInput = {
+  itemId: ShoppingItemId;
+  title?: string;
+  quantity?: string | null;
+  categoryId?: ShoppingCategoryId | null;
+  note?: string | null;
+  assignee?: "alex" | "maya" | "shared" | "unassigned";
+  dueDate?: string | null;
+  priority?: HouseholdTaskPriority;
+  recurrence?: string | null;
+  isTemplate?: boolean;
+  updatedBy: UserId;
+  updatedAt: ISODateTimeString;
+};
+
+export type DeleteShoppingListItemInput = {
+  itemId: ShoppingItemId;
+  deletedBy: UserId;
+  deletedAt: ISODateTimeString;
 };
 
 export type LocalAppState = {
@@ -249,9 +280,11 @@ export type ShoppingItem = {
   categoryIcon?: string;
   purchased: boolean;
   assignee?: PersonId | 'shared';
-  urgency?: 'today' | 'running-out' | 'soon' | null;
-  urgencyLabel?: string;
-  daysUntilNeeded?: number;
+  dueDate?: string | null;
+  priority?: HouseholdTaskPriority;
+  recurrence?: string | null;
+  note?: string | null;
+  isTemplate?: boolean;
   estimatedPrice?: number;
 };
 

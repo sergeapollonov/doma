@@ -131,13 +131,31 @@ export function toShoppingItem(
   language: Language,
   text: ShoppingMapperCopy
 ): ShoppingItem {
+  const categoryModel = categories.find((c) => c.id === item.categoryId);
+  const ICONS: Record<string, string> = { "milk": "🥛", "leaf": "🥬", "home": "🏠", "meat": "🥩", "more": "📦", "dairy": "🥛", "fruit-veg": "🥬" };
+  const COLORS: Record<string, string> = { "doma_blue": "#4A90D9", "danger_red": "#E74C3C", "warning_yellow": "#F39C12", "success_green": "#27AE60", "family_sand": "#D7B98B" };
+  
+  const category = categoryModel ? {
+    name: language === "pl" ? categoryModel.namePl : categoryModel.nameRu,
+    icon: ICONS[categoryModel.iconKey] || "🛒",
+    color: COLORS[categoryModel.colorKey] || "#6D5DF6"
+  } : null;
+
   return {
     id: item.id,
     title: item.title,
     quantity: item.quantity ?? undefined,
     categoryId: item.categoryId,
-    category: shoppingCategoryName(item.categoryId, categories, language, text),
-    purchased: item.status === "purchased"
+    category: category?.name || text.categoryOther,
+    categoryColor: category?.color,
+    categoryIcon: category?.icon,
+    purchased: item.status === "purchased",
+    assignee: item.assignee === "unassigned" ? undefined : item.assignee,
+    dueDate: item.dueDate,
+    priority: item.priority,
+    recurrence: item.recurrence,
+    note: item.note,
+    isTemplate: item.isTemplate
   };
 }
 
