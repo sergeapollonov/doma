@@ -150,7 +150,7 @@ export function toShoppingItem(
     categoryColor: category?.color,
     categoryIcon: category?.icon,
     purchased: item.status === "purchased",
-    assignee: item.assignee,
+    assignee: item.assignee === "unassigned" ? undefined : item.assignee,
     dueDate: item.dueDate,
     priority: item.priority,
     recurrence: item.recurrence,

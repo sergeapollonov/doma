@@ -140,6 +140,11 @@ export default function App() {
     mode: "onChange",
     resolver: zodResolver(taskFormSchema)
   });
+
+  const shoppingItems = useMemo(
+    () => shoppingList.items.map((item) => toShoppingItem(item, shoppingList.categories, language, copy[language] as any)),
+    [shoppingList.items, shoppingList.categories, language]
+  );
   const shoppingForm = useForm<ShoppingFormInput>({
     defaultValues: { title: "", quantity: "", category: "food", assignee: "unassigned", priority: "normal" },
     mode: "onChange",
@@ -413,8 +418,11 @@ export default function App() {
 
                       {selectedShoppingItemId ? (
                         (() => {
-                          const itemToEdit = selectedShoppingItemId !== "new" 
+                          const rawItem = selectedShoppingItemId !== "new" 
                             ? shoppingList.items.find((i) => i.id === selectedShoppingItemId) 
+                            : undefined;
+                          const itemToEdit = rawItem 
+                            ? toShoppingItem(rawItem, shoppingList.categories, language, text) 
                             : undefined;
                             
                           return (
@@ -438,10 +446,12 @@ export default function App() {
                         })()
                       ) : (
                         <ShoppingScreen
+                          items={shoppingItems}
                           onOpenItemDetail={(id) => setSelectedShoppingItemId(id ?? "new")}
                           onStartShoppingMode={() => {}}
                           onOpenTemplates={() => {}}
                           onSelectTemplate={() => {}}
+                          onToggleItem={(id) => toggleShopping(id)}
                         />
                       )}
                     </View>
