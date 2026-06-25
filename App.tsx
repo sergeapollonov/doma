@@ -503,7 +503,9 @@ export default function App() {
                       />
                     </View>
                   )}
-                  <TabBar activeTab={activeTab} onChange={setActiveTab} onAdd={() => setSheet("quick")} labels={text.tabs} />
+                  {!(isShoppingModeActive || selectedShoppingItemId !== null || selectedTaskId !== null) && (
+                    <TabBar activeTab={activeTab} onChange={setActiveTab} onAdd={() => setSheet("quick")} labels={text.tabs} />
+                  )}
                 </View>
               </SafeAreaView>
               <BottomSheet visible={sheet !== null} onClose={() => setSheet(null)}>
