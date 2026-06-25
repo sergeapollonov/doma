@@ -4,6 +4,7 @@ import {
   addEvent,
   addHouseholdTask,
   addShoppingItem,
+  applyShoppingTemplate,
   completeTask,
   createInitialLocalAppState,
   deleteTask,
@@ -48,6 +49,7 @@ type LocalAppStore = LocalAppState & {
   deleteShoppingItem: (input: DeleteShoppingListItemInput) => void;
   purchaseShoppingItem: (input: PurchaseShoppingListItemInput) => void;
   unpurchaseShoppingItem: (input: UnpurchaseShoppingListItemInput) => void;
+  applyShoppingTemplate: (templateId: string) => void;
 };
 
 export const useLocalAppStore = create<LocalAppStore>((set) => ({
@@ -65,5 +67,6 @@ export const useLocalAppStore = create<LocalAppStore>((set) => ({
   updateShoppingItem: (input) => set((state) => updateShoppingItem(state, input)),
   deleteShoppingItem: (input) => set((state) => deleteShoppingItem(state, input)),
   purchaseShoppingItem: (input) => set((state) => purchaseShoppingItem(state, input)),
-  unpurchaseShoppingItem: (input) => set((state) => unpurchaseShoppingItem(state, input))
+  unpurchaseShoppingItem: (input) => set((state) => unpurchaseShoppingItem(state, input)),
+  applyShoppingTemplate: (templateId) => set((state) => applyShoppingTemplate(state, templateId))
 }));

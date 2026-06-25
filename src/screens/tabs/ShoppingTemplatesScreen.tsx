@@ -14,9 +14,10 @@ import {
 
 interface ShoppingTemplatesScreenProps {
   onClose: () => void;
+  onSelectTemplate: (templateId: string) => void;
 }
 
-export const ShoppingTemplatesScreen = ({ onClose }: ShoppingTemplatesScreenProps) => {
+export const ShoppingTemplatesScreen = ({ onClose, onSelectTemplate }: ShoppingTemplatesScreenProps) => {
   const insets = useSafeAreaInsets();
   const templates = useLocalAppStore(state => state.shoppingList.templates) || [];
   const [searchQuery, setSearchQuery] = useState("");
@@ -107,7 +108,7 @@ export const ShoppingTemplatesScreen = ({ onClose }: ShoppingTemplatesScreenProp
                 <TemplateListItem 
                   key={template.id} 
                   template={template} 
-                  onPress={() => {}} 
+                  onPress={() => onSelectTemplate(template.id)} 
                   onMenuPress={() => {}} 
                 />
               ))
@@ -132,7 +133,7 @@ export const ShoppingTemplatesScreen = ({ onClose }: ShoppingTemplatesScreenProp
                 <PopularTemplateCard 
                   key={`pop-${template.id}`} 
                   template={template} 
-                  onUse={() => {}} 
+                  onUse={() => onSelectTemplate(template.id)} 
                 />
               ))}
             </ScrollView>

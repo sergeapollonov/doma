@@ -483,13 +483,24 @@ export const initialShoppingCategories = [
     createdAt: "2026-06-03T08:00:00+02:00"
   },
   {
-    id: "cat-fruit-veg",
+    id: "cat-veg",
     familyId: null,
-    nameRu: "Овощи и фрукты",
-    namePl: "Warzywa i owoce",
+    nameRu: "Овощи",
+    namePl: "Warzywa",
     iconKey: "leaf",
     colorKey: "shopping_green",
     sortOrder: 2,
+    isDefault: true,
+    createdAt: "2026-06-03T08:00:00+02:00"
+  },
+  {
+    id: "cat-fruits",
+    familyId: null,
+    nameRu: "Фрукты",
+    namePl: "Owoce",
+    iconKey: "nutrition",
+    colorKey: "task_orange",
+    sortOrder: 3,
     isDefault: true,
     createdAt: "2026-06-03T08:00:00+02:00"
   },
@@ -512,6 +523,39 @@ export const initialShoppingCategories = [
     iconKey: "meat",
     colorKey: "danger_red",
     sortOrder: 4,
+    isDefault: true,
+    createdAt: "2026-06-03T08:00:00+02:00"
+  },
+  {
+    id: "cat-bakery",
+    familyId: null,
+    nameRu: "Хлеб",
+    namePl: "Pieczywo",
+    iconKey: "cafe",
+    colorKey: "task_orange",
+    sortOrder: 5,
+    isDefault: true,
+    createdAt: "2026-06-03T08:00:00+02:00"
+  },
+  {
+    id: "cat-drinks",
+    familyId: null,
+    nameRu: "Напитки",
+    namePl: "Napoje",
+    iconKey: "water",
+    colorKey: "doma_blue",
+    sortOrder: 6,
+    isDefault: true,
+    createdAt: "2026-06-03T08:00:00+02:00"
+  },
+  {
+    id: "cat-grocery",
+    familyId: null,
+    nameRu: "Бакалея",
+    namePl: "Artykuły suche",
+    iconKey: "restaurant",
+    colorKey: "doma_purple",
+    sortOrder: 7,
     isDefault: true,
     createdAt: "2026-06-03T08:00:00+02:00"
   },
@@ -670,12 +714,20 @@ export const initialShoppingListState = {
       itemCount: 12,
       scope: "family",
       lastUsedDaysAgo: 3,
+      description: "Базовый набор продуктов на неделю для всей семьи.",
       items: [
-        { title: "Молоко", quantity: "2" },
-        { title: "Хлеб", quantity: "1" },
-        { title: "Яйца", quantity: "10" },
-        { title: "Куриное филе", quantity: "1 кг" },
-        { title: "Помидоры", quantity: "500 г" },
+        { title: "Молоко", quantity: "2 шт.", categoryId: "cat-dairy" },
+        { title: "Хлеб", quantity: "1 шт.", categoryId: "cat-bakery" },
+        { title: "Бананы", quantity: "6 шт.", categoryId: "cat-fruits" },
+        { title: "Помидоры", quantity: "500 г", categoryId: "cat-veg" },
+        { title: "Огурцы", quantity: "2 шт.", categoryId: "cat-veg" },
+        { title: "Куриное филе", quantity: "500 г", categoryId: "cat-meat-fish" },
+        { title: "Вода", quantity: "6 бутылок", categoryId: "cat-drinks" },
+        { title: "Йогурт", quantity: "4 шт.", categoryId: "cat-dairy" },
+        { title: "Сыр", quantity: "200 г", categoryId: "cat-dairy" },
+        { title: "Яйца", quantity: "10 шт.", categoryId: "cat-dairy" },
+        { title: "Макароны", quantity: "1 уп.", categoryId: "cat-grocery" },
+        { title: "Туалетная бумага", quantity: "1 уп.", categoryId: "cat-home" },
       ]
     },
     {

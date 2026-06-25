@@ -40,7 +40,8 @@ import { ShoppingScreen } from "./src/screens/tabs/ShoppingScreen";
 import {
   ShoppingItemDetailScreen,
   ShoppingModeScreen,
-  ShoppingTemplatesScreen
+  ShoppingTemplatesScreen,
+  ShoppingTemplatePreviewScreen
 } from "./src/screens/tabs";
 import { TasksScreen, TodayScreen, type TaskFilter } from "./src/screens/tabs";
 import { TaskDetailScreen } from "./src/screens/tabs/TaskDetailScreen";
@@ -124,6 +125,7 @@ export default function App() {
   const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [selectedShoppingItemId, setSelectedShoppingItemId] = useState<string | "new" | null>(null);
+  const [selectedShoppingTemplatePreviewId, setSelectedShoppingTemplatePreviewId] = useState<string | null>(null);
   const [isShoppingModeActive, setIsShoppingModeActive] = useState(false);
   const [isShoppingTemplatesActive, setIsShoppingTemplatesActive] = useState(false);
   const loginForm = useForm<LoginFormInput>({
@@ -457,15 +459,27 @@ export default function App() {
                           onToggleItem={(id) => toggleShopping(id)}
                           onOpenItemDetail={(id) => setSelectedShoppingItemId(id ?? "new")}
                         />
+                      ) : selectedShoppingTemplatePreviewId ? (
+                        <ShoppingTemplatePreviewScreen 
+                          templateId={selectedShoppingTemplatePreviewId}
+                          onClose={() => setSelectedShoppingTemplatePreviewId(null)}
+                          onApplySuccess={() => {
+                            setSelectedShoppingTemplatePreviewId(null);
+                            setIsShoppingTemplatesActive(false);
+                          }}
+                        />
                       ) : isShoppingTemplatesActive ? (
-                        <ShoppingTemplatesScreen onClose={() => setIsShoppingTemplatesActive(false)} />
+                        <ShoppingTemplatesScreen 
+                          onClose={() => setIsShoppingTemplatesActive(false)} 
+                          onSelectTemplate={(id) => setSelectedShoppingTemplatePreviewId(id)}
+                        />
                       ) : (
                         <ShoppingScreen
                           items={shoppingItems}
                           onOpenItemDetail={(id) => setSelectedShoppingItemId(id ?? "new")}
                           onStartShoppingMode={() => setIsShoppingModeActive(true)}
                           onOpenTemplates={() => setIsShoppingTemplatesActive(true)}
-                          onSelectTemplate={() => {}}
+                          onSelectTemplate={(id) => setSelectedShoppingTemplatePreviewId(id)}
                           onToggleItem={(id) => toggleShopping(id)}
                         />
                       )}
