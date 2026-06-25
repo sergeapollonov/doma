@@ -156,3 +156,46 @@ export function deleteTask(state: LocalAppState, input: DeleteHouseholdTaskInput
     householdTasks: state.householdTasks.map((task) => deleteHouseholdTask(task, input))
   };
 }
+
+export function applyShoppingTemplate(state: LocalAppState, templateId: string): LocalAppState {
+  const template = state.shoppingList.templates.find(t => t.id === templateId);
+  if (!template || !template.items || template.items.length === 0) {
+    return state;
+  }
+
+  const now = new Date().toISOString();
+  const currentItems = state.shoppingList.items;
+  
+  // Find items that are NOT already in the active list
+  const newItemsToCreate = template.items.filter(templateItem => {
+    // Check if there is an active (not purchased, not deleted) item with the same title
+    const existingActive = currentItems.find(i => 
+      i.title.toLowerCase() === templateItem.title.toLowerCase() && 
+      i.status === "active" && 
+      i.deletedAt === null
+    );
+    return !existingActive; // Keep if NO active item exists (prevent duplicates)
+  });
+
+  const generatedItems = newItemsToCreate.map((item, index) => {
+    return createShoppingListItem({
+      familyId: state.familyId,
+      title: item.title,
+      quantity: item.quantity,
+      categoryId: item.categoryId as any,
+      createdBy: state.currentUserId,
+    }, `shop-tpl-gen-${Date.now()}-${index}` as any, now as any);
+  });
+
+  if (generatedItems.length === 0) {
+    return state; // Nothing new to add
+  }
+
+  return {
+    ...state,
+    shoppingList: {
+      ...state.shoppingList,
+      items: [...generatedItems, ...state.shoppingList.items]
+    }
+  };
+}
