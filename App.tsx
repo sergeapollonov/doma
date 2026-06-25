@@ -109,6 +109,8 @@ export default function App() {
   const storeCompleteTask = useLocalAppStore((state) => state.completeTask);
   const storeReopenTask = useLocalAppStore((state) => state.reopenTask);
   const storeAddShoppingItem = useLocalAppStore((state) => state.addShoppingItem);
+  const storeUpdateShoppingItem = useLocalAppStore((state) => state.updateShoppingItem);
+  const storeDeleteShoppingItem = useLocalAppStore((state) => state.deleteShoppingItem);
   const storePurchaseShoppingItem = useLocalAppStore((state) => state.purchaseShoppingItem);
   const storeUnpurchaseShoppingItem = useLocalAppStore((state) => state.unpurchaseShoppingItem);
   const text = copy[language] as typeof copy.ru;
@@ -264,25 +266,38 @@ export default function App() {
   function submitShoppingItem(values: ShoppingFormInput) {
     const nextTitle = values.title.trim();
     if (selectedShoppingItemId && selectedShoppingItemId !== "new") {
-      // Logic for editing would go here. For now we just create a new one anyway
-      // since the store doesn't have an edit endpoint in the snippet we saw
+      storeUpdateShoppingItem({
+        itemId: selectedShoppingItemId as ShoppingItemId,
+        title: nextTitle,
+        quantity: values.quantity.trim() || null,
+        categoryId: shoppingCategoryLabelToId(values.category, shoppingList.categories),
+        assignee: values.assignee,
+        dueDate: values.dueDate,
+        priority: values.priority,
+        recurrence: values.recurrence,
+        note: values.note,
+        isTemplate: values.isTemplate,
+        updatedBy: currentUserId,
+        updatedAt: nowDateTime()
+      });
+    } else {
+      storeAddShoppingItem({
+        id: createShoppingItemId(nextTitle),
+        familyId,
+        categoryId: shoppingCategoryLabelToId(values.category, shoppingList.categories),
+        title: nextTitle,
+        quantity: values.quantity.trim() || null,
+        assignee: values.assignee,
+        dueDate: values.dueDate,
+        priority: values.priority,
+        recurrence: values.recurrence,
+        note: values.note,
+        isTemplate: values.isTemplate,
+        createdBy: currentUserId,
+        createdAt: nowDateTime()
+      });
     }
     
-    storeAddShoppingItem({
-      id: createShoppingItemId(nextTitle),
-      familyId,
-      categoryId: shoppingCategoryLabelToId(values.category, shoppingList.categories),
-      title: nextTitle,
-      quantity: values.quantity.trim() || null,
-      assignee: values.assignee,
-      dueDate: values.dueDate,
-      priority: values.priority,
-      recurrence: values.recurrence,
-      note: values.note,
-      isTemplate: values.isTemplate,
-      createdBy: currentUserId,
-      createdAt: nowDateTime()
-    });
     shoppingForm.reset({ title: "", quantity: "", category: "food", assignee: "unassigned", priority: "normal" });
     setSelectedShoppingItemId(null);
     setActiveTab("shopping");
@@ -397,13 +412,30 @@ export default function App() {
                     <View style={{ flex: 1 }}>
 
                       {selectedShoppingItemId ? (
-                        <ShoppingItemDetailScreen
-                          text={text}
-                          onBack={() => setSelectedShoppingItemId(null)}
-                          onSave={(data) => {
-                            submitShoppingItem(data);
-                          }}
-                        />
+                        (() => {
+                          const itemToEdit = selectedShoppingItemId !== "new" 
+                            ? shoppingList.items.find((i) => i.id === selectedShoppingItemId) 
+                            : undefined;
+                            
+                          return (
+                            <ShoppingItemDetailScreen
+                              text={text}
+                              item={itemToEdit}
+                              onBack={() => setSelectedShoppingItemId(null)}
+                              onSave={(data) => {
+                                submitShoppingItem(data);
+                              }}
+                              onDelete={(id) => {
+                                storeDeleteShoppingItem({
+                                  itemId: id as ShoppingItemId,
+                                  deletedBy: currentUserId,
+                                  deletedAt: nowDateTime()
+                                });
+                                setSelectedShoppingItemId(null);
+                              }}
+                            />
+                          );
+                        })()
                       ) : (
                         <ShoppingScreen
                           onOpenItemDetail={() => setSelectedShoppingItemId("new")}

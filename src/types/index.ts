@@ -199,6 +199,27 @@ export type UnpurchaseShoppingListItemInput = {
   updatedAt: ISODateTimeString;
 };
 
+export type UpdateShoppingListItemInput = {
+  itemId: ShoppingItemId;
+  title?: string;
+  quantity?: string | null;
+  categoryId?: ShoppingCategoryId | null;
+  note?: string | null;
+  assignee?: "alex" | "maya" | "shared" | "unassigned";
+  dueDate?: string | null;
+  priority?: HouseholdTaskPriority;
+  recurrence?: string | null;
+  isTemplate?: boolean;
+  updatedBy: UserId;
+  updatedAt: ISODateTimeString;
+};
+
+export type DeleteShoppingListItemInput = {
+  itemId: ShoppingItemId;
+  deletedBy: UserId;
+  deletedAt: ISODateTimeString;
+};
+
 export type LocalAppState = {
   language: Language;
   familyId: FamilyId;

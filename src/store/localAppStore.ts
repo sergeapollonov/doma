@@ -12,6 +12,8 @@ import {
   selectDate,
   setLanguage,
   unpurchaseShoppingItem,
+  updateShoppingItem,
+  deleteShoppingItem,
   updateTask
 } from "../state/appState";
 import type {
@@ -19,6 +21,7 @@ import type {
   AddShoppingListItemActionInput,
   CompleteHouseholdTaskInput,
   DeleteHouseholdTaskInput,
+  DeleteShoppingListItemInput,
   EventItem,
   ISODateString,
   Language,
@@ -26,7 +29,8 @@ import type {
   PurchaseShoppingListItemInput,
   ReopenHouseholdTaskInput,
   UnpurchaseShoppingListItemInput,
-  UpdateHouseholdTaskInput
+  UpdateHouseholdTaskInput,
+  UpdateShoppingListItemInput
 } from "../types";
 
 type LocalAppStore = LocalAppState & {
@@ -40,6 +44,8 @@ type LocalAppStore = LocalAppState & {
   updateTask: (input: UpdateHouseholdTaskInput) => void;
   deleteTask: (input: DeleteHouseholdTaskInput) => void;
   addShoppingItem: (input: AddShoppingListItemActionInput) => void;
+  updateShoppingItem: (input: UpdateShoppingListItemInput) => void;
+  deleteShoppingItem: (input: DeleteShoppingListItemInput) => void;
   purchaseShoppingItem: (input: PurchaseShoppingListItemInput) => void;
   unpurchaseShoppingItem: (input: UnpurchaseShoppingListItemInput) => void;
 };
@@ -56,6 +62,8 @@ export const useLocalAppStore = create<LocalAppStore>((set) => ({
   updateTask: (input) => set((state) => updateTask(state, input)),
   deleteTask: (input) => set((state) => deleteTask(state, input)),
   addShoppingItem: (input) => set((state) => addShoppingItem(state, input)),
+  updateShoppingItem: (input) => set((state) => updateShoppingItem(state, input)),
+  deleteShoppingItem: (input) => set((state) => deleteShoppingItem(state, input)),
   purchaseShoppingItem: (input) => set((state) => purchaseShoppingItem(state, input)),
   unpurchaseShoppingItem: (input) => set((state) => unpurchaseShoppingItem(state, input))
 }));

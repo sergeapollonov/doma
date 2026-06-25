@@ -1,11 +1,13 @@
 import type {
+  DeleteShoppingListItemInput,
   NewShoppingListItemInput,
   PurchaseShoppingListItemInput,
   ShoppingCategoryId,
   ShoppingItemId,
   ShoppingListItem,
   ISODateTimeString,
-  UnpurchaseShoppingListItemInput
+  UnpurchaseShoppingListItemInput,
+  UpdateShoppingListItemInput
 } from "./types";
 
 export function createShoppingListItem(
@@ -65,6 +67,46 @@ export function unpurchaseShoppingListItem(
     purchasedAt: null,
     updatedBy: input.updatedBy,
     updatedAt: input.updatedAt
+  };
+}
+
+export function updateShoppingListItem(
+  item: ShoppingListItem,
+  input: UpdateShoppingListItemInput
+): ShoppingListItem {
+  if (item.id !== input.itemId) {
+    return item;
+  }
+
+  return {
+    ...item,
+    ...(input.title !== undefined && { title: input.title.trim() }),
+    ...(input.quantity !== undefined && { quantity: input.quantity?.trim() || null }),
+    ...(input.categoryId !== undefined && { categoryId: input.categoryId }),
+    ...(input.note !== undefined && { note: input.note?.trim() || null }),
+    ...(input.assignee !== undefined && { assignee: input.assignee }),
+    ...(input.dueDate !== undefined && { dueDate: input.dueDate }),
+    ...(input.priority !== undefined && { priority: input.priority }),
+    ...(input.recurrence !== undefined && { recurrence: input.recurrence }),
+    ...(input.isTemplate !== undefined && { isTemplate: input.isTemplate }),
+    updatedBy: input.updatedBy,
+    updatedAt: input.updatedAt
+  };
+}
+
+export function deleteShoppingListItem(
+  item: ShoppingListItem,
+  input: DeleteShoppingListItemInput
+): ShoppingListItem {
+  if (item.id !== input.itemId) {
+    return item;
+  }
+
+  return {
+    ...item,
+    deletedAt: input.deletedAt,
+    updatedBy: input.deletedBy,
+    updatedAt: input.deletedAt
   };
 }
 
