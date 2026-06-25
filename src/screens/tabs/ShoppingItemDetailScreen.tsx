@@ -358,7 +358,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
       </ScrollView>
 
       {/* Footer Button */}
-      <View style={[styles.footer, { paddingBottom: sizes.tabBarHeight + Math.max(insets.bottom, 20) }]}>
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
         <PrimaryButton 
           label="Сохранить товар" 
           onPress={handleSubmit} 

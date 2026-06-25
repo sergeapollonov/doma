@@ -658,5 +658,85 @@ export const frequentShopping = ["Молоко", "Хлеб", "Яйца", "Бан
 export const initialShoppingListState = {
   categories: initialShoppingCategories,
   items: initialShoppingListItems,
-  frequentItemTitles: frequentShopping
+  frequentItemTitles: frequentShopping,
+  templates: [
+    {
+      id: "tpl-1",
+      name: "Продукты на неделю",
+      category: "Продукты",
+      iconBg: "rgba(95, 150, 105, 0.15)",
+      iconColor: "#5F9669",
+      iconName: "basket-outline",
+      itemCount: 12,
+      scope: "family",
+      lastUsedDaysAgo: 3,
+      items: [
+        { title: "Молоко", quantity: "2" },
+        { title: "Хлеб", quantity: "1" },
+        { title: "Яйца", quantity: "10" },
+        { title: "Куриное филе", quantity: "1 кг" },
+        { title: "Помидоры", quantity: "500 г" },
+      ]
+    },
+    {
+      id: "tpl-2",
+      name: "Большая закупка",
+      category: "Продукты",
+      iconBg: "rgba(116, 92, 219, 0.15)",
+      iconColor: "#745CDB",
+      iconName: "cart-outline",
+      itemCount: 24,
+      scope: "family",
+      lastUsedDaysAgo: 7,
+      items: [
+        { title: "Макароны", quantity: "3 уп" },
+        { title: "Рис", quantity: "1 кг" },
+      ]
+    },
+    {
+      id: "tpl-3",
+      name: "Аптечка",
+      category: "Аптека",
+      iconBg: "rgba(229, 57, 53, 0.15)",
+      iconColor: "#E53935",
+      iconName: "medkit-outline",
+      itemCount: 15,
+      scope: "personal",
+      lastUsedDaysAgo: 14,
+      items: [
+        { title: "Ибупрофен" },
+        { title: "Пластыри" },
+      ]
+    },
+    {
+      id: "tpl-4",
+      name: "Все для малыша",
+      category: "Детям",
+      iconBg: "rgba(41, 128, 185, 0.15)",
+      iconColor: "#2980B9",
+      iconName: "water-outline",
+      itemCount: 18,
+      scope: "family",
+      lastUsedDaysAgo: 5,
+      items: [
+        { title: "Подгузники" },
+        { title: "Влажные салфетки" },
+      ]
+    },
+    {
+      id: "tpl-5",
+      name: "Подготовка к поездке",
+      category: "Для дома",
+      iconBg: "rgba(214, 154, 69, 0.15)",
+      iconColor: "#D69A45",
+      iconName: "briefcase-outline",
+      itemCount: 20,
+      scope: "family",
+      lastUsedDaysAgo: 30,
+      items: [
+        { title: "Шампунь" },
+        { title: "Зубная паста" },
+      ]
+    }
+  ]
 } satisfies ShoppingListState;

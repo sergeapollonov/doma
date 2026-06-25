@@ -40,7 +40,8 @@ export function createInitialLocalAppState(): LocalAppState {
     shoppingList: {
       categories: [...initialShoppingListState.categories],
       items: [...initialShoppingListState.items],
-      frequentItemTitles: [...initialShoppingListState.frequentItemTitles]
+      frequentItemTitles: [...initialShoppingListState.frequentItemTitles],
+      templates: [...(initialShoppingListState.templates || [])]
     }
   };
 }

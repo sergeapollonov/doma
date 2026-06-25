@@ -170,6 +170,7 @@ export type ShoppingListState = {
   categories: ShoppingCategory[];
   items: ShoppingListItem[];
   frequentItemTitles: string[];
+  templates: ShoppingTemplate[];
 };
 
 export type NewShoppingListItemInput = {
@@ -291,11 +292,16 @@ export type ShoppingItem = {
 export type ShoppingTemplate = {
   id: string;
   name: string;
+  category?: string;
   iconBg: string;
   iconColor: string;
   iconName: string;
   itemCount: number;
+  items?: { title: string; categoryId?: string; quantity?: string }[];
   scope: 'family' | 'personal';
   lastUsedDaysAgo?: number;
   description?: string;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };

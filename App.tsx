@@ -37,8 +37,11 @@ import {
 } from "./src/types";
 import { CalendarScreen } from "./src/screens/tabs/CalendarScreen";
 import { ShoppingScreen } from "./src/screens/tabs/ShoppingScreen";
-import { ShoppingItemDetailScreen } from "./src/screens/tabs/ShoppingItemDetailScreen";
-import { ShoppingModeScreen } from "./src/screens/tabs/ShoppingModeScreen";
+import {
+  ShoppingItemDetailScreen,
+  ShoppingModeScreen,
+  ShoppingTemplatesScreen
+} from "./src/screens/tabs";
 import { TasksScreen, TodayScreen, type TaskFilter } from "./src/screens/tabs";
 import { TaskDetailScreen } from "./src/screens/tabs/TaskDetailScreen";
 import {
@@ -122,6 +125,7 @@ export default function App() {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [selectedShoppingItemId, setSelectedShoppingItemId] = useState<string | "new" | null>(null);
   const [isShoppingModeActive, setIsShoppingModeActive] = useState(false);
+  const [isShoppingTemplatesActive, setIsShoppingTemplatesActive] = useState(false);
   const loginForm = useForm<LoginFormInput>({
     defaultValues: { email: "alex@example.com" },
     mode: "onChange",
@@ -453,12 +457,14 @@ export default function App() {
                           onToggleItem={(id) => toggleShopping(id)}
                           onOpenItemDetail={(id) => setSelectedShoppingItemId(id ?? "new")}
                         />
+                      ) : isShoppingTemplatesActive ? (
+                        <ShoppingTemplatesScreen onClose={() => setIsShoppingTemplatesActive(false)} />
                       ) : (
                         <ShoppingScreen
                           items={shoppingItems}
                           onOpenItemDetail={(id) => setSelectedShoppingItemId(id ?? "new")}
                           onStartShoppingMode={() => setIsShoppingModeActive(true)}
-                          onOpenTemplates={() => {}}
+                          onOpenTemplates={() => setIsShoppingTemplatesActive(true)}
                           onSelectTemplate={() => {}}
                           onToggleItem={(id) => toggleShopping(id)}
                         />
