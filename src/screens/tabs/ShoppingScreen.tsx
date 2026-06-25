@@ -1,207 +1,207 @@
-import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useState } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-import { ShoppingCategorySection } from "../../components/shopping";
-import { Card, type IconName } from "../../components/ui";
-import { colors } from "../../theme";
-import type { Language, ShoppingCategory, ShoppingCategoryId, ShoppingItem } from "../../types";
-import type { copy } from "../../i18n";
+import { colors, radius, spacing } from '../../theme';
+import type { ShoppingItem, ShoppingTemplate } from '../../types';
+import {
+  ShoppingFilterBar,
+  QuickAddBar,
+  ShoppingUrgentSection,
+  ShoppingTripCard,
+  ShoppingSoonSection,
+  ShoppingPurchasedSection,
+  ShoppingTemplatesStrip,
+} from './components/shopping/ShoppingComponents';
+import {
+  mockUrgentItems,
+  mockSoonItems,
+  mockPurchasedCount,
+  mockTripItemCount,
+  mockTripEstimatedPrice,
+  mockShoppingTemplates,
+} from '../../utils/shoppingMocks';
 
-const frequentVisuals: Record<string, { icon: IconName; tint: string }> = {
-  Молоко: { icon: "water-outline", tint: "rgba(176,210,226,0.45)" },
-  Хлеб: { icon: "restaurant-outline", tint: "rgba(214,154,69,0.15)" },
-  Яйца: { icon: "ellipse-outline", tint: "rgba(215,185,139,0.18)" },
-  Бананы: { icon: "leaf-outline", tint: "rgba(230,183,67,0.16)" },
-  Кофе: { icon: "cafe-outline", tint: "rgba(143,102,61,0.14)" }
-};
+type FilterKey = 'all' | 'mine' | 'family' | 'purchased';
 
 type ShoppingScreenProps = {
-  text: typeof copy.ru;
-  shopping: ShoppingItem[];
-  categories: ShoppingCategory[];
-  language: Language;
-  frequentShopping: string[];
-  categoryName: (categoryId: ShoppingCategoryId, categories: ShoppingCategory[], language: Language, text: typeof copy.ru) => string;
-  onOpenShoppingSheet: () => void;
-  onAddFrequentItem: (title: string) => void;
-  onToggleShoppingItem: (itemId: string) => void;
+  onOpenItemDetail?: (id?: string) => void;
+  onStartShoppingMode?: () => void;
+  onOpenTemplates?: () => void;
+  onSelectTemplate?: (id: string) => void;
 };
 
 export function ShoppingScreen({
-  text,
-  shopping,
-  categories,
-  language,
-  frequentShopping,
-  categoryName,
-  onOpenShoppingSheet,
-  onAddFrequentItem,
-  onToggleShoppingItem
+  onOpenItemDetail,
+  onStartShoppingMode,
+  onOpenTemplates,
+  onSelectTemplate,
 }: ShoppingScreenProps) {
-  const sortedShopping = [...shopping].sort((a, b) => Number(a.purchased) - Number(b.purchased));
-  const categoryOrder: ShoppingCategoryId[] = ["cat-dairy", "cat-fruit-veg", "cat-home", "cat-meat-fish", "cat-other"];
-  const groupedShopping = categoryOrder
-    .map((categoryId) => ({
-      categoryId,
-      category: categoryName(categoryId, categories, language, text),
-      items: sortedShopping.filter((item) => item.categoryId === categoryId)
-    }))
-    .filter((group) => group.items.length > 0);
+  const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
+  const [urgentItems, setUrgentItems] = useState<ShoppingItem[]>(mockUrgentItems);
+  const [soonItems, setSoonItems] = useState<ShoppingItem[]>(mockSoonItems);
+
+  const allCount = urgentItems.length + soonItems.length;
+  const mineCount = urgentItems.filter((i) => i.assignee === 'alex').length +
+    soonItems.filter((i) => i.assignee === 'alex').length;
+  const familyCount = urgentItems.filter((i) => i.assignee === 'shared').length +
+    soonItems.filter((i) => i.assignee === 'shared').length;
+
+  const handleToggleUrgent = (id: string) => {
+    setUrgentItems((prev) =>
+      prev.map((item) => item.id === id ? { ...item, purchased: !item.purchased } : item)
+    );
+  };
+
+  const handleToggleSoon = (id: string) => {
+    setSoonItems((prev) =>
+      prev.map((item) => item.id === id ? { ...item, purchased: !item.purchased } : item)
+    );
+  };
 
   return (
-    <View>
-      <Pressable style={styles.addField} onPress={onOpenShoppingSheet}>
-        <View style={styles.addFieldIcon}>
-          <Ionicons name="add" size={26} color={colors.domaGold} />
+    <View style={styles.container}>
+      {/* ── Header ── */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Покупки</Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="search-outline" size={22} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButtonPrimary}
+            onPress={() => onOpenItemDetail?.()}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="add" size={22} color={colors.white} />
+          </TouchableOpacity>
         </View>
-        <Text style={styles.addFieldText}>{text.shoppingAddItem}</Text>
-      </Pressable>
-      <Card style={styles.frequentCard}>
-        <Text style={styles.shoppingSectionTitle}>{text.shoppingFrequent}</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.frequentTiles}>
-          {frequentShopping.map((item) => {
-            const visual = frequentVisuals[item] ?? frequentVisuals["Молоко"];
-            return (
-              <Pressable key={item} style={styles.frequentTile} onPress={() => onAddFrequentItem(item)}>
-                <View style={[styles.frequentImage, { backgroundColor: visual.tint }]}>
-                  <Ionicons name={visual.icon} size={34} color={colors.domaBlue} />
-                </View>
-                <Text style={styles.frequentLabel}>{item}</Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      </Card>
-      {groupedShopping.map((group) => (
-        <ShoppingCategorySection
-          key={group.categoryId}
-          categoryId={group.categoryId}
-          category={group.category}
-          items={group.items}
-          onToggleItem={onToggleShoppingItem}
+      </View>
+
+      {/* ── Quick Add ── */}
+      <QuickAddBar onPress={() => onOpenItemDetail?.()} />
+
+      {/* ── Filter Bar ── */}
+      <View style={styles.filterWrap}>
+        <ShoppingFilterBar
+          active={activeFilter}
+          allCount={allCount}
+          mineCount={mineCount}
+          familyCount={familyCount}
+          purchasedCount={mockPurchasedCount}
+          onSelect={setActiveFilter}
         />
-      ))}
-      <Pressable style={styles.quickShoppingHelp} onPress={onOpenShoppingSheet}>
-        <View style={styles.previewBasket}>
-          <Ionicons name="basket-outline" size={34} color={colors.domaGold} />
-        </View>
-        <View style={styles.rowGrow}>
-          <Text style={styles.cardTitle}>{text.shoppingQuickTitle}</Text>
-          <Text style={styles.caption}>{text.shoppingQuickHint}</Text>
-        </View>
-        <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
-      </Pressable>
+      </View>
+
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── Urgent Section ── */}
+        <ShoppingUrgentSection
+          items={urgentItems}
+          onToggleItem={handleToggleUrgent}
+          onPressItem={(id) => onOpenItemDetail?.(id)}
+        />
+
+        {/* ── Next Trip Card ── */}
+        <ShoppingTripCard
+          itemCount={mockTripItemCount}
+          estimatedPrice={mockTripEstimatedPrice}
+          onStart={() => onStartShoppingMode?.()}
+        />
+
+        {/* ── Soon Section ── */}
+        <ShoppingSoonSection
+          items={soonItems}
+          onToggleItem={handleToggleSoon}
+          onPressItem={(id) => onOpenItemDetail?.(id)}
+        />
+
+        {/* ── Purchased Section ── */}
+        <ShoppingPurchasedSection count={mockPurchasedCount} />
+
+        {/* ── Templates Strip ── */}
+        <ShoppingTemplatesStrip
+          templates={mockShoppingTemplates}
+          onSeeAll={() => onOpenTemplates?.()}
+          onSelectTemplate={(id) => onSelectTemplate?.(id)}
+        />
+
+        <View style={styles.bottomPad} />
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  addField: {
-    height: 78,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: colors.glass.borderHeavy,
-    backgroundColor: colors.glass.medium,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-    paddingHorizontal: 0,
-    marginBottom: 14,
-    shadowColor: "#372614",
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 9 }
+  container: {
+    flex: 1,
+    backgroundColor: colors.warmBackground,
   },
-  addFieldIcon: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
-    marginLeft: -2,
-    backgroundColor: colors.glass.heavy,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#372614",
-    shadowOpacity: 0.10,
-    shadowRadius: 15,
-    shadowOffset: { width: 0, height: 8 }
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.screen,
+    paddingTop: 50,
+    paddingBottom: 12,
   },
-  addFieldText: {
-    color: colors.domaBlue,
-    fontSize: 24,
-    fontWeight: "500"
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    letterSpacing: -0.5,
   },
-  shoppingSectionTitle: {
-    color: colors.domaBlue,
-    fontSize: 25,
-    lineHeight: 31,
-    fontWeight: "500",
-    marginBottom: 15
-  },
-  frequentCard: {
-    padding: 16,
-    borderRadius: 25,
-    marginBottom: 14
-  },
-  frequentTiles: {
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
-    paddingRight: 4
   },
-  frequentTile: {
-    width: 68,
-    minHeight: 104,
-    alignItems: "center",
-    justifyContent: "space-between"
+  headerButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.surfacePrimary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.domaBlue,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
   },
-  frequentImage: {
-    width: 66,
-    height: 66,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center"
+  headerButtonPrimary: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.shoppingGreen,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.shoppingGreen,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
-  frequentLabel: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontWeight: "600",
-    marginTop: 8
+  filterWrap: {
+    marginBottom: spacing.md,
   },
-  quickShoppingHelp: {
-    minHeight: 92,
-    borderRadius: 24,
-    padding: 14,
-    marginTop: 4,
-    marginBottom: 12,
-    backgroundColor: colors.glass.medium,
-    borderWidth: 1,
-    borderColor: colors.glass.borderHeavy,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    shadowColor: "#372614",
-    shadowOpacity: 0.08,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 10 }
+  scroll: {
+    flex: 1,
   },
-  previewBasket: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(95,150,105,0.11)"
+  scrollContent: {
+    paddingTop: 4,
   },
-  rowGrow: {
-    flex: 1
+  bottomPad: {
+    height: 100,
   },
-  cardTitle: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "800"
-  },
-  caption: {
-    color: colors.textSecondary,
-    fontSize: 12.5,
-    lineHeight: 17
-  }
 });
