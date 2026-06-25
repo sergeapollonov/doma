@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { colors, radius, spacing, typography } from "../../theme";
+import { colors, radius, spacing, typography, sizes } from "../../theme";
 import type { Language, PersonId, ShoppingItem } from "../../types";
 import { people } from "../../data";
 import { Avatar, AvatarGroup } from "../../components/family";
@@ -358,7 +358,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
       </ScrollView>
 
       {/* Footer Button */}
-      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
+      <View style={[styles.footer, { paddingBottom: sizes.tabBarHeight + Math.max(insets.bottom, 20) }]}>
         <PrimaryButton 
           label="Сохранить товар" 
           onPress={handleSubmit} 
