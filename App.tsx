@@ -438,7 +438,7 @@ export default function App() {
                         })()
                       ) : (
                         <ShoppingScreen
-                          onOpenItemDetail={() => setSelectedShoppingItemId("new")}
+                          onOpenItemDetail={(id) => setSelectedShoppingItemId(id ?? "new")}
                           onStartShoppingMode={() => {}}
                           onOpenTemplates={() => {}}
                           onSelectTemplate={() => {}}
