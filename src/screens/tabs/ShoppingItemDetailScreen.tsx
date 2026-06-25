@@ -23,11 +23,11 @@ type ShoppingItemDetailScreenProps = {
 };
 
 const CATEGORIES = [
-  { id: 'food', icon: '🍞', label: 'Jedzenie', color: '#E53935' },
-  { id: 'drinks', icon: '🥤', label: 'Napoje', color: '#1E88E5' },
-  { id: 'cleaning', icon: '🧼', label: 'Chemia', color: '#43A047' },
-  { id: 'pharmacy', icon: '💊', label: 'Apteka', color: '#8E24AA' },
-  { id: 'home', icon: '🏠', label: 'Dom', color: '#F4511E' },
+  { id: 'food', icon: '🍞', label: 'Еда', color: '#E53935' },
+  { id: 'drinks', icon: '🥤', label: 'Напитки', color: '#1E88E5' },
+  { id: 'cleaning', icon: '🧼', label: 'Бытовая химия', color: '#43A047' },
+  { id: 'pharmacy', icon: '💊', label: 'Аптека', color: '#8E24AA' },
+  { id: 'home', icon: '🏠', label: 'Дом', color: '#F4511E' },
 ];
 
 export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete }: ShoppingItemDetailScreenProps) {
@@ -66,21 +66,21 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
         <Pressable onPress={onBack} hitSlop={15} style={styles.backBtn}>
           <Ionicons name="chevron-back" size={28} color={colors.domaBlue} />
         </Pressable>
-        <Text style={styles.headerTitle}>{isEditing ? "Edytuj towar" : "Nowy towar"}</Text>
+        <Text style={styles.headerTitle}>{isEditing ? "Редактировать товар" : "Новый товар"}</Text>
         <Pressable onPress={handleSubmit} hitSlop={15} disabled={!isValid}>
-          <Text style={[styles.headerSave, !isValid && { opacity: 0.5 }]}>Zapisz</Text>
+          <Text style={[styles.headerSave, !isValid && { opacity: 0.5 }]}>Сохранить</Text>
         </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
         {/* SECTION 1: Основное (Main) */}
-        <Text style={styles.sectionHeader}>Podstawowe</Text>
+        <Text style={styles.sectionHeader}>Основное</Text>
         <View style={styles.card}>
           
           {/* Title */}
           <View style={styles.row}>
-            <Text style={styles.rowLabel}>Nazwa <Text style={styles.required}>*</Text></Text>
+            <Text style={styles.rowLabel}>Название <Text style={styles.required}>*</Text></Text>
             <Controller
               control={form.control}
               name="title"
@@ -88,7 +88,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
                 <View style={styles.inputContainer}>
                   <TextInput
                     style={styles.textInput}
-                    placeholder="Np. Mleko"
+                    placeholder="Напр. Молоко"
                     placeholderTextColor={colors.textTertiary}
                     value={value}
                     onChangeText={onChange}
@@ -106,7 +106,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
 
           {/* Quantity */}
           <View style={styles.row}>
-            <Text style={styles.rowLabel}>Ilość</Text>
+            <Text style={styles.rowLabel}>Количество</Text>
             <Controller
               control={form.control}
               name="quantity"
@@ -133,7 +133,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
                     </Pressable>
                   </View>
                   <View style={styles.unitDropdown}>
-                    <Text style={styles.unitText}>szt.</Text>
+                    <Text style={styles.unitText}>шт.</Text>
                     <Ionicons name="chevron-down" size={16} color={colors.textSecondary} />
                   </View>
                 </View>
@@ -144,7 +144,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
 
           {/* Category */}
           <View style={styles.row}>
-            <Text style={styles.rowLabel}>Kategoria</Text>
+            <Text style={styles.rowLabel}>Категория</Text>
             <Controller
               control={form.control}
               name="category"
@@ -168,7 +168,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
 
           {/* Assignee */}
           <View style={styles.row}>
-            <Text style={styles.rowLabel}>Kto kupuje</Text>
+            <Text style={styles.rowLabel}>Кто покупает</Text>
             <Controller
               control={form.control}
               name="assignee"
@@ -185,7 +185,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
                       </View>
                     )}
                     <Text style={styles.selectorText}>
-                      {value === 'alex' ? 'Ja' : value === 'maya' ? 'Maya' : value === 'shared' ? 'Wspólnie' : 'Ktoś'}
+                      {value === 'alex' ? 'Я' : value === 'maya' ? 'Maya' : value === 'shared' ? 'Вместе' : 'Кто-то'}
                     </Text>
                   </View>
                   <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
@@ -197,7 +197,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
 
           {/* Due Date */}
           <View style={styles.row}>
-            <Text style={styles.rowLabel}>Kupić do</Text>
+            <Text style={styles.rowLabel}>Купить до</Text>
             <Controller
               control={form.control}
               name="dueDate"
@@ -206,7 +206,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
                   <View style={styles.selectorLeft}>
                     <Ionicons name="calendar-outline" size={24} color={colors.domaBlue} />
                     <Text style={[styles.selectorText, { color: colors.domaBlue }]}>
-                      {value ? value : "Dzisiaj"}
+                      {value ? value : "Сегодня"}
                     </Text>
                   </View>
                   <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
@@ -218,7 +218,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
 
           {/* Priority */}
           <View style={styles.row}>
-            <Text style={styles.rowLabel}>Priorytet</Text>
+            <Text style={styles.rowLabel}>Приоритет</Text>
             <Controller
               control={form.control}
               name="priority"
@@ -228,19 +228,19 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
                     style={[styles.priorityBtn, value === 'low' && styles.priorityBtnActive]} 
                     onPress={() => onChange('low')}
                   >
-                    <Text style={[styles.priorityText, value === 'low' && styles.priorityTextLow]}>Niski</Text>
+                    <Text style={[styles.priorityText, value === 'low' && styles.priorityTextLow]}>Низкий</Text>
                   </Pressable>
                   <Pressable 
                     style={[styles.priorityBtn, value === 'normal' && styles.priorityBtnActiveGreen]} 
                     onPress={() => onChange('normal')}
                   >
-                    <Text style={[styles.priorityText, value === 'normal' && styles.priorityTextNormal]}>Średni</Text>
+                    <Text style={[styles.priorityText, value === 'normal' && styles.priorityTextNormal]}>Средний</Text>
                   </Pressable>
                   <Pressable 
                     style={[styles.priorityBtn, value === 'high' && styles.priorityBtnActiveRed]} 
                     onPress={() => onChange('high')}
                   >
-                    <Text style={[styles.priorityText, value === 'high' && styles.priorityTextHigh]}>Wysoki</Text>
+                    <Text style={[styles.priorityText, value === 'high' && styles.priorityTextHigh]}>Высокий</Text>
                   </Pressable>
                 </View>
               )}
@@ -250,7 +250,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
         </View>
 
         {/* SECTION 2: Дополнительно (Additional) */}
-        <Text style={styles.sectionHeader}>Dodatkowe</Text>
+        <Text style={styles.sectionHeader}>Дополнительно</Text>
         <View style={styles.card}>
           
           {/* Recurrence */}
@@ -260,7 +260,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
                 <View style={styles.iconCircle}>
                   <Ionicons name="repeat" size={18} color={colors.domaBlue} />
                 </View>
-                <Text style={styles.rowLabel}>Powtarzaj</Text>
+                <Text style={styles.rowLabel}>Повторение</Text>
               </View>
               <Controller
                 control={form.control}
@@ -268,14 +268,14 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
                 render={({ field: { value } }) => (
                   <Pressable style={styles.selectorRight}>
                     <Text style={[styles.selectorText, { color: colors.domaBlue }]}>
-                      {value ? value : "Nie powtarzaj"}
+                      {value ? value : "Без повтора"}
                     </Text>
                     <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
                   </Pressable>
                 )}
               />
             </View>
-            <Text style={styles.helperText}>Po zakupie towar automatycznie powróci na listę.</Text>
+            <Text style={styles.helperText}>После покупки товар автоматически вернется в список.</Text>
           </View>
           <View style={styles.divider} />
 
@@ -285,7 +285,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
               <View style={styles.iconCircleGray}>
                 <Ionicons name="chatbubble-ellipses-outline" size={18} color={colors.textSecondary} />
               </View>
-              <Text style={styles.rowLabel}>Notatka</Text>
+              <Text style={styles.rowLabel}>Заметка</Text>
             </View>
             <Controller
               control={form.control}
@@ -295,7 +295,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
                   <TextInput
                     style={styles.textArea}
                     multiline
-                    placeholder="Np. mleko bez laktozy, jeśli będzie"
+                    placeholder="Напр. безлактозное молоко, если будет"
                     placeholderTextColor={colors.textTertiary}
                     value={value}
                     onChangeText={onChange}
@@ -314,7 +314,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
               <View style={styles.iconCircleBlue}>
                 <Ionicons name="bookmark-outline" size={18} color={colors.domaBlue} />
               </View>
-              <Text style={styles.rowLabel}>Szablon</Text>
+              <Text style={styles.rowLabel}>Шаблон</Text>
             </View>
             <Controller
               control={form.control}
@@ -322,7 +322,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
               render={({ field: { onChange, value } }) => (
                 <View style={styles.selectorRight}>
                   <Text style={styles.selectorText}>
-                    {value ? "Zapisz jako szablon" : "Nie zapisuj do szablonu"}
+                    {value ? "Сохранить как шаблон" : "Не сохранять в шаблон"}
                   </Text>
                   <Switch
                     value={value}
@@ -345,8 +345,8 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
                   <Ionicons name="trash-outline" size={18} color={colors.overdueRed} />
                 </View>
                 <View>
-                  <Text style={styles.deleteText}>Usuń towar</Text>
-                  <Text style={styles.helperText}>Towar zostanie usunięty z listy zakupów.</Text>
+                  <Text style={styles.deleteText}>Удалить товар</Text>
+                  <Text style={styles.helperText}>Товар будет удален из списка покупок.</Text>
                 </View>
               </View>
               <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
@@ -360,7 +360,7 @@ export function ShoppingItemDetailScreen({ text, item, onBack, onSave, onDelete 
       {/* Footer Button */}
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
         <PrimaryButton 
-          label="Zapisz towar" 
+          label="Сохранить товар" 
           onPress={handleSubmit} 
           disabled={!isValid} 
           color={colors.shoppingGreen}
