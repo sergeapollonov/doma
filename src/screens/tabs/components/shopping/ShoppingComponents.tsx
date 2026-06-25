@@ -47,35 +47,37 @@ export function ShoppingFilterBar({
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.filterRow}
     >
-      {filters.map((f) => {
-        const isActive = active === f.key;
-        const isPurchased = f.key === 'purchased';
-        return (
-          <TouchableOpacity
-            key={f.key}
-            style={[styles.filterChip, isActive && styles.filterChipActive]}
-            onPress={() => onSelect(f.key)}
-            hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
-          >
-            {isPurchased && (
-              <Ionicons
-                name="checkmark-circle-outline"
-                size={15}
-                color={isActive ? colors.white : colors.textSecondary}
-                style={{ marginRight: 4 }}
-              />
-            )}
-            <Text style={[styles.filterLabel, isActive && styles.filterLabelActive]}>
-              {f.label}
-            </Text>
-            <View style={[styles.filterBadge, isActive && styles.filterBadgeActive]}>
-              <Text style={[styles.filterBadgeText, isActive && styles.filterBadgeTextActive]}>
-                {f.count}
+      <View style={styles.segmentedControl}>
+        {filters.map((f) => {
+          const isActive = active === f.key;
+          const isPurchased = f.key === 'purchased';
+          return (
+            <TouchableOpacity
+              key={f.key}
+              style={[styles.filterChip, isActive && styles.filterChipActive]}
+              onPress={() => onSelect(f.key)}
+              hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+            >
+              {isPurchased && (
+                <Ionicons
+                  name="checkmark-circle-outline"
+                  size={15}
+                  color={isActive ? colors.white : colors.textSecondary}
+                  style={{ marginRight: 4 }}
+                />
+              )}
+              <Text style={[styles.filterLabel, isActive && styles.filterLabelActive]}>
+                {f.label}
               </Text>
-            </View>
-          </TouchableOpacity>
-        );
-      })}
+              <View style={[styles.filterBadge, isActive && styles.filterBadgeActive]}>
+                <Text style={[styles.filterBadgeText, isActive && styles.filterBadgeTextActive]}>
+                  {f.count}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </ScrollView>
   );
 }
@@ -452,20 +454,27 @@ const styles = StyleSheet.create({
   // Filter Bar
   filterRow: {
     paddingHorizontal: spacing.screen,
-    gap: 8,
     paddingBottom: 2,
+  },
+  segmentedControl: {
+    flexDirection: "row",
+    backgroundColor: colors.glass.medium,
+    borderWidth: 1,
+    borderColor: colors.glass.borderHeavy,
+    borderRadius: 26,
+    padding: 4,
+    shadowColor: "#372614",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.1,
+    shadowRadius: 28,
   },
   filterChip: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surfacePrimary,
-    shadowColor: colors.domaBlue,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
+    paddingVertical: 8,
+    borderRadius: 22,
+    backgroundColor: "transparent",
   },
   filterChipActive: {
     backgroundColor: colors.shoppingGreen,
