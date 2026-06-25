@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { colors, spacing } from "../../theme/tokens";
 import { useLocalAppStore } from "../../store/localAppStore";
@@ -11,13 +12,16 @@ import {
   TemplateInfoBanner 
 } from "./components/shopping/ShoppingTemplatesComponents";
 
-export const ShoppingTemplatesScreen = ({ onClose }: { onClose: () => void }) => {
-  const { shoppingList } = useLocalAppStore();
+interface ShoppingTemplatesScreenProps {
+  onClose: () => void;
+}
+
+export const ShoppingTemplatesScreen = ({ onClose }: ShoppingTemplatesScreenProps) => {
+  const insets = useSafeAreaInsets();
+  const templates = useLocalAppStore(state => state.shoppingList.templates) || [];
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategoryId, setActiveCategoryId] = useState("all");
   const [showBanner, setShowBanner] = useState(true);
-  
-  const templates = shoppingList.templates || [];
   
   // Calculate category counts
   const categoryCounts = useMemo(() => {
@@ -59,87 +63,88 @@ export const ShoppingTemplatesScreen = ({ onClose }: { onClose: () => void }) =>
   }, [templates]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onClose} hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}>
-          <Ionicons name="chevron-back" size={28} color={colors.domaBlue} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Шаблоны покупок</Text>
-        <TouchableOpacity style={styles.addButton} hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}>
-          <Ionicons name="add-circle-outline" size={28} color={colors.domaBlue} />
-        </TouchableOpacity>
-      </View>
-      
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
-        
-        {/* Search */}
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
-          <TextInput 
-            style={styles.searchInput}
-            placeholder="Поиск шаблонов..."
-            placeholderTextColor={colors.textSecondary}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
+    <View style={[styles.safeArea, { paddingTop: Math.max(insets.top, 20) }]}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={onClose} hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+            <Ionicons name="chevron-back" size={28} color={colors.domaBlue} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Шаблоны покупок</Text>
+          <TouchableOpacity style={styles.addButton} hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+            <Ionicons name="add-circle-outline" size={28} color={colors.domaBlue} />
+          </TouchableOpacity>
         </View>
         
-        {/* Category Filters */}
-        <TemplateCategoryFilterBar 
-          filters={filters}
-          activeFilterId={activeCategoryId}
-          onSelectFilter={setActiveCategoryId}
-          onOpenSettings={() => {}}
-          style={styles.filterBar}
-        />
-        
-        {/* Мои шаблоны */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Мои шаблоны</Text>
-          {myTemplates.length > 0 ? (
-            myTemplates.map((template: ShoppingTemplate) => (
-              <TemplateListItem 
-                key={template.id} 
-                template={template} 
-                onPress={() => {}} 
-                onMenuPress={() => {}} 
-              />
-            ))
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>Ничего не найдено</Text>
-            </View>
-          )}
-        </View>
-        
-        {/* Популярные шаблоны */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>Популярные шаблоны</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAllText}>Посмотреть все</Text>
-            </TouchableOpacity>
+        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
+          
+          {/* Search */}
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
+            <TextInput 
+              style={styles.searchInput}
+              placeholder="Поиск шаблонов..."
+              placeholderTextColor={colors.textSecondary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
           </View>
           
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.popularScrollContent}>
-            {popularTemplates.map((template: ShoppingTemplate) => (
-              <PopularTemplateCard 
-                key={`pop-${template.id}`} 
-                template={template} 
-                onUse={() => {}} 
-              />
-            ))}
-          </ScrollView>
-        </View>
-        
-        {/* Info Banner */}
-        {showBanner && (
-          <TemplateInfoBanner onClose={() => setShowBanner(false)} />
-        )}
-        
-      </ScrollView>
-    </SafeAreaView>
+          {/* Category Filters */}
+          <TemplateCategoryFilterBar 
+            filters={filters}
+            activeFilterId={activeCategoryId}
+            onSelectFilter={setActiveCategoryId}
+            onOpenSettings={() => {}}
+            style={styles.filterBar}
+          />
+          
+          {/* Мои шаблоны */}
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Мои шаблоны</Text>
+            {myTemplates.length > 0 ? (
+              myTemplates.map((template: ShoppingTemplate) => (
+                <TemplateListItem 
+                  key={template.id} 
+                  template={template} 
+                  onPress={() => {}} 
+                  onMenuPress={() => {}} 
+                />
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyStateText}>Ничего не найдено</Text>
+              </View>
+            )}
+          </View>
+          
+          {/* Популярные шаблоны */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeaderRow}>
+              <Text style={styles.sectionTitle}>Популярные шаблоны</Text>
+              <TouchableOpacity>
+                <Text style={styles.seeAllText}>Посмотреть все</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.popularScrollContent}>
+              {popularTemplates.map((template: ShoppingTemplate) => (
+                <PopularTemplateCard 
+                  key={`pop-${template.id}`} 
+                  template={template} 
+                  onUse={() => {}} 
+                />
+              ))}
+            </ScrollView>
+          </View>
+          
+          {/* Info Banner */}
+          {showBanner && (
+            <TemplateInfoBanner onClose={() => setShowBanner(false)} />
+          )}
+        </ScrollView>
+      </View>
+    </View>
   );
 };
 
@@ -181,8 +186,11 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.xl,
     marginTop: spacing.md,
     marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.strokeSoft,
+    shadowColor: colors.textPrimary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
   searchIcon: {
     marginRight: spacing.sm,

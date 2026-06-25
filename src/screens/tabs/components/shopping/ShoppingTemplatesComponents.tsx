@@ -19,42 +19,42 @@ type TemplateCategoryFilterBarProps = {
   style?: ViewStyle;
 };
 
-export const TemplateCategoryFilterBar: React.FC<TemplateCategoryFilterBarProps> = ({
-  filters,
-  activeFilterId,
-  onSelectFilter,
-  onOpenSettings,
-  style,
-}) => {
+export const TemplateCategoryFilterBar = ({ filters, activeFilterId, onSelectFilter, onOpenSettings, style }: TemplateCategoryFilterBarProps) => {
   return (
     <View style={[styles.filterBarContainer, style]}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScrollContent}>
-        {filters.map((filter) => {
-          const isActive = filter.id === activeFilterId;
-          return (
-            <TouchableOpacity
-              key={filter.id}
-              style={[styles.filterPill, isActive && styles.filterPillActive]}
-              onPress={() => onSelectFilter(filter.id)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.filterPillText, isActive && styles.filterPillTextActive]}>
-                {filter.label}
-              </Text>
-              <View style={[styles.filterBadge, isActive && styles.filterBadgeActive]}>
-                <Text style={[styles.filterBadgeText, isActive && styles.filterBadgeTextActive]}>
-                  {filter.count}
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filterScrollContent}
+      >
+        <View style={styles.segmentedFilterContainer}>
+          {filters.map((filter) => {
+            const isActive = filter.id === activeFilterId;
+            return (
+              <TouchableOpacity 
+                key={filter.id}
+                style={[styles.filterPill, isActive && styles.filterPillActive]}
+                onPress={() => onSelectFilter(filter.id)}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.filterPillText, isActive && styles.filterPillTextActive]}>
+                  {filter.label}
                 </Text>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
+                {filter.count !== undefined && (
+                  <View style={[styles.filterBadge, isActive && styles.filterBadgeActive]}>
+                    <Text style={[styles.filterBadgeText, isActive && styles.filterBadgeTextActive]}>
+                      {filter.count}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </ScrollView>
-      {onOpenSettings && (
-        <TouchableOpacity style={styles.filterSettingsButton} onPress={onOpenSettings}>
-          <Ionicons name="options-outline" size={20} color={colors.textPrimary} />
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity style={styles.filterSettingsButton} onPress={onOpenSettings} hitSlop={{top: 10, right: 10, bottom: 10, left: 10}}>
+        <Ionicons name="options-outline" size={24} color={colors.textSecondary} />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -171,31 +171,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     gap: spacing.sm,
   },
+  segmentedFilterContainer: {
+    flexDirection: "row",
+    backgroundColor: colors.surfacePrimary,
+    borderRadius: 22,
+    padding: 4,
+    shadowColor: colors.textPrimary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
+  },
   filterPill: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: colors.surfacePrimary,
-    borderWidth: 1,
-    borderColor: colors.strokeSoft,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 18,
+    backgroundColor: "transparent",
     gap: 6,
   },
   filterPillActive: {
-    backgroundColor: colors.domaBlue,
-    borderColor: colors.domaBlue,
+    backgroundColor: colors.warmBackground,
   },
   filterPillText: {
     fontSize: 14,
     fontWeight: "500",
-    color: colors.textPrimary,
+    color: colors.textSecondary,
   },
   filterPillTextActive: {
-    color: colors.white,
+    color: colors.domaBlue,
+    fontWeight: "600",
   },
   filterBadge: {
-    backgroundColor: colors.warmBackground,
+    backgroundColor: "transparent",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 10,
@@ -225,12 +234,10 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.md,
     alignItems: "flex-start",
-    borderWidth: 1,
-    borderColor: colors.strokeSoft,
     shadowColor: colors.textPrimary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.03,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
     elevation: 2,
   },
   iconContainer: {
@@ -289,12 +296,10 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: spacing.lg,
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.strokeSoft,
     shadowColor: colors.textPrimary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
     elevation: 3,
   },
   popularIconContainer: {
