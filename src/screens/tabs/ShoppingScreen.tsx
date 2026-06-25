@@ -135,7 +135,11 @@ export function ShoppingScreen({
         />
 
         {/* ── Purchased Section ── */}
-        <ShoppingPurchasedSection count={currentPurchasedCount} />
+        <ShoppingPurchasedSection
+          items={purchasedItems}
+          onToggleItem={onToggleItem ?? (() => {})}
+          onPressItem={(id) => onOpenItemDetail?.(id)}
+        />
 
         {/* ── Templates Strip ── */}
         <ShoppingTemplatesStrip
