@@ -32,39 +32,43 @@ import {
 type FilterKey = 'all' | 'mine' | 'family' | 'purchased';
 
 type ShoppingScreenProps = {
+  items: ShoppingItem[];
   onOpenItemDetail?: (id?: string) => void;
   onStartShoppingMode?: () => void;
   onOpenTemplates?: () => void;
   onSelectTemplate?: (id: string) => void;
+  onToggleItem?: (id: string) => void;
 };
 
 export function ShoppingScreen({
+  items,
   onOpenItemDetail,
   onStartShoppingMode,
   onOpenTemplates,
   onSelectTemplate,
+  onToggleItem,
 }: ShoppingScreenProps) {
   const insets = useSafeAreaInsets();
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
-  const [urgentItems, setUrgentItems] = useState<ShoppingItem[]>(mockUrgentItems);
-  const [soonItems, setSoonItems] = useState<ShoppingItem[]>(mockSoonItems);
+  
+  // Basic sorting: urgent (high priority), soon (normal/low)
+  const urgentItems = items.filter(i => i.priority === 'high' && !i.purchased);
+  const soonItems = items.filter(i => i.priority !== 'high' && !i.purchased);
+  const purchasedItems = items.filter(i => i.purchased);
 
   const allCount = urgentItems.length + soonItems.length;
   const mineCount = urgentItems.filter((i) => i.assignee === 'alex').length +
     soonItems.filter((i) => i.assignee === 'alex').length;
   const familyCount = urgentItems.filter((i) => i.assignee === 'shared').length +
     soonItems.filter((i) => i.assignee === 'shared').length;
+  const currentPurchasedCount = purchasedItems.length;
 
   const handleToggleUrgent = (id: string) => {
-    setUrgentItems((prev) =>
-      prev.map((item) => item.id === id ? { ...item, purchased: !item.purchased } : item)
-    );
+    onToggleItem?.(id);
   };
 
   const handleToggleSoon = (id: string) => {
-    setSoonItems((prev) =>
-      prev.map((item) => item.id === id ? { ...item, purchased: !item.purchased } : item)
-    );
+    onToggleItem?.(id);
   };
 
   return (
@@ -99,7 +103,7 @@ export function ShoppingScreen({
           allCount={allCount}
           mineCount={mineCount}
           familyCount={familyCount}
-          purchasedCount={mockPurchasedCount}
+          purchasedCount={currentPurchasedCount}
           onSelect={setActiveFilter}
         />
       </View>
@@ -131,7 +135,7 @@ export function ShoppingScreen({
         />
 
         {/* ── Purchased Section ── */}
-        <ShoppingPurchasedSection count={mockPurchasedCount} />
+        <ShoppingPurchasedSection count={currentPurchasedCount} />
 
         {/* ── Templates Strip ── */}
         <ShoppingTemplatesStrip
