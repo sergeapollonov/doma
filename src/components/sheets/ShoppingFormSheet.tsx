@@ -213,8 +213,7 @@ export function ShoppingFormSheet({ form, language, text, isValid, onSubmit }: S
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    maxHeight: '90%',
+    paddingBottom: spacing.md,
   },
   scrollContent: {
     paddingHorizontal: spacing.screen,
